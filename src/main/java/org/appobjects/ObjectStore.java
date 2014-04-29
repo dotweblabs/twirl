@@ -18,6 +18,7 @@ package org.appobjects;
 
 import com.google.appengine.api.datastore.Key;
 import org.appobjects.types.Find;
+import org.appobjects.types.Update;
 
 /**
  * Simple wrapper around the low-level Datastore service to allow
@@ -40,9 +41,10 @@ public interface ObjectStore {
     public Key putInTransaction(Object object);
     public Iterable<Key> putInTransaction(Iterable<Object> objects);
 
-    public Find find();
+    public <T> Find find(Class<T> clazz);
+    public <T> Update update(Class<T> clazz);
     public abstract Marshaller marshaller();
     public abstract Unmarshaller unmarshaller();
-    
+
 
 }
