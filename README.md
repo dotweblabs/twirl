@@ -50,8 +50,8 @@ store.put(joe);
 
 ####Update
 ```java
-store.update(Friend.class).equals("name", "Joe").with("age").increment(1).now();  
-store.update(Friend.class).equals("name", "Joe").with("address").set(new Address(...)).now(); 
+store.update(Friend.class).equals("name", "Joe").increment("age",1).now();
+store.update(Friend.class).equals("name", "Joe").set("address", new Address(...)).now();
 store.update(Friend.class).equals("name", "Joe").with(new Friend(..)).now();
 ```
 
