@@ -629,7 +629,8 @@ public class GaeMarshaller implements Marshaller {
 
     private static void setProperty(Entity entity, String key, Object value){
         Preconditions.checkNotNull(entity, "Entity can't be null");
-        Preconditions.checkNotNull(key, "String keyType can't be null");
+        Preconditions.checkNotNull(key, "String key can't be null");
+        Preconditions.checkArgument(key.isEmpty(), "String key can't be empty");
 
         if (value == null){
             entity.setProperty(key, null);
