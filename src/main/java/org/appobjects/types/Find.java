@@ -22,10 +22,7 @@ import org.appobjects.util.Pair;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Query;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Builds GAE filters and sorts
@@ -34,6 +31,7 @@ public class Find {
 
     protected Map<String, Pair<Query.FilterOperator, Object>> filters;
     protected Map<String, Query.SortDirection> sorts;
+    protected List<String> projections;
     protected Integer skip;
     protected Integer max;
 
@@ -44,6 +42,7 @@ public class Find {
     public Find(QueryStore store, Class<?> clazz, String kind){
         filters = new LinkedHashMap<String, Pair<Query.FilterOperator, Object>>();
         sorts = new LinkedHashMap<String, Query.SortDirection>();
+        projections = new LinkedList<String>();
         _store = store;
         _clazz = clazz;
         _kind = kind;
@@ -102,6 +101,18 @@ public class Find {
     public Find limit(int limit){
         this.max = limit;
         return this;
+    }
+
+    public Find projection(String field){
+        throw new RuntimeException("Not yet implemented");
+    }
+
+    public Find projection(String[]fields){
+        throw new RuntimeException("Not yet implemented");
+    }
+
+    public Find projection(Iterable<String> fields){
+        throw new RuntimeException("Not yet implemented");
     }
 
     public <V> Iterator<V> now() {

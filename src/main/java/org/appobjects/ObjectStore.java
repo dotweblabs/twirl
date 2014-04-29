@@ -18,6 +18,7 @@ package org.appobjects;
 
 import com.google.appengine.api.datastore.Key;
 import org.appobjects.types.Find;
+import org.appobjects.types.FindOne;
 import org.appobjects.types.Update;
 
 /**
@@ -42,6 +43,7 @@ public interface ObjectStore {
     public Iterable<Key> putInTransaction(Iterable<Object> objects);
 
     public <T> Find find(Class<T> clazz);
+    public <T> FindOne findOne(Class<T> clazz);
     public <T> Update update(Class<T> clazz);
     public abstract Marshaller marshaller();
     public abstract Unmarshaller unmarshaller();
