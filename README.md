@@ -9,7 +9,7 @@ Yet Another Google App Engine Datastore ORM with a twist!
  |  _  |  _  |  _  |.  |   |  _  |  |  -__|  __|   _|__ --|
  |___._|   __|   __|.  |   |_____|  |_____|____|____|_____|
        |__|  |__|  |:  1   |    |___|                      
-                   |::.. . |                               
+                   |::.. . |           Jop                    
                    `-------'     
 ```
                                                            
@@ -28,9 +28,9 @@ Key key = store.put(friend);
 
 Friend saved = store.get(Friend.class, friend.getId()); 
 
-Iterator<Friend> all = store.find(Friend.class).greaterThanOrEqual("name", "John").now();
+Iterator<Friend> all = store.find(Friend.class).greaterThanOrEqual("name", "Joe").now();
 
-Friend one = store.findOne(Friend.class).greaterThanOrEqual("name", "John").now();
+Friend one = store.findOne(Friend.class).greaterThanOrEqual("name", "Joe").now();
 ```
 
 
@@ -50,9 +50,9 @@ store.put(joe);
 
 ####Update
 ```java
-store.update(Friend.class).equals("name", "Joe").with("age").increment(1);  
-store.update(Friend.class).equals("name", "Joe").with("address").set(new Address(...)); 
-store.update(Friend.class).equals("name", "Joe").with(new Friend(..));
+store.update(Friend.class).equals("name", "Joe").with("age").increment(1).now();  
+store.update(Friend.class).equals("name", "Joe").with("address").set(new Address(...)).now(); 
+store.update(Friend.class).equals("name", "Joe").with(new Friend(..)).now();
 ```
 
 ####Insert
@@ -91,6 +91,30 @@ public class Friend {
 ###Querying
 ```java
 ```
+
+###Find & FindOne
+```java
+Iterator<Friend> all = store.find(Friend.class).greaterThanOrEqual("name", "Joe").now();
+Friend one = store.findOne(Friend.class).greaterThanOrEqual("name", "Joe").now();
+```
+
+####Projection and Field selection
+```java
+store.find(Friend.class).projection("firstName", "address").greaterThanOrEqual("name", "Joe").now();
+```
+
+####Sorting
+```java
+store.find(Friend.class).sortAscending("firstName").now();
+store.find(Friend.class).sortDescending("lastName").now();
+```
+
+####Skip and Limit
+```java
+store.find(Friend.class).skip(20).now();
+store.find(Friend.class).limit(10).now();
+```
+
 
 
 Version
