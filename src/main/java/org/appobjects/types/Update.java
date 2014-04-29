@@ -91,6 +91,18 @@ public class Update {
         return this;
     }
 
+    /**
+     * Operator updates queried entity with the values of the
+     * reference object {@code ref}
+     *
+     * @param ref
+     * @return
+     */
+    public Update with(Object ref){
+        filters.clear();
+        return this;
+    }
+
     public <V> Iterator<V> now() {
         throw new RuntimeException("Not yet implemented");
     }
