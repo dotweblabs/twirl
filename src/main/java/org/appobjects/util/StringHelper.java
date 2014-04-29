@@ -24,7 +24,7 @@ public class StringHelper {
            return getClassNameFrom(o.getClass().getName());
     }
     public static String getClassNameFrom(String qualified){
-        String name = qualified.replaceAll(".*\\.(?=\\w+)", "");
+        String name = qualified.replaceAll(".+?\\W", "");
         return name;
     }
 }
