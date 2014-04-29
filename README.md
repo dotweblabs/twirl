@@ -50,9 +50,9 @@ store.save(joe);
 
 ####Update
 ```java
-store.update(Friend.class).where("name").equals("Joe").with("age").increment(1);  
-store.update(Friend.class).where("name").equals("Joe").with("address").set(new Address(...)); 
-store.update(Friend.class).where("name").equals("Joe").with(new Friend(..));
+store.update(Friend.class).equals("name", "Joe").with("age").increment(1);  
+store.update(Friend.class).equals("name", "Joe").with("address").set(new Address(...)); 
+store.update(Friend.class).equals("name", "Joe").with(new Friend(..));
 ```
 
 ####Insert
