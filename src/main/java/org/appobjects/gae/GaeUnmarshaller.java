@@ -35,11 +35,11 @@ import java.util.*;
  */
 public class GaeUnmarshaller implements Unmarshaller {
 
-    private final GaeObjectStore bender;
+    private final GaeObjectStore store;
     private final Validator validator = new Validator();
 
-    public GaeUnmarshaller(GaeObjectStore bender){
-        this.bender = bender;
+    public GaeUnmarshaller(GaeObjectStore store){
+        this.store = store;
     }
 
     @Override
@@ -105,11 +105,11 @@ public class GaeUnmarshaller implements Unmarshaller {
             Class<?> fieldValueType = fieldValue.getClass();
             if(fieldValue instanceof Key){ // child
                 try{
-                    Entity e = bender.getDatastoreService()
+                    Entity e = store.getDatastoreService()
                             .get((com.google.appengine.api.datastore.Key)fieldValue);
                     AnnotatedField annotatedField
                             = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.child(), destination);
-                    Object childInstance = bender.createInstance(annotatedField.getFieldType());
+                    Object childInstance = store.createInstance(annotatedField.getFieldType());
                     unmarshall(childInstance, e);
                 } catch (EntityNotFoundException e){
                     fieldValue = null;
@@ -128,7 +128,7 @@ public class GaeUnmarshaller implements Unmarshaller {
             } else if (fieldValue instanceof EmbeddedEntity) { // POJO's
                 EmbeddedEntity ee = (EmbeddedEntity) fieldValue;
                 Map<String,Object> map = ee.getProperties();
-                bender.createInstance(fieldValueType);
+                store.createInstance(fieldValueType);
             } else if (fieldValue.getClass().isPrimitive()){
                 // TODO
             }
@@ -143,7 +143,7 @@ public class GaeUnmarshaller implements Unmarshaller {
             } else if(f.isAnnotationPresent(GaeObjectStore.parent())){
 
             } else if(f.isAnnotationPresent(GaeObjectStore.child())){
-                Object child = bender.createInstance(f.getType());
+                Object child = store.createInstance(f.getType());
                 setFieldValue(f, destination, child);
             }
         }
