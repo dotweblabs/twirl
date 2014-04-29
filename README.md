@@ -38,14 +38,14 @@ Friend one = store.findOne(Friend.class).greaterThanOrEqual("name", "John").now(
 
 ####Save
 
-Passing an object to the save(..) method will do the job.
+Passing an object to the put(..) method will do the job.
 
 ```java
 Friend joe = new Friend("Joe", 27);
 
-store.save(joe);
+store.put(joe);
 joe.age = 28;
-store.save(joe);
+store.put(joe);
 ```
 
 ####Update
@@ -57,14 +57,34 @@ store.update(Friend.class).equals("name", "Joe").with(new Friend(..));
 
 ####Insert
 ```java
+store.put(new Friend(..));
+store.put(new Friend(..), new Friend(..));
 ```
 
 ####Remove
 ```java
+store.delete(key);
+store.delete(friend.getId());
 ```
 
 ###Object Mapping
 ```java
+@Entity(name="CloseFriends") // Optional name
+public class Friend {
+    @Id
+    private long id; // Can be long, Long or String only
+    
+    @Parent
+    private Circle circle;
+    
+    @Child
+    private Box box;
+    
+    @Embedded
+    private Map map;
+    
+    private List<String> notes; 
+}
 ```
 
 
