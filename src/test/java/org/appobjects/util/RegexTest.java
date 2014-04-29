@@ -12,11 +12,11 @@ public class RegexTest extends LocalDatastoreTestCase {
     @Test
     public void testGetClassNameFromString(){
         String result = StringHelper.getClassNameFrom(TestData.RootEntity.class.getName());
-        assertEquals("RootEntity" , result);
+        assertEquals("TestData$RootEntity" , result);
     }
     @Test
     public void testGetClassNameFromObject(){
         String result = StringHelper.getClassNameOf(new TestData.RootEntity());
-        assertEquals("RootEntity" , result);
+        assertEquals("TestData$RootEntity" , result);
     }
 }
