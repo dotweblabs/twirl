@@ -16,20 +16,62 @@ Yet Another Google App Engine Datastore ORM with a twist!
 appObjects aims to provide a lightweight Object mapping framework. Without adding complexity into the api. 
 
 
+###Setup
 
 ```java
 @Inject
 ObjectStore store;
 
-Friend friend = createComplexObject();
+Friend friend = createComplexFriend();
 
 Key key = store.put(friend);
 
 Friend saved = store.get(Friend.class, friend.getId()); 
 
-// Find all Friend objects with name staring with "John"
-Iterator<Friend> it = store.find(Friend.class).greaterThanOrEqual("name", "John").now();
+Iterator<Friend> all = store.find(Friend.class).greaterThanOrEqual("name", "John").now();
+
+Friend one = store.findOne(Friend.class).greaterThanOrEqual("name", "John").now();
 ```
+
+
+###Updating
+
+####Save
+
+Passing an object to the save(..) method will do the job.
+
+```java
+Friend joe = new Friend("Joe", 27);
+
+store.save(joe);
+joe.age = 28;
+store.save(joe);
+```
+
+####Update
+```java
+store.update(Friend.class).where("name").equals("Joe").with("age").increment(1);  
+store.update(Friend.class).where("name").equals("Joe").with("address").set(new Address(...)); 
+store.update(Friend.class).where("name").equals("Joe").with(new Friend(..));
+```
+
+####Insert
+```java
+```
+
+####Remove
+```java
+```
+
+###Object Mapping
+```java
+```
+
+
+###Querying
+```java
+```
+
 
 Version
 -
