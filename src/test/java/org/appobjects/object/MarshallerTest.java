@@ -9,9 +9,12 @@ import org.appobjects.Marshaller;
 import org.appobjects.TestData;
 import org.appobjects.TestData.RootEntity;
 import org.appobjects.TestData.ChildEntity;
+import org.appobjects.common.AutoGenerateStringIdException;
 import org.appobjects.gae.GaeMarshaller;
 import org.appobjects.LocalDatastoreTestCase;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.IdentityHashMap;
 
@@ -27,8 +30,18 @@ public class MarshallerTest extends LocalDatastoreTestCase {
 
     }
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
-    public void testMarshallChild(){
+    public void testMarshall_withoutStringKey_shouldThrowError(){
+        RootEntity rootObject = new RootEntity(); // one Entity
+        thrown.expect(AutoGenerateStringIdException.class);
+        IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, rootObject);
+    }
+
+    @Test
+    public void testMarshall_Child(){
         RootEntity rootObject = new RootEntity(); // one Entity
         ChildEntity childObject = new TestData.ChildEntity("Test City");
         rootObject.setKey("TestUser");
@@ -52,7 +65,7 @@ public class MarshallerTest extends LocalDatastoreTestCase {
     }
 
     @Test
-    public void testMarshallEmbedded(){
+    public void testMarshall_Embedded(){
         RootEntity rootObject = new RootEntity(); // one Entity
         ChildEntity childObject = new TestData.ChildEntity("Test City");
         ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
@@ -83,6 +96,21 @@ public class MarshallerTest extends LocalDatastoreTestCase {
         assertEquals(1L, ee.getProperties().get("id"));
         assertEquals("EmbeddedType", ee.getProperties().get("type"));
 
+    }
+
+    @Test
+    public void testMarshall_ChildChild(){
+        RootEntity rootObject = new RootEntity();
+        TestData.ChildChildEntity cc = new TestData.ChildChildEntity();
+        ChildEntity child = new ChildEntity();
+        child.setType("ChildType");
+        child.setParent(rootObject);
+        cc.setChild(child);
+
+        IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, cc);
+
+        assertNotNull(stack);
+        assertTrue(!stack.isEmpty());
     }
 
 

@@ -6,6 +6,53 @@ import org.appobjects.annotations.*;
  * Created by kerby on 4/24/14.
  */
 public class TestData {
+
+    public static class ChildChildEntity {
+
+        @Id
+        private Long id;
+
+        @Child
+        private ChildEntity child;
+
+        private String type;
+
+        public ChildChildEntity() {}
+
+        public ChildChildEntity(String type){
+            setType(type);
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return "[" + type + "]";
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public ChildEntity getChild() {
+            return child;
+        }
+
+        public void setChild(ChildEntity child) {
+            this.child = child;
+        }
+    }
+
     //@Entity(name = "ChildKind")
     public static class ChildEntity {
 
