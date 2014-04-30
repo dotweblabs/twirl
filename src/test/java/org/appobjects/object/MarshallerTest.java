@@ -8,6 +8,7 @@ import com.google.appengine.api.datastore.Key;
 import org.appobjects.Marshaller;
 import org.appobjects.TestData;
 import org.appobjects.TestData.RootEntity;
+import org.appobjects.TestData.ChildEntity;
 import org.appobjects.gae.GaeMarshaller;
 import org.appobjects.LocalDatastoreTestCase;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class MarshallerTest extends LocalDatastoreTestCase {
     @Test
     public void testMarshallChild(){
         RootEntity rootObject = new RootEntity(); // one Entity
-        TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
+        ChildEntity childObject = new TestData.ChildEntity("Test City");
         rootObject.setKey("TestUser");
         rootObject.setCount(25);
         childObject.setParent(rootObject);
@@ -53,8 +54,10 @@ public class MarshallerTest extends LocalDatastoreTestCase {
     @Test
     public void testMarshallEmbedded(){
         RootEntity rootObject = new RootEntity(); // one Entity
-        TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
-        TestData.ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
+        ChildEntity childObject = new TestData.ChildEntity("Test City");
+        ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
+        embeddedObject.setId(1L);
+        embeddedObject.setType("EmbeddedType");
         rootObject.setKey("TestUser");
         rootObject.setCount(25);
         childObject.setParent(rootObject);
@@ -66,16 +69,20 @@ public class MarshallerTest extends LocalDatastoreTestCase {
         Entity rootObjectEntity = stack.get(rootObject);
         Entity childObjectEntity = stack.get(childObject);
 
-        EmbeddedEntity expectedEmbeddedEntity = (EmbeddedEntity) rootObjectEntity.getProperty("oldChildEntity");
+        EmbeddedEntity ee = (EmbeddedEntity) rootObjectEntity.getProperty("oldChildEntity");
         Key childKey = (Key) rootObjectEntity.getProperty("newChildEntity");
         Key parentKey = childKey.getParent();
 
         assertEquals(2, stack.size());
         assertNotNull(parentKey);
-        assertEquals(EmbeddedEntity.class, expectedEmbeddedEntity.getClass());
+        assertEquals(EmbeddedEntity.class, ee.getClass());
         assertTrue(childKey instanceof Key);
         assertEquals(rootObjectEntity.getKey().getId(), parentKey.getId());
         assertEquals(rootObjectEntity.getKey().getName(), parentKey.getName());
+
+        assertEquals(1L, ee.getProperties().get("id"));
+        assertEquals("EmbeddedType", ee.getProperties().get("type"));
+
     }
 
 
