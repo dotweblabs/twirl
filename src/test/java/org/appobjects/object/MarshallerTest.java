@@ -22,15 +22,42 @@ public class MarshallerTest extends LocalDatastoreTestCase {
     Marshaller testMarshaller =  new GaeMarshaller();
 
     @Test
-    public void testMarshallChildEmbedded(){
+    public void testCreateMapFromPOJO(){
 
+    }
+
+    @Test
+    public void testMarshallChild(){
         RootEntity rootObject = new RootEntity(); // one Entity
-
         TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
-        TestData.ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
-
         rootObject.setKey("TestUser");
         rootObject.setCount(25);
+        childObject.setParent(rootObject);
+        rootObject.setNewChildEntity(childObject); // one Entity
+
+        IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, rootObject);
+
+        Entity rootObjectEntity = stack.get(rootObject);
+        Entity childObjectEntity = stack.get(childObject);
+
+        Key childKey = (Key) rootObjectEntity.getProperty("newChildEntity");
+        Key parentKey = childKey.getParent();
+
+        assertEquals(2, stack.size());
+        assertNotNull(parentKey);
+        assertTrue(childKey instanceof Key);
+        assertEquals(rootObjectEntity.getKey().getId(), parentKey.getId());
+        assertEquals(rootObjectEntity.getKey().getName(), parentKey.getName());
+    }
+
+    @Test
+    public void testMarshallEmbedded(){
+        RootEntity rootObject = new RootEntity(); // one Entity
+        TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
+        TestData.ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
+        rootObject.setKey("TestUser");
+        rootObject.setCount(25);
+        childObject.setParent(rootObject);
         rootObject.setNewChildEntity(childObject); // one Entity
         rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded
 
@@ -39,9 +66,8 @@ public class MarshallerTest extends LocalDatastoreTestCase {
         Entity rootObjectEntity = stack.get(rootObject);
         Entity childObjectEntity = stack.get(childObject);
 
-        Object expectedEmbeddedEntity = rootObjectEntity.getProperty("oldTestEntity");
-
-        Key childKey = (Key) rootObjectEntity.getProperty("newTestEntity");
+        EmbeddedEntity expectedEmbeddedEntity = (EmbeddedEntity) rootObjectEntity.getProperty("oldChildEntity");
+        Key childKey = (Key) rootObjectEntity.getProperty("newChildEntity");
         Key parentKey = childKey.getParent();
 
         assertEquals(2, stack.size());
@@ -50,8 +76,9 @@ public class MarshallerTest extends LocalDatastoreTestCase {
         assertTrue(childKey instanceof Key);
         assertEquals(rootObjectEntity.getKey().getId(), parentKey.getId());
         assertEquals(rootObjectEntity.getKey().getName(), parentKey.getName());
-
     }
+
+
 
 
 }

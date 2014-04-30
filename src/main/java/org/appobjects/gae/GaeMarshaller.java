@@ -16,6 +16,7 @@
  */
 package org.appobjects.gae;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.appobjects.common.AppobjectsException;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Blob;
@@ -34,6 +35,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -148,21 +150,25 @@ public class GaeMarshaller implements Marshaller {
                         if (field.isAnnotationPresent(Embedded.class)){
                             Object pojoField = field.get(instance);
                             Map<String,Object> map = createMapFromPOJO(pojoField);
-                            EmbeddedEntity ee = new EmbeddedEntity();
-                            // TODO!
-                            //setProperty(e, fieldName, ee);
+                            EmbeddedEntity ee = createEmbeddedEntityFromMap(map);
+                            setProperty(e, fieldName, ee);
                         } else if (field.isAnnotationPresent(Parent.class)){
                             // @Parent first before @Child, don't switch. @Child needs parent Key.
-                            Object parentFieldValue = field.get(instance);
-                            marshall(null, parentFieldValue);
-                            Entity parentEntity = stack.get(parentFieldValue);
-                            Entity _target = new Entity(createKeyFrom(parentEntity.getKey(), instance));
-                            _target.setPropertiesFrom(e);
-                            e = _target;
+                            if (parent != null){
+                                Entity _target = new Entity(createKeyFrom(parent, instance));
+                                _target.setPropertiesFrom(e);
+                                e = _target;
+                            } /*else {
+                                Object parentField = field.get(instance);
+                                Entity parentEntity = stack.get(parentField);
+                                Entity _target = new Entity(createKeyFrom(parentEntity.getKey(), instance));
+                                _target.setPropertiesFrom(e);
+                                e = _target;
+                            }*/
                         } else if (field.isAnnotationPresent(Child.class)){
-                            Object childFieldValue = field.get(instance);
-                            marshall(e.getKey(), childFieldValue);
-                            Entity childEntity = stack.get(childFieldValue);
+                            Object childField = field.get(instance);
+                            marshall(e.getKey(), childField);
+                            Entity childEntity = stack.get(childField);
                             Key childEntityKey = childEntity.getKey();
                             setProperty(e, fieldName, childEntityKey);
                         } else {
@@ -369,12 +375,12 @@ public class GaeMarshaller implements Marshaller {
          * Creates a <code>EmbeddedEntity</code> from a <code>Map</code>
          * Which may include inner <code>EmbeddedEntity</code>.
          *
-         * @param entity
+         * @param map
          * @return
          */
-    public EmbeddedEntity createEmbeddedEntityFromMap(Map<String,Object> entity){
+    public EmbeddedEntity createEmbeddedEntityFromMap(Map<String,Object> map){
 
-        Preconditions.checkNotNull(entity, "Map entity cannot be null");
+        Preconditions.checkNotNull(map, "Map entity cannot be null");
 
         // I think this is not necessary:
         // Deal with empty map
@@ -387,17 +393,15 @@ public class GaeMarshaller implements Marshaller {
 
         EmbeddedEntity ee = null;
 
-        Object oid = entity.get(GaeObjectStore.KEY_RESERVED_PROPERTY); // TODO!
+        Object oid = map.get(GaeObjectStore.KEY_RESERVED_PROPERTY); // TODO!
 
 
         Iterator<Map.Entry<String, Object>> it
-                = entity.entrySet().iterator();
+                = map.entrySet().iterator();
         while (it.hasNext()){
-//            if (ee == null) {
-//                ee = new EmbeddedEntity();
-//                if (parent != null)
-//                    ee.setKey(parent);
-//            }
+            if (ee == null) {
+                ee = new EmbeddedEntity();
+            }
             Map.Entry<String, Object> entry = it.next();
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -416,7 +420,7 @@ public class GaeMarshaller implements Marshaller {
             } else if(value instanceof List) {
                 ee.setProperty(key, createEmbeddedEntityFromList((List)value));
             } else if(value instanceof Map){
-                Map<String, Object> map = (Map<String, Object>) value;
+                Map<String, Object> newMap = (Map<String, Object>) value;
                 ee.setProperty(key, createEmbeddedEntityFromMap(map));
             }
         }
@@ -562,18 +566,20 @@ public class GaeMarshaller implements Marshaller {
 
     /**
      * Used as a method in the chain of making a EmbeddedEntity from a given
-     * POJO instance.
+     * POJO instance. Should not be used other than for EmbeddedEntity objects.
      *
      * @param instance
      * @return
      */
     public Map<String,Object> createMapFromPOJO(Object instance){
-        Iterator<Field> it = list(instance.getClass().getDeclaredFields()).iterator();
-        while(it.hasNext()){
-            Field field = it.next();
-            // TODO
+        Map<String,Object> result = null;
+        try {
+            result = BeanUtils.describe(instance);
+        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException e) {
+        } catch (NoSuchMethodException e) {
         }
-        return null;
+        return result;
     }
 
     private static Object[] copyArrayRemove(Object[] objects, int[] elemToRemove){
