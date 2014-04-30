@@ -25,7 +25,7 @@ package org.appobjects;
 
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.repackaged.com.google.common.collect.Iterables;
+import com.google.common.collect.Iterables;
 import org.appobjects.annotations.Child;
 import org.appobjects.annotations.Id;
 import org.appobjects.gae.GaeMarshaller;
@@ -35,6 +35,8 @@ import org.appobjects.serializer.ObjectSerializer;
 import org.appobjects.types.Find;
 import org.appobjects.types.FindOne;
 import org.appobjects.types.Update;
+import org.appobjects.util.AnnotationUtil;
+import org.appobjects.util.AnnotationUtil.AnnotatedField;
 import org.appobjects.util.StringHelper;
 import org.appobjects.annotations.Parent;
 import org.apache.log4j.LogManager;
@@ -42,6 +44,8 @@ import org.apache.log4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
+
+import static org.boon.Lists.list;
 
 /**
  * Created by kerby on 4/27/14.
@@ -72,8 +76,6 @@ public class GaeObjectStore implements ObjectStore {
     protected DatastoreService _ds;
     protected static TransactionOptions _options;
     protected ObjectSerializer _serializer;
-    protected Marshaller _marshaller;
-    protected Unmarshaller _unmarshaller;
 
     /**
      * GAE datastore supported types.
@@ -87,8 +89,6 @@ public class GaeObjectStore implements ObjectStore {
             _options = TransactionOptions.Builder.withXG(true);
             LOG.info("Create a new DatastoreService instance");
         }
-        _marshaller = new GaeMarshaller();
-        _unmarshaller = new GaeUnmarshaller(this);
     }
 
     @Override
@@ -182,9 +182,9 @@ public class GaeObjectStore implements ObjectStore {
         try {
             Entity e = _ds.get(key);
             instance = createInstance(clazz);
-            _unmarshaller.unmarshall(instance, e);
+            unmarshaller().unmarshall(instance, e);
         } catch (EntityNotFoundException e1) {
-            // TODO: Wrap the exception
+            e1.printStackTrace();
         }
         return instance;
     }
@@ -250,12 +250,26 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public Key put(Object object) {
-        Transaction tx = _ds.beginTransaction();
+        Transaction tx = _ds.beginTransaction(_options);
         Key result = null;
         try {
             List<Key> keys = _ds.put(marshall(object));
-            if(!keys.isEmpty()){
-                result = Iterables.getLast(keys);
+            // FIXME: Key retrieved order is not always the saved key for the "object" stored
+            Iterator<Key> it = list(keys).iterator();
+            while(it.hasNext()){
+                Key key = it.next();
+                if(key.getKind().equals(getKind(object.getClass()))){
+                    AnnotatedField field = AnnotationUtil.getFieldWithAnnotation(key(), object);
+                    Object value = field.getFieldValue();
+                    if(field.getFieldType().equals(String.class) &&
+                            value instanceof String){
+                        result = key;
+                    } else if((field.getFieldType().equals(Long.class) ||
+                            field.getFieldType().equals(long.class)) &&
+                            value instanceof Long){
+                        result = key;
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -287,7 +301,7 @@ public class GaeObjectStore implements ObjectStore {
     private Iterable<Entity> marshall(Object instance){
         List<Entity> entities = null;
         IdentityHashMap<Object, Entity> stack
-                = _marshaller.marshall(null, instance);
+                = marshaller().marshall(null, instance);
         final Iterator it = stack.entrySet().iterator();
         while(it.hasNext()){
             Map.Entry<Object,Entity> entry
@@ -303,10 +317,10 @@ public class GaeObjectStore implements ObjectStore {
 
     /**
      * Register the class into DS kind
-     *
+     * TODO: Register or just call this check for each operation?
      * @param clazz
      */
-    static void register(Class<?> clazz){
+    public static void register(Class<?> clazz){
         Annotation[] annotations = clazz.getAnnotations();
         for (Annotation annotation : annotations) {
             org.appobjects.annotations.Entity entityAnnotation = (org.appobjects.annotations.Entity)annotation;
@@ -318,6 +332,15 @@ public class GaeObjectStore implements ObjectStore {
                         cls.put(clazz, StringHelper.getClassNameFrom(clazz.getName()));
                     } else {
                         cls.put(clazz, entityName);
+                    }
+                }
+            } else {
+                if (cls.get(clazz) == null){
+                    String kind = StringHelper.getClassNameFrom(clazz.getName());
+                    if (kind == null || kind.isEmpty()){
+                        cls.put(clazz, StringHelper.getClassNameFrom(clazz.getName()));
+                    } else {
+                        cls.put(clazz, kind);
                     }
                 }
             }

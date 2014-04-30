@@ -38,25 +38,25 @@ public class AnnotationUtilTest {
     @Test
     public void testGetAnnotatedField() {
         TestData.RootEntity f = new TestData.RootEntity();
-        f.setNewTestEntity(new TestData.TestEntity("Test City"));
+        f.setNewChildEntity(new TestData.ChildEntity("Test City"));
         AnnotatedField field = AnnotationUtil.getFieldWithAnnotation(Child.class, f);
         assertNotNull(field);
-        TestData.TestEntity testEntity = (TestData.TestEntity) field.getFieldValue();
-        assertEquals("Test City", testEntity.getType());
+        TestData.ChildEntity childEntity = (TestData.ChildEntity) field.getFieldValue();
+        assertEquals("Test City", childEntity.getType());
     }
 
     @Test
     public void testUpdateAnnotatedField() {
         TestData.RootEntity f = new TestData.RootEntity();
-        f.setNewTestEntity(new TestData.TestEntity("Test City"));
+        f.setNewChildEntity(new TestData.ChildEntity("Test City"));
         AnnotatedField field = AnnotationUtil.getFieldWithAnnotation(Child.class, f);
         assertNotNull(field);
-        TestData.TestEntity testEntity = (TestData.TestEntity) field.getFieldValue();
-        testEntity.setType("New Test City");
-        field.setFieldValue(testEntity);
+        TestData.ChildEntity childEntity = (TestData.ChildEntity) field.getFieldValue();
+        childEntity.setType("New Test City");
+        field.setFieldValue(childEntity);
 
         field = AnnotationUtil.getFieldWithAnnotation(Child.class, f);
-        assertNotSame("Test City", ((TestData.TestEntity) field.getFieldValue()).getType());
-        assertEquals("New Test City", ((TestData.TestEntity) field.getFieldValue()).getType());
+        assertNotSame("Test City", ((TestData.ChildEntity) field.getFieldValue()).getType());
+        assertEquals("New Test City", ((TestData.ChildEntity) field.getFieldValue()).getType());
     }
 }

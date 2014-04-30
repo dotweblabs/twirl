@@ -6,8 +6,8 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import org.appobjects.Marshaller;
+import org.appobjects.TestData;
 import org.appobjects.TestData.RootEntity;
-import org.appobjects.TestData.TestEntity;
 import org.appobjects.gae.GaeMarshaller;
 import org.appobjects.LocalDatastoreTestCase;
 import org.junit.Test;
@@ -25,13 +25,14 @@ public class MarshallerTest extends LocalDatastoreTestCase {
     public void testMarshallChildEmbedded(){
 
         RootEntity rootObject = new RootEntity(); // one Entity
-        TestEntity childObject = new TestEntity("Test City");
-        TestEntity embeddedObject = new TestEntity("Old Test City");
+
+        TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
+        TestData.ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
 
         rootObject.setKey("TestUser");
         rootObject.setCount(25);
-        rootObject.setNewTestEntity(childObject); // one Entity
-        rootObject.setOldTestEntity(embeddedObject); // not included, @Embedded
+        rootObject.setNewChildEntity(childObject); // one Entity
+        rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded
 
         IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, rootObject);
 
@@ -51,5 +52,6 @@ public class MarshallerTest extends LocalDatastoreTestCase {
         assertEquals(rootObjectEntity.getKey().getName(), parentKey.getName());
 
     }
+
 
 }

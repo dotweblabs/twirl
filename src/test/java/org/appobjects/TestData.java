@@ -7,19 +7,19 @@ import org.appobjects.annotations.*;
  */
 public class TestData {
     //@Entity(name = "ChildKind")
-    public static class TestEntity {
+    public static class ChildEntity {
 
         @Id
-        private String id;
+        private Long id;
 
         @Parent
         private RootEntity parent;
 
         private String type;
 
-        public TestEntity() {}
+        public ChildEntity() {}
 
-        public TestEntity(String type){
+        public ChildEntity(String type){
             setType(type);
         }
 
@@ -36,12 +36,20 @@ public class TestData {
             return "[" + type + "]";
         }
 
-        public String getId() {
+        public Long getId() {
             return id;
         }
 
-        public void setId(String id) {
+        public void setId(Long id) {
             this.id = id;
+        }
+
+        public RootEntity getParent() {
+            return parent;
+        }
+
+        public void setParent(RootEntity parent) {
+            this.parent = parent;
         }
     }
 
@@ -51,9 +59,9 @@ public class TestData {
         private String key;
         private Integer count;
         @Child
-        private TestEntity newTestEntity;
+        private ChildEntity newChildEntity;
         @Embedded
-        private TestEntity oldTestEntity;
+        private ChildEntity oldChildEntity;
 
         public RootEntity() {}
 
@@ -62,25 +70,25 @@ public class TestData {
             setCount(count);
         }
 
-        public RootEntity(String key, Integer count, TestEntity testEntity){
+        public RootEntity(String key, Integer count, ChildEntity childEntity){
             setKey(key);
             setCount(count);
-            setNewTestEntity(testEntity);
+            setNewChildEntity(childEntity);
         }
 
-        public RootEntity(String key, Integer count, TestEntity newTestEntity, TestEntity oldTestEntity){
+        public RootEntity(String key, Integer count, ChildEntity newChildEntity, ChildEntity oldChildEntity){
             setKey(key);
             setCount(count);
-            setNewTestEntity(newTestEntity);
-            setOldTestEntity(oldTestEntity);
+            setNewChildEntity(newChildEntity);
+            setOldChildEntity(oldChildEntity);
         }
 
-        public TestEntity getNewTestEntity() {
-            return newTestEntity;
+        public ChildEntity getNewChildEntity() {
+            return newChildEntity;
         }
 
-        public void setNewTestEntity(TestEntity newTestEntity) {
-            this.newTestEntity = newTestEntity;
+        public void setNewChildEntity(ChildEntity newChildEntity) {
+            this.newChildEntity = newChildEntity;
         }
 
         public String getKey() {
@@ -104,15 +112,15 @@ public class TestData {
             return "RootEntity"
                     +" key="+ key
                     +" count=" + count
-                    +" newTestEntity=" + newTestEntity;
+                    +" newChildEntity=" + newChildEntity;
         }
 
-        public TestEntity getOldTestEntity() {
-            return oldTestEntity;
+        public ChildEntity getOldChildEntity() {
+            return oldChildEntity;
         }
 
-        public void setOldTestEntity(TestEntity testEntity){
-            this.oldTestEntity = testEntity;
+        public void setOldChildEntity(ChildEntity childEntity){
+            this.oldChildEntity = childEntity;
         }
     }
 
@@ -147,15 +155,13 @@ public class TestData {
 
     public static RootEntity createTestRootEnity(){
         RootEntity rootObject = new RootEntity(); // one Entity
-        TestEntity childObject = new TestEntity("Test City");
-        TestEntity embeddedObject = new TestEntity("Old Test City");
-
-        childObject.setId("SomeUniqueId1");
+        ChildEntity childObject = new ChildEntity("Test City");
+        ChildEntity embeddedObject = new ChildEntity("Old Test City");
 
         rootObject.setKey("TestUser");
         rootObject.setCount(25);
-        rootObject.setNewTestEntity(childObject); // one Entity
-        rootObject.setOldTestEntity(embeddedObject); // not included, @Embedded
+        rootObject.setNewChildEntity(childObject); // one Entity
+        rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded
 
         return rootObject;
     }
