@@ -158,7 +158,9 @@ public class GaeMarshaller implements Marshaller {
                                 Entity _target = new Entity(createKeyFrom(parent, instance));
                                 _target.setPropertiesFrom(e);
                                 e = _target;
-                            } /*else {
+                            } else {
+
+                            }/*else {
                                 Object parentField = field.get(instance);
                                 Entity parentEntity = stack.get(parentField);
                                 Entity _target = new Entity(createKeyFrom(parentEntity.getKey(), instance));

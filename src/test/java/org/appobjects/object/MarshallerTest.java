@@ -41,6 +41,18 @@ public class MarshallerTest extends LocalDatastoreTestCase {
     }
 
     @Test
+    public void testMarshall_Child_first(){
+        ChildEntity child = new ChildEntity();
+        RootEntity parent = new RootEntity();
+        parent.setKey("ParentKey");
+        child.setParent(parent);
+        IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, child);
+        assertNotNull(stack);
+        assertEquals(1, stack.size());
+
+    }
+
+    @Test
     public void testMarshall_Child(){
         RootEntity rootObject = new RootEntity(); // one Entity
         ChildEntity childObject = new TestData.ChildEntity("Test City");
