@@ -15,6 +15,7 @@ Yet Another Google App Engine Datastore ORM with a twist!
                                                            
 appObjects aims to provide a lightweight Object mapping framework. Without adding complexity into the api. 
 
+[![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/appObjects)
 
 ###Setup
 
