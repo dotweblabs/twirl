@@ -16,7 +16,6 @@
  */
 package org.appobjects.gae;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.appobjects.common.AppobjectsException;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Blob;
@@ -33,13 +32,11 @@ import org.appobjects.util.StringHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.boon.Maps;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import static org.boon.Lists.*;
 
 
 /**
@@ -150,7 +147,7 @@ public class GaeMarshaller implements Marshaller {
                         setProperty(e, fieldName, i);
                     } else { // POJO
                         if (field.isAnnotationPresent(Embedded.class)){
-                            Map<String,Object> map = createMapFromPOJO(fieldValue);
+                            Map<String,Object> map = createMapFrom(fieldValue);
                             EmbeddedEntity ee = createEmbeddedEntityFromMap(map);
                             setProperty(e, fieldName, ee);
                         } else if (field.isAnnotationPresent(Parent.class)){
@@ -582,14 +579,8 @@ public class GaeMarshaller implements Marshaller {
      * @param instance
      * @return
      */
-    public Map<String,Object> createMapFromPOJO(Object instance){
-        Map<String,Object> result = null;
-        try {
-            result = BeanUtils.describe(instance);
-        } catch (IllegalAccessException e) {
-        } catch (InvocationTargetException e) {
-        } catch (NoSuchMethodException e) {
-        }
+    public Map<String,Object> createMapFrom(Object instance){
+        Map<String,Object> result = Maps.toMap(instance);
         return result;
     }
 
