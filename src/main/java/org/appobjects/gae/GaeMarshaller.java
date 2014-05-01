@@ -56,7 +56,9 @@ public class GaeMarshaller implements Marshaller {
             DataTypeUtils.getSupportedTypes();
     protected static Logger LOG = LogManager.getLogger(GaeMarshaller.class.getName());
 
-    public GaeMarshaller(){}
+    public GaeMarshaller(){
+        stack.clear();
+    }
 
 
     /**
@@ -71,7 +73,7 @@ public class GaeMarshaller implements Marshaller {
     @Override
     public IdentityHashMap marshall(Key parent, Object instance){
         Preconditions.checkNotNull(instance, "Object should not be null");
-        stack.clear();
+        //stack.clear();
         Key key = createKeyFrom(parent, instance); // inspect kind and create key
         Map<String,Object> props = new LinkedHashMap<String, Object>();
         List<Entity> target = null;
@@ -148,8 +150,7 @@ public class GaeMarshaller implements Marshaller {
                         setProperty(e, fieldName, i);
                     } else { // POJO
                         if (field.isAnnotationPresent(Embedded.class)){
-                            Object pojoField = field.get(instance);
-                            Map<String,Object> map = createMapFromPOJO(pojoField);
+                            Map<String,Object> map = createMapFromPOJO(fieldValue);
                             EmbeddedEntity ee = createEmbeddedEntityFromMap(map);
                             setProperty(e, fieldName, ee);
                         } else if (field.isAnnotationPresent(Parent.class)){
@@ -381,18 +382,13 @@ public class GaeMarshaller implements Marshaller {
         return ee;
     }
 
-    public EmbeddedEntity createEmbeddedEntityFromPOJO(Object instance){
-        return createEmbeddedEntityFromMap(createMapFromPOJO(instance));
-    }
-
-
-        /**
-         * Creates a <code>EmbeddedEntity</code> from a <code>Map</code>
-         * Which may include inner <code>EmbeddedEntity</code>.
-         *
-         * @param map
-         * @return
-         */
+    /**
+     * Creates a <code>EmbeddedEntity</code> from a <code>Map</code>
+     * Which may include inner <code>EmbeddedEntity</code>.
+     *
+     * @param map
+     * @return
+     */
     public EmbeddedEntity createEmbeddedEntityFromMap(Map<String,Object> map){
 
         Preconditions.checkNotNull(map, "Map entity cannot be null");
