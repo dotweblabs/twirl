@@ -6,7 +6,6 @@ import org.appobjects.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
 import org.appobjects.TestData;
 import org.appobjects.TestData.RootEntity;
-import org.appobjects.common.AutoGenerateStringIdException;
 import org.appobjects.LocalDatastoreTestCase;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,25 +24,26 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
     }
 
     @Rule
-    public ExpectedException exception = ExpectedException.none();
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void testPut_shouldThrowException(){
-
-        exception.expect(AutoGenerateStringIdException.class);
+    public void testPut_notRegistered(){
 
         RootEntity rootObject = new RootEntity(); // one Entity
 
         // String not set
-        TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
-        TestData.ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
+        //TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
+        //TestData.ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
 
-        rootObject.setKey("TestUser");
+        rootObject.setId("TestParent");
         rootObject.setCount(25);
-        rootObject.setNewChildEntity(childObject); // one Entity
-        rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded
+        //rootObject.setNewChildEntity(childObject); // one Entity
+        //rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded
+
         Key key = store.put(rootObject);
 
+        assertNotNull(key);
+        assertEquals("TestParent", key.getName());
     }
 
     @Test
@@ -53,15 +53,14 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         // String not set
         TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
         childObject.setParent(rootObject);
-
-        rootObject.setKey("TestUser");
+        rootObject.setId("TestUser");
         rootObject.setCount(25);
         //rootObject.setNewChildEntity(childObject); // one Entity, causes stackoverflow error
 
         Key key = store.put(childObject); // FIXME not consistent, RootEntity is not on last item!
 
         assertNotNull(key);
-        assertEquals("SomeUniqueId1", key.getName());
+        assertEquals("TestUser", key.getParent().getName());
         assertEquals(rootObject.getKey(), key.getParent().getName());
 
     }

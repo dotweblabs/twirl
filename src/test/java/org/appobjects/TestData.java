@@ -113,18 +113,18 @@ public class TestData {
         public RootEntity() {}
 
         public RootEntity(String key, Integer count){
-            setKey(key);
+            setId(key);
             setCount(count);
         }
 
         public RootEntity(String key, Integer count, ChildEntity childEntity){
-            setKey(key);
+            setId(key);
             setCount(count);
             setNewChildEntity(childEntity);
         }
 
         public RootEntity(String key, Integer count, ChildEntity newChildEntity, ChildEntity oldChildEntity){
-            setKey(key);
+            setId(key);
             setCount(count);
             setNewChildEntity(newChildEntity);
             setOldChildEntity(oldChildEntity);
@@ -142,7 +142,7 @@ public class TestData {
             return key;
         }
 
-        public void setKey(String key) {
+        public void setId(String key) {
             this.key = key;
         }
 
@@ -205,7 +205,7 @@ public class TestData {
         ChildEntity childObject = new ChildEntity("Test City");
         ChildEntity embeddedObject = new ChildEntity("Old Test City");
 
-        rootObject.setKey("TestUser");
+        rootObject.setId("TestUser");
         rootObject.setCount(25);
         rootObject.setNewChildEntity(childObject); // one Entity
         rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded

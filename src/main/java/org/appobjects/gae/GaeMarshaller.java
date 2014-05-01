@@ -155,18 +155,31 @@ public class GaeMarshaller implements Marshaller {
                         } else if (field.isAnnotationPresent(Parent.class)){
                             // @Parent first before @Child, don't switch. @Child needs parent Key.
                             if (parent != null){
+                                // Case where a Parent entity is marshalled then during the
+                                // iteration process, a @Child entity is found
                                 Entity _target = new Entity(createKeyFrom(parent, instance));
                                 _target.setPropertiesFrom(e);
                                 e = _target;
                             } else {
-
-                            }/*else {
+                                // Case where a Child entity is first marshalled
+                                // at this point this child is not yet in the stack
+                                // and the Parent entity is not yet also in the stack
+                                // so we will create a Key from the "not yet marshalled" parent instance
+                                // or is it not? Let's check.
                                 Object parentField = field.get(instance);
                                 Entity parentEntity = stack.get(parentField);
-                                Entity _target = new Entity(createKeyFrom(parentEntity.getKey(), instance));
-                                _target.setPropertiesFrom(e);
-                                e = _target;
-                            }*/
+                                if(parentEntity!=null){
+                                    Entity _target = new Entity(createKeyFrom(parentEntity.getKey(), instance));
+                                    _target.setPropertiesFrom(e);
+                                    e = _target;
+                                } else{
+                                    Key generatedParentKey = createKeyFrom(null, parentField);
+                                    Entity _target = new Entity(createKeyFrom(generatedParentKey, instance));
+                                    _target.setPropertiesFrom(e);
+                                    e = _target;
+                                    marshall(null, parentField);
+                                }
+                            }
                         } else if (field.isAnnotationPresent(Child.class)){
                             Object childField = field.get(instance);
                             marshall(e.getKey(), childField);

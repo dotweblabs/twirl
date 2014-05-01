@@ -256,21 +256,23 @@ public class GaeObjectStore implements ObjectStore {
             List<Key> keys = _ds.put(marshall(object));
             // FIXME: Key retrieved order is not always the saved key for the "object" stored
             Iterator<Key> it = list(keys).iterator();
-            while(it.hasNext()){
-                Key key = it.next();
-                if(key.getKind().equals(getKind(object.getClass()))){
-                    AnnotatedField field = AnnotationUtil.getFieldWithAnnotation(key(), object);
-                    Object value = field.getFieldValue();
-                    if(field.getFieldType().equals(String.class) &&
-                            value instanceof String){
-                        result = key;
-                    } else if((field.getFieldType().equals(Long.class) ||
-                            field.getFieldType().equals(long.class)) &&
-                            value instanceof Long){
-                        result = key;
-                    }
-                }
-            }
+            result = Iterables.getLast(keys);
+
+//            while(it.hasNext()){
+//                Key key = it.next();
+//                if(key.getKind().equals(getKind(object.getClass()))){
+//                    AnnotatedField field = AnnotationUtil.getFieldWithAnnotation(key(), object);
+//                    Object value = field.getFieldValue();
+//                    if(field.getFieldType().equals(String.class) &&
+//                            value instanceof String){
+//                        result = key;
+//                    } else if((field.getFieldType().equals(Long.class) ||
+//                            field.getFieldType().equals(long.class)) &&
+//                            value instanceof Long){
+//                        result = key;
+//                    }
+//                }
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             tx.rollback();
@@ -354,9 +356,10 @@ public class GaeObjectStore implements ObjectStore {
     static String getKind(Class<?> clazz){
         String kind =  cls.get(clazz);
         if (kind == null){
-            throw new RuntimeException("Class " + clazz.getName() + " was not registered.");
+            LOG.info(clazz.getName() + " is not registered. Registering now.");
+            register(clazz);
         }
-        return kind;
+        return cls.get(clazz);
     }
 
     public <T> T createInstance(Class<T> clazz) {
