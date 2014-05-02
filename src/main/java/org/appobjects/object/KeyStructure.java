@@ -32,9 +32,6 @@ import java.util.List;
  */
 public class KeyStructure {
 
-
-
-
 	public static Key createKey(String kind, String key) {
 		return KeyFactory.createKey(kind, key);
 	}
@@ -86,5 +83,7 @@ public class KeyStructure {
     public static long autoLongId(String kind){
        return DatastoreServiceFactory.getDatastoreService().allocateIds(kind, 1).getStart().getId();
     }
+
+
 
 }

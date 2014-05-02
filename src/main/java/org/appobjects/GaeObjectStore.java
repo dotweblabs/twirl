@@ -254,25 +254,7 @@ public class GaeObjectStore implements ObjectStore {
         Key result = null;
         try {
             List<Key> keys = _ds.put(marshall(object));
-            // FIXME: Key retrieved order is not always the saved key for the "object" stored
-            Iterator<Key> it = list(keys).iterator();
             result = Iterables.getLast(keys);
-
-//            while(it.hasNext()){
-//                Key key = it.next();
-//                if(key.getKind().equals(getKind(object.getClass()))){
-//                    AnnotatedField field = AnnotationUtil.getFieldWithAnnotation(key(), object);
-//                    Object value = field.getFieldValue();
-//                    if(field.getFieldType().equals(String.class) &&
-//                            value instanceof String){
-//                        result = key;
-//                    } else if((field.getFieldType().equals(Long.class) ||
-//                            field.getFieldType().equals(long.class)) &&
-//                            value instanceof Long){
-//                        result = key;
-//                    }
-//                }
-//            }
         } catch (Exception e) {
             e.printStackTrace();
             tx.rollback();
@@ -301,19 +283,20 @@ public class GaeObjectStore implements ObjectStore {
 
 
     private Iterable<Entity> marshall(Object instance){
-        List<Entity> entities = null;
+        List<Entity> entities = new LinkedList<Entity>();
         IdentityHashMap<Object, Entity> stack
                 = marshaller().marshall(null, instance);
+        Entity root = stack.get(instance);
+        assert root != null;
+        stack.remove(instance);
         final Iterator it = stack.entrySet().iterator();
         while(it.hasNext()){
             Map.Entry<Object,Entity> entry
                     = (Map.Entry<Object, Entity>) it.next();
             Entity e = entry.getValue();
-            if (entities == null){
-                entities = new LinkedList<Entity>();
-            }
             entities.add(e);
         }
+        entities.add(root);
         return entities;
     }
 

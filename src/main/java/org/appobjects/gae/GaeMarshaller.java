@@ -280,7 +280,7 @@ public class GaeMarshaller implements Marshaller {
         return null;
     }
 
-    private String getKindOf(Object instance){
+    private static String getKindOf(Object instance){
         String kind;
         org.appobjects.annotations.Entity anno = (org.appobjects.annotations.Entity)
                 AnnotationUtil.getClassAnnotation(org.appobjects.annotations.Entity.class, instance);
@@ -305,7 +305,7 @@ public class GaeMarshaller implements Marshaller {
      * @param instance
      * @return
      */
-    private Key createKeyFrom(Key parent, Object instance){
+    private static Key createKeyFrom(Key parent, Object instance){
         Key key = null;
         Object id = null;
         String kind = getKindOf(instance);
