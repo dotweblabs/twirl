@@ -256,9 +256,8 @@ public class GaeObjectStore implements ObjectStore {
         try {
             Iterable<Entity> entities = marshall(object);
             List<Key> keys = _ds.put(entities);
+            assert list(entities).size() == keys.size();
             result = Iterables.getLast(keys);
-            Entity save =  _ds.get(result);
-            assert save != null;
         } catch (Exception e) {
             e.printStackTrace();
             //tx.rollback();
