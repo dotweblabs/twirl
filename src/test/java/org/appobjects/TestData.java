@@ -202,10 +202,10 @@ public class TestData {
 
     public static RootEntity createTestRootEnity(){
         RootEntity rootObject = new RootEntity(); // one Entity
-        ChildEntity childObject = new ChildEntity("Test City");
-        ChildEntity embeddedObject = new ChildEntity("Old Test City");
+        ChildEntity childObject = new ChildEntity("TestChild");
+        ChildEntity embeddedObject = new ChildEntity("TestEmbedded");
 
-        rootObject.setId("TestUser");
+        rootObject.setId("TestRoot");
         rootObject.setCount(25);
         rootObject.setNewChildEntity(childObject); // one Entity
         rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded
