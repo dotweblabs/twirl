@@ -16,6 +16,7 @@
  */
 package org.appobjects.gae;
 
+import com.google.common.collect.Lists;
 import org.appobjects.GaeObjectStore;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.users.User;
@@ -29,6 +30,8 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
+
+import static org.boon.Lists.lists;
 
 /**
  * Created by kerby on 4/28/14.
@@ -99,13 +102,76 @@ public class GaeUnmarshaller implements Unmarshaller {
         }
 
         Iterator<Map.Entry<String,Object>> it = props.entrySet().iterator();
+        Class<?> clazz = destination.getClass();
+        List<Field> fields = Lists.newArrayList(clazz.getDeclaredFields());
+
         while(it.hasNext()){
             Map.Entry<String,Object> entry = it.next();
             String fieldName = entry.getKey();
             Object fieldValue = entry.getValue();
+
+            for (Field field : fields){
+                if(field.getName().equals(fieldName)){
+                    if(fieldValue == null){
+                        setFieldValue(field, destination, fieldValue);
+                    } else if(fieldValue instanceof Key){ // child
+                        try{
+                            Entity e = store.getDatastoreService()
+                                    .get((com.google.appengine.api.datastore.Key)fieldValue);
+                            AnnotatedField annotatedField
+                                    = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.child(), destination);
+                            Object childInstance = store.createInstance(annotatedField.getFieldType());
+                            unmarshall(childInstance, e);
+                        } catch (EntityNotFoundException e){
+                            fieldValue = null;
+                        }
+                    } else if(fieldValue instanceof String
+                            || fieldValue instanceof Boolean
+                            || fieldValue instanceof Number) {
+                        if(field.getName().equals(fieldName)){
+                            Class<?> fieldType = field.getType();
+                            if (field.getType().equals(String.class)){
+                                setFieldValue(field, destination, String.valueOf(fieldValue));
+                            } else if (field.getType().equals(Boolean.class)){
+                                setFieldValue(field, destination, (Boolean)fieldValue);
+                            } else if (field.getType().equals(Long.class)){
+                                setFieldValue(field, destination, (Long) fieldValue);
+                            } else if (field.getType().equals(Integer.class)){
+                                if(fieldValue.getClass().equals(Long.class)){
+                                    Long value = (Long) fieldValue;
+                                    setFieldValue(field, destination, value.intValue());
+                                } else {
+                                    setFieldValue(field, destination, (Integer)fieldValue);
+                                }
+                            } else if (field.getType().equals(int.class)){
+                                setFieldValue(field, destination, ((Integer)fieldValue).intValue());
+                            } else if (field.getType().equals(long.class)){
+                                setFieldValue(field, destination, ((Long)fieldValue).longValue());
+                            } else if (field.getType().equals(boolean.class)){
+                                setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
+                            }
+                        }
+                    } else if (fieldValue instanceof EmbeddedEntity) { // POJO's
+                        Class<?> fieldValueType = fieldValue.getClass();
+                        EmbeddedEntity ee = (EmbeddedEntity) fieldValue;
+                        Map<String,Object> map = ee.getProperties();
+                        store.createInstance(fieldValueType);
+                        if (field.getType().equals(List.class) || field.getType().equals(Map.class)){
+                            Object mapOrList = getMapOrList((EmbeddedEntity) fieldValue);
+                            setFieldValue(field, destination, mapOrList);
+                        } else { // Must be a POJO
+                            Map<String,Object> mapPojo = getMapFromEmbeddedEntity((EmbeddedEntity) fieldValue);
+                            // TODO: Create object from Map
+                        }
+                    } else if (fieldValue.getClass().isPrimitive()){
+                        // TODO
+                    }
+                }
+            }
+
+/*
             if(fieldValue == null){
-                Class<?> clazz = destination.getClass();
-                for (Field field : clazz.getDeclaredFields()){
+                for (Field field : fields){
                     if(field.getName().equals(fieldName)){
                         Class<?> fieldType = field.getType();
                         setFieldValue(field, destination, fieldValue);
@@ -125,8 +191,7 @@ public class GaeUnmarshaller implements Unmarshaller {
             } else if(fieldValue instanceof String
                     || fieldValue instanceof Boolean
                     || fieldValue instanceof Number) {
-                Class<?> clazz = destination.getClass();
-                for (Field field : clazz.getDeclaredFields()){
+                for (Field field : fields){
                     if(field.getName().equals(fieldName)){
                         Class<?> fieldType = field.getType();
                         if (field.getType().equals(String.class)){
@@ -156,10 +221,12 @@ public class GaeUnmarshaller implements Unmarshaller {
                 EmbeddedEntity ee = (EmbeddedEntity) fieldValue;
                 Map<String,Object> map = ee.getProperties();
                 store.createInstance(fieldValueType);
+
+
             } else if (fieldValue.getClass().isPrimitive()){
                 // TODO
             }
-
+*/
         }
 
 //        for (Field f : destination.getClass().getDeclaredFields()){
