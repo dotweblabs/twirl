@@ -128,7 +128,6 @@ public class GaeUnmarshaller implements Unmarshaller {
                 Class<?> clazz = destination.getClass();
                 for (Field field : clazz.getDeclaredFields()){
                     if(field.getName().equals(fieldName)){
-                        //if(fieldValueType.equals(field.getType())){
                         Class<?> fieldType = field.getType();
                         if (field.getType().equals(String.class)){
                             setFieldValue(field, destination, String.valueOf(fieldValue));
@@ -150,7 +149,6 @@ public class GaeUnmarshaller implements Unmarshaller {
                         } else if (field.getType().equals(boolean.class)){
                             setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
                         }
-                        //}
                     }
                 }
             } else if (fieldValue instanceof EmbeddedEntity) { // POJO's
@@ -164,18 +162,16 @@ public class GaeUnmarshaller implements Unmarshaller {
 
         }
 
-
-
-        for (Field f : destination.getClass().getDeclaredFields()){
-            if(f.isAnnotationPresent(GaeObjectStore.key())) {
-                // skip
-            } else if(f.isAnnotationPresent(GaeObjectStore.parent())){
-
-            } else if(f.isAnnotationPresent(GaeObjectStore.child())){
-                Object child = store.createInstance(f.getType());
-                setFieldValue(f, destination, child);
-            }
-        }
+//        for (Field f : destination.getClass().getDeclaredFields()){
+//            if(f.isAnnotationPresent(GaeObjectStore.key())) {
+//                // skip
+//            } else if(f.isAnnotationPresent(GaeObjectStore.parent())){
+//
+//            } else if(f.isAnnotationPresent(GaeObjectStore.child())){
+//                Object child = store.createInstance(f.getType());
+//                setFieldValue(f, destination, child);
+//            }
+//        }
     }
 
     /**
