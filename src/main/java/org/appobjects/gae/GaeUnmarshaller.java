@@ -66,6 +66,7 @@ public class GaeUnmarshaller implements Unmarshaller {
 
     private void setFieldValue(Field field, Object instance, Object value){
         boolean accessible = field.isAccessible();
+        Class<?> clazz = field.getType();
         field.setAccessible(true);
         try {
             field.set(instance, value);
@@ -102,8 +103,15 @@ public class GaeUnmarshaller implements Unmarshaller {
             Map.Entry<String,Object> entry = it.next();
             String fieldName = entry.getKey();
             Object fieldValue = entry.getValue();
-            Class<?> fieldValueType = fieldValue.getClass();
-            if(fieldValue instanceof Key){ // child
+            if(fieldValue == null){
+                Class<?> clazz = destination.getClass();
+                for (Field field : clazz.getDeclaredFields()){
+                    if(field.getName().equals(fieldName)){
+                        Class<?> fieldType = field.getType();
+                        setFieldValue(field, destination, fieldValue);
+                    }
+                }
+            } else if(fieldValue instanceof Key){ // child
                 try{
                     Entity e = store.getDatastoreService()
                             .get((com.google.appengine.api.datastore.Key)fieldValue);
@@ -120,12 +128,33 @@ public class GaeUnmarshaller implements Unmarshaller {
                 Class<?> clazz = destination.getClass();
                 for (Field field : clazz.getDeclaredFields()){
                     if(field.getName().equals(fieldName)){
-                        if(fieldValueType.equals(field.getType())){
-                            setFieldValue(field, destination, fieldValue);
+                        //if(fieldValueType.equals(field.getType())){
+                        Class<?> fieldType = field.getType();
+                        if (field.getType().equals(String.class)){
+                            setFieldValue(field, destination, String.valueOf(fieldValue));
+                        } else if (field.getType().equals(Boolean.class)){
+                            setFieldValue(field, destination, (Boolean)fieldValue);
+                        } else if (field.getType().equals(Long.class)){
+                            setFieldValue(field, destination, (Long) fieldValue);
+                        } else if (field.getType().equals(Integer.class)){
+                            if(fieldValue.getClass().equals(Long.class)){
+                                Long value = (Long) fieldValue;
+                                setFieldValue(field, destination, value.intValue());
+                            } else {
+                                setFieldValue(field, destination, (Integer)fieldValue);
+                            }
+                        } else if (field.getType().equals(int.class)){
+                            setFieldValue(field, destination, ((Integer)fieldValue).intValue());
+                        } else if (field.getType().equals(long.class)){
+                            setFieldValue(field, destination, ((Long)fieldValue).longValue());
+                        } else if (field.getType().equals(boolean.class)){
+                            setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
                         }
+                        //}
                     }
                 }
             } else if (fieldValue instanceof EmbeddedEntity) { // POJO's
+                Class<?> fieldValueType = fieldValue.getClass();
                 EmbeddedEntity ee = (EmbeddedEntity) fieldValue;
                 Map<String,Object> map = ee.getProperties();
                 store.createInstance(fieldValueType);

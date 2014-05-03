@@ -26,6 +26,7 @@ package org.appobjects;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Entity;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.appobjects.annotations.Child;
 import org.appobjects.annotations.Id;
 import org.appobjects.gae.GaeMarshaller;
@@ -98,7 +99,7 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public void delete(Key... keys) {
-        delete(com.google.common.collect.Lists.newArrayList(keys));
+        delete(Lists.newArrayList(keys));
     }
 
     @Override
@@ -250,35 +251,38 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public Key put(Object object) {
-        Transaction tx = _ds.beginTransaction(_options);
+        //Transaction tx = _ds.beginTransaction(_options);
         Key result = null;
         try {
-            List<Key> keys = _ds.put(marshall(object));
+            Iterable<Entity> entities = marshall(object);
+            List<Key> keys = _ds.put(entities);
             result = Iterables.getLast(keys);
+            Entity save =  _ds.get(result);
+            assert save != null;
         } catch (Exception e) {
             e.printStackTrace();
-            tx.rollback();
+            //tx.rollback();
         } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
+            //if (tx.isActive()) {
+            //    tx.rollback();
+            //}
         }
         return result;
     }
 
     @Override
     public Iterable<Key> put(Iterable<Object> objects) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public Key putInTransaction(Object object) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public Iterable<Key> putInTransaction(Iterable<Object> objects) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
 

@@ -67,11 +67,12 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
     @Test
     public void testGet(){
-//       Object testEntity = TestData.createTestRootEnity();
-//       Key key = store.put(testEntity);
-//       assertNotNull(key);
-//       RootEntity result = store.get(RootEntity.class, key);
-//       assertNotNull(result);
+       Object testEntity = TestData.createTestRootEnity();
+       Key key = store.put(testEntity);
+       assertNotNull(key);
+       assertEquals("TestUser", key.getName());
+       RootEntity result = store.get(RootEntity.class, key);
+       assertNotNull(result);
     }
 
     @Test
