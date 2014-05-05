@@ -38,7 +38,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         rootObject.setId("TestParent");
         rootObject.setCount(25);
         //rootObject.setNewChildEntity(childObject); // one Entity
-        //rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded
+        //rootObject.setEmbeddedEntity(embeddedObject); // not included, @Embedded
 
         Key key = store.put(rootObject);
 
@@ -76,11 +76,11 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         assertEquals("TestRoot", key.getName());
         assertNotNull(result);
 
-        //assertNotNull(result.getNewChildEntity());
-        assertNotNull(result.getOldChildEntity());
+        assertNotNull(result.getNewChildEntity());
+        assertNotNull(result.getEmbeddedEntity());
         assertEquals("TestRoot", result.getKey());
         //assertEquals("Test City", result.getNewChildEntity());
-        //assertEquals("Old Test City", result.getOldChildEntity());
+        //assertEquals("Old Test City", result.getEmbeddedEntity());
     }
 
     @Test

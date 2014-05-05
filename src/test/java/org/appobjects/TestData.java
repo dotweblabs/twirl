@@ -108,7 +108,7 @@ public class TestData {
         @Child
         private ChildEntity newChildEntity;
         @Embedded
-        private ChildEntity oldChildEntity;
+        private ChildEntity embeddedEntity;
 
         public RootEntity() {}
 
@@ -123,11 +123,11 @@ public class TestData {
             setNewChildEntity(childEntity);
         }
 
-        public RootEntity(String key, Integer count, ChildEntity newChildEntity, ChildEntity oldChildEntity){
+        public RootEntity(String key, Integer count, ChildEntity newChildEntity, ChildEntity embeddedEntity){
             setId(key);
             setCount(count);
             setNewChildEntity(newChildEntity);
-            setOldChildEntity(oldChildEntity);
+            setEmbeddedEntity(embeddedEntity);
         }
 
         public ChildEntity getNewChildEntity() {
@@ -162,12 +162,12 @@ public class TestData {
                     +" newChildEntity=" + newChildEntity;
         }
 
-        public ChildEntity getOldChildEntity() {
-            return oldChildEntity;
+        public ChildEntity getEmbeddedEntity() {
+            return embeddedEntity;
         }
 
-        public void setOldChildEntity(ChildEntity childEntity){
-            this.oldChildEntity = childEntity;
+        public void setEmbeddedEntity(ChildEntity childEntity){
+            this.embeddedEntity = childEntity;
         }
     }
 
@@ -208,7 +208,7 @@ public class TestData {
         rootObject.setId("TestRoot");
         rootObject.setCount(25);
         rootObject.setNewChildEntity(childObject); // one Entity
-        rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded
+        rootObject.setEmbeddedEntity(embeddedObject); // not included, @Embedded
 
         return rootObject;
     }

@@ -89,7 +89,7 @@ public class MarshallerTest extends LocalDatastoreTestCase {
         rootObject.setCount(25);
         childObject.setParent(rootObject);
         rootObject.setNewChildEntity(childObject); // one Entity
-        rootObject.setOldChildEntity(embeddedObject); // not included, @Embedded
+        rootObject.setEmbeddedEntity(embeddedObject); // not included, @Embedded
 
         IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, rootObject);
 
