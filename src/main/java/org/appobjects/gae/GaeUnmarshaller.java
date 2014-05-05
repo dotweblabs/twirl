@@ -26,6 +26,7 @@ import org.appobjects.util.AnnotationUtil;
 import org.appobjects.util.AnnotationUtil.AnnotatedField;
 import org.appobjects.validation.Validator;
 import org.apache.commons.lang3.ArrayUtils;
+import org.boon.Maps;
 
 
 import java.lang.reflect.Field;
@@ -160,8 +161,8 @@ public class GaeUnmarshaller implements Unmarshaller {
                             Object mapOrList = getMapOrList((EmbeddedEntity) fieldValue);
                             setFieldValue(field, destination, mapOrList);
                         } else { // Must be a POJO
-                            Map<String,Object> mapPojo = getMapFromEmbeddedEntity((EmbeddedEntity) fieldValue);
-                            // TODO: Create object from Map
+                            Map<String,Object> getMap = getMapFromEmbeddedEntity((EmbeddedEntity) fieldValue);
+                            setFieldValue(field, destination, Maps.fromMap(getMap, field.getType()));
                         }
                     } else if (fieldValue.getClass().isPrimitive()){
                         // TODO
