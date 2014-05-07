@@ -205,6 +205,11 @@ public class GaeObjectStore implements ObjectStore {
     }
 
     @Override
+    public <T> T get(Class<T> clazz, Long id) {
+        throw new RuntimeException("Not yet implemented");
+    }
+
+    @Override
     public Iterable<Object> get(Iterable<Key> keys) {
         List<Object> result = null;
         try {

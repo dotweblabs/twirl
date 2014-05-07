@@ -41,6 +41,7 @@ public interface ObjectStore {
     public void deleteInTransaction(Iterable<Key> keys);
     public <T> T get(Class<T> clazz, Key key);
     public <T> T get(Class<T> clazz, String key);
+    public <T> T get(Class<T> clazz, Long id);
     public Iterable<Object> get(Iterable<Key> keys);
     public Object getInTransaction(Key key);
     public Iterable<Object> getInTransaction(Iterable<Key> keys);
