@@ -123,6 +123,7 @@ public class GaeUnmarshaller implements Unmarshaller {
                                     = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.child(), destination);
                             Object childInstance = store.createInstance(annotatedField.getFieldType());
                             unmarshall(childInstance, e);
+                            setFieldValue(field, destination, childInstance);
                         } catch (EntityNotFoundException e){
                             fieldValue = null;
                         }
@@ -152,7 +153,7 @@ public class GaeUnmarshaller implements Unmarshaller {
                                 setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
                             }
                         }
-                    } else if (fieldValue instanceof EmbeddedEntity) { // POJO's
+                    } else if (fieldValue instanceof EmbeddedEntity) { // List or Java  primitive types and standard types, Map or  POJO's
                         Class<?> fieldValueType = fieldValue.getClass();
                         EmbeddedEntity ee = (EmbeddedEntity) fieldValue;
                         Map<String,Object> map = ee.getProperties();
@@ -162,7 +163,8 @@ public class GaeUnmarshaller implements Unmarshaller {
                             setFieldValue(field, destination, mapOrList);
                         } else { // Must be a POJO
                             Map<String,Object> getMap = getMapFromEmbeddedEntity((EmbeddedEntity) fieldValue);
-                            setFieldValue(field, destination, Maps.fromMap(getMap, field.getType()));
+                            Object pojo = Maps.fromMap(getMap, field.getType());
+                            setFieldValue(field, destination, pojo);
                         }
                     } else if (fieldValue.getClass().isPrimitive()){
                         // TODO
@@ -172,7 +174,7 @@ public class GaeUnmarshaller implements Unmarshaller {
 
 /*
             if(fieldValue == null){
-                for (Field field : fields){
+                for (Field field : fcd err  ields){
                     if(field.getName().equals(fieldName)){
                         Class<?> fieldType = field.getType();
                         setFieldValue(field, destination, fieldValue);

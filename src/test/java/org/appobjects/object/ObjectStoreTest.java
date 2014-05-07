@@ -79,8 +79,8 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         assertNotNull(result.getNewChildEntity());
         assertNotNull(result.getEmbeddedEntity());
         assertEquals("TestRoot", result.getKey());
-        //assertEquals("Test City", result.getNewChildEntity());
-        //assertEquals("Old Test City", result.getEmbeddedEntity());
+        assertEquals("TestChild", result.getNewChildEntity().getType());
+        assertEquals("TestEmbedded", result.getEmbeddedEntity().getType());
     }
 
     @Test

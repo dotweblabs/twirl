@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * Use this annotation to specify that a given POJO field to store the
- * field as a child entity
+ * field as a child entity, stored as a EmbeddedEntity into the datastore
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
