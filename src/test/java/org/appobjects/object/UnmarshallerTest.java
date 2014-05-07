@@ -16,13 +16,13 @@ public class UnmarshallerTest extends LocalDatastoreTestCase {
 
 
     GaeUnmarshaller unmarshaller;
-    GaeObjectStore bender;
+    GaeObjectStore store;
 
     @Override
     public void setupDatastore() {
         super.setupDatastore();
-        bender = new GaeObjectStore();
-        unmarshaller = (GaeUnmarshaller)bender.unmarshaller();
+        store = new GaeObjectStore();
+        unmarshaller = (GaeUnmarshaller) store.unmarshaller();
     }
 
     @Test
