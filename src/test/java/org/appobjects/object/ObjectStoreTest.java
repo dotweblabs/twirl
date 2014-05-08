@@ -18,10 +18,10 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
     GaeObjectStore store = new GaeObjectStore();
 
-    {
-        GaeObjectStore.register(RootEntity.class);
-        GaeObjectStore.register(TestData.ChildEntity.class);
-    }
+//    {
+//        GaeObjectStore.register(RootEntity.class);
+//        GaeObjectStore.register(TestData.ChildEntity.class);
+//    }
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -66,7 +66,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
     }
 
     @Test
-    public void testGet(){
+    public void testGetByKey(){
 
         Object testEntity = TestData.createTestRootEnity();
         Key key = store.put(testEntity);
@@ -84,8 +84,32 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
     }
 
     @Test
-    public void testDelete(){
+    public void testGetById(){
 
+        Object testEntity = TestData.createTestRootEnity();
+        Key key = store.put(testEntity);
+        RootEntity result = store.get(RootEntity.class, "TestRoot");
+
+        assertNotNull(key);
+        assertEquals("TestRoot", key.getName());
+        assertNotNull(result);
+
+        assertNotNull(result.getNewChildEntity());
+        assertNotNull(result.getEmbeddedEntity());
+        assertEquals("TestRoot", result.getKey());
+        assertEquals("TestChild", result.getNewChildEntity().getType());
+        assertEquals("TestEmbedded", result.getEmbeddedEntity().getType());
+    }
+
+    @Test
+    public void testDelete(){
+        Object testEntity = TestData.createTestRootEnity();
+        Key key = store.put(testEntity);
+        RootEntity result = store.get(RootEntity.class, key);
+        assertNotNull(result);
+        store.delete(RootEntity.class, result.getKey());
+        result = store.get(RootEntity.class, key);
+        assertNull(result);
     }
 
     @Test

@@ -69,7 +69,7 @@ public class GaeObjectStore implements ObjectStore {
         return Child.class;
     }
 
-    private static IdentityHashMap<Class<?>,String> cls = new IdentityHashMap<Class<?>,String>();
+    private IdentityHashMap<Class<?>,String> cls = new IdentityHashMap<Class<?>,String>();
 
     protected static Logger LOG = LogManager.getLogger(GaeObjectStore.class.getName());
     public static String KEY_RESERVED_PROPERTY = Entity.KEY_RESERVED_PROPERTY;
@@ -153,6 +153,33 @@ public class GaeObjectStore implements ObjectStore {
     }
 
     @Override
+    public <T> void delete(Class<T> clazz, String key) {
+        T result = null;
+        try {
+            String kind = getKind(clazz);
+            _ds.delete(KeyStructure.createKey(kind, key));
+        } catch (Exception e1) {
+            // TODO: Wrap the exception
+            // e.g store.getLastError();
+            e1.printStackTrace();
+        }
+    }
+
+    @Override
+    public <T> void delete(Class<T> clazz, Long id) {
+        T result = null;
+        try {
+            String kind = getKind(clazz);
+            assert kind != null;
+            _ds.delete(KeyStructure.createKey(kind, id));
+        } catch (Exception e1) {
+            // TODO: Wrap the exception
+            // e.g store.getLastError();
+            e1.printStackTrace();
+        }
+    }
+
+    @Override
     public <T> Find find(Class<T> clazz){
         throw new RuntimeException("Not yet implemented");
     }
@@ -165,16 +192,6 @@ public class GaeObjectStore implements ObjectStore {
     @Override
     public <T> Update update(Class<T> clazz){
         throw new RuntimeException("Not yet implemented");
-    }
-
-    @Override
-    public Marshaller marshaller() {
-        return new GaeMarshaller();
-    }
-
-    @Override
-    public Unmarshaller unmarshaller() {
-        return new GaeUnmarshaller(this);
     }
 
     @Override
@@ -195,11 +212,11 @@ public class GaeObjectStore implements ObjectStore {
         T result = null;
         try {
             String kind = getKind(clazz);
-            assert kind != null;
             Entity e = _ds.get(KeyStructure.createKey(kind, key));
-
+            unmarshaller().unmarshall(result, e);
         } catch (EntityNotFoundException e1) {
             // TODO: Wrap the exception
+            e1.printStackTrace();
         }
         return result;
     }
@@ -289,6 +306,15 @@ public class GaeObjectStore implements ObjectStore {
         throw new RuntimeException("Not yet implemented");
     }
 
+    @Override
+    public Marshaller marshaller() {
+        return new GaeMarshaller();
+    }
+
+    @Override
+    public Unmarshaller unmarshaller() {
+        return new GaeUnmarshaller(this);
+    }
 
     private Iterable<Entity> marshall(Object instance){
         List<Entity> entities = new LinkedList<Entity>();
@@ -313,7 +339,7 @@ public class GaeObjectStore implements ObjectStore {
      * TODO: Register or just call this check for each operation?
      * @param clazz
      */
-    public static void register(Class<?> clazz){
+    public void register(Class<?> clazz){
         Annotation[] annotations = clazz.getAnnotations();
         for (Annotation annotation : annotations) {
             org.appobjects.annotations.Entity entityAnnotation = (org.appobjects.annotations.Entity)annotation;
@@ -344,13 +370,15 @@ public class GaeObjectStore implements ObjectStore {
         return _ds;
     }
 
-    static String getKind(Class<?> clazz){
+    public String getKind(Class<?> clazz){
         String kind =  cls.get(clazz);
         if (kind == null){
             LOG.info(clazz.getName() + " is not registered. Registering now.");
             register(clazz);
+            return cls.get(clazz);
+        } else {
+            return cls.get(clazz);
         }
-        return cls.get(clazz);
     }
 
     public <T> T createInstance(Class<T> clazz) {
