@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.appobjects.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
+import org.appobjects.ObjectStore;
 import org.appobjects.TestData;
 import org.appobjects.TestData.RootEntity;
 import org.appobjects.LocalDatastoreTestCase;
@@ -16,7 +17,7 @@ import org.junit.rules.ExpectedException;
  */
 public class ObjectStoreTest extends LocalDatastoreTestCase {
 
-    GaeObjectStore store = new GaeObjectStore();
+    ObjectStore store = new GaeObjectStore();
 
 //    {
 //        GaeObjectStore.register(RootEntity.class);
