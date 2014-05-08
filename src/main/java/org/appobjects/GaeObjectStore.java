@@ -47,6 +47,7 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 
 import static org.boon.Lists.list;
+import static org.boon.Lists.lists;
 
 /**
  * Created by kerby on 4/27/14.
@@ -213,6 +214,7 @@ public class GaeObjectStore implements ObjectStore {
         try {
             String kind = getKind(clazz);
             Entity e = _ds.get(KeyStructure.createKey(kind, key));
+            result = createInstance(clazz);
             unmarshaller().unmarshall(result, e);
         } catch (EntityNotFoundException e1) {
             // TODO: Wrap the exception
@@ -340,26 +342,31 @@ public class GaeObjectStore implements ObjectStore {
      * @param clazz
      */
     public void register(Class<?> clazz){
-        Annotation[] annotations = clazz.getAnnotations();
-        for (Annotation annotation : annotations) {
-            org.appobjects.annotations.Entity entityAnnotation = (org.appobjects.annotations.Entity)annotation;
-            if(entityAnnotation != null){
-                String entityName = entityAnnotation.name();
-                String entitySpacer = entityAnnotation.spacer();
-                if (cls.get(clazz) == null){
-                    if (entityName == null || entityName.isEmpty()){
-                        cls.put(clazz, StringHelper.getClassNameFrom(clazz.getName()));
-                    } else {
-                        cls.put(clazz, entityName);
+        List<Annotation> annotations = Lists.newArrayList(clazz.getAnnotations());
+        if(annotations.isEmpty()){
+            String kind = StringHelper.getClassNameFrom(clazz.getName());
+            cls.put(clazz, kind);
+        } else {
+            for (Annotation annotation : annotations) {
+                org.appobjects.annotations.Entity entityAnnotation = (org.appobjects.annotations.Entity)annotation;
+                if(entityAnnotation != null){
+                    String entityName = entityAnnotation.name();
+                    String entitySpacer = entityAnnotation.spacer();
+                    if (cls.get(clazz) == null){
+                        if (entityName == null || entityName.isEmpty()){
+                            cls.put(clazz, StringHelper.getClassNameFrom(clazz.getName()));
+                        } else {
+                            cls.put(clazz, entityName);
+                        }
                     }
-                }
-            } else {
-                if (cls.get(clazz) == null){
-                    String kind = StringHelper.getClassNameFrom(clazz.getName());
-                    if (kind == null || kind.isEmpty()){
-                        cls.put(clazz, StringHelper.getClassNameFrom(clazz.getName()));
-                    } else {
-                        cls.put(clazz, kind);
+                } else {
+                    if (cls.get(clazz) == null){
+                        String kind = StringHelper.getClassNameFrom(clazz.getName());
+                        if (kind == null || kind.isEmpty()){
+                            cls.put(clazz, StringHelper.getClassNameFrom(clazz.getName()));
+                        } else {
+                            cls.put(clazz, kind);
+                        }
                     }
                 }
             }
