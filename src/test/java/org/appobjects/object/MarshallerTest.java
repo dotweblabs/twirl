@@ -96,7 +96,7 @@ public class MarshallerTest extends LocalDatastoreTestCase {
         Entity rootObjectEntity = stack.get(rootObject);
         Entity childObjectEntity = stack.get(childObject);
 
-        EmbeddedEntity ee = (EmbeddedEntity) rootObjectEntity.getProperty("oldChildEntity");
+        EmbeddedEntity ee = (EmbeddedEntity) rootObjectEntity.getProperty("embeddedEntity");
         Key childKey = (Key) rootObjectEntity.getProperty("newChildEntity");
         Key parentKey = childKey.getParent();
 
