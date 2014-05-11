@@ -42,10 +42,12 @@ public abstract class AbstractStore {
             DataTypeUtils.getSupportedTypes();
 
     public AbstractStore(DatastoreService ds, ObjectSerializer serializer){
-        if (_ds == null) {
+        if (ds == null) {
             _ds = DatastoreServiceFactory.getDatastoreService();
             _options = TransactionOptions.Builder.withXG(true);
             LOG.info("Create a new DatastoreService instance");
+        } else {
+            _ds = ds;
         }
         _marshaller = new GaeMarshaller();
     }
