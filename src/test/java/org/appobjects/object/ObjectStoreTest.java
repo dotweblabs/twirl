@@ -133,6 +133,8 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         List<RootEntity> all_reversed = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101")
                 .sortAscending("count").now());
 
+        List<RootEntity> all_count = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("count", 1).now());
+        List<RootEntity> two = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("count", 1).greaterThanOrEqual("__key__", "104").now());
 
         assertEquals(1, one.size());
         assertEquals(4, four.size());
@@ -140,7 +142,8 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         assertEquals(5, all_reversed.size());
         assertEquals("105", all_reversed.get(4).getKey());
         assertEquals("101", all_reversed.get(0).getKey());
-
+        assertEquals(5, all_count.size());
+        assertEquals(2, two.size());
     }
 
     @Test
