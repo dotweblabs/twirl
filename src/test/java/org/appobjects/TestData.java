@@ -112,6 +112,10 @@ public class TestData {
 
         public RootEntity() {}
 
+        public RootEntity(String key) {
+            this.key = key;
+        }
+
         public RootEntity(String key, Integer count){
             setId(key);
             setCount(count);

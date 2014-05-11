@@ -32,6 +32,7 @@ import org.appobjects.annotations.Id;
 import org.appobjects.gae.GaeMarshaller;
 import org.appobjects.gae.GaeUnmarshaller;
 import org.appobjects.object.KeyStructure;
+import org.appobjects.object.QueryStore;
 import org.appobjects.serializer.ObjectSerializer;
 import org.appobjects.types.Find;
 import org.appobjects.types.FindOne;
@@ -182,7 +183,7 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public <T> Find find(Class<T> clazz){
-        throw new RuntimeException("Not yet implemented");
+        return new Find(this, clazz, getKind(clazz));
     }
 
     @Override

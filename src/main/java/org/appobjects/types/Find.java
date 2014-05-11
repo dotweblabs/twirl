@@ -16,6 +16,9 @@
  */
 package org.appobjects.types;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import org.appobjects.GaeObjectStore;
+import org.appobjects.ObjectStore;
 import org.appobjects.object.QueryStore;
 import org.appobjects.util.BoundedIterator;
 import org.appobjects.util.Pair;
@@ -27,7 +30,7 @@ import java.util.*;
 /**
  * Builds GAE filters and sorts
  */
-public class Find {
+public class Find<V> {
 
     protected Map<String, Pair<Query.FilterOperator, Object>> filters;
     protected Map<String, Query.SortDirection> sorts;
@@ -35,15 +38,17 @@ public class Find {
     protected Integer skip;
     protected Integer max;
 
+    final GaeObjectStore objectStore;
     final QueryStore _store;
-    final Class<?> _clazz;
+    final Class<V> _clazz;
     final String _kind;
 
-    public Find(QueryStore store, Class<?> clazz, String kind){
+    public Find(GaeObjectStore store, Class<V> clazz, String kind){
         filters = new LinkedHashMap<String, Pair<Query.FilterOperator, Object>>();
         sorts = new LinkedHashMap<String, Query.SortDirection>();
         projections = new LinkedList<String>();
-        _store = store;
+        objectStore = store;
+        _store = new QueryStore(store.getDatastoreService(), null);
         _clazz = clazz;
         _kind = kind;
     }
@@ -54,7 +59,7 @@ public class Find {
     }
 
     public Find greaterThanOrEqual(String key, Object value){
-        filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.GREATER_THAN, value));
+        filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.GREATER_THAN_OR_EQUAL, value));
         return this;
     }
 
@@ -64,7 +69,7 @@ public class Find {
     }
 
     public Find lessThanOrEqual(String key, Object value){
-        filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.LESS_THAN, value));
+        filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.LESS_THAN_OR_EQUAL, value));
         return this;
     }
 
@@ -115,7 +120,7 @@ public class Find {
         throw new RuntimeException("Not yet implemented");
     }
 
-    public <V> Iterator<V> now() {
+    public Iterator<V> now() {
         if (filters == null){
             filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
         }
@@ -134,9 +139,9 @@ public class Find {
                 }
                 public V next() {
                     Entity e = eit.next();
-                    return null; // TODO!
-                    //Map<String,Object> map = EntityMapper.createMapObjectFromEntity(e);
-                    //return EntityMapper.createPOJOFrom(clazz, map);
+                    V instance = createInstance(_clazz);
+                    objectStore.unmarshaller().unmarshall(instance, e);
+                    return instance;
                 }
                 public boolean hasNext() {
                     return eit.hasNext();
@@ -163,5 +168,15 @@ public class Find {
         return it;
     }
 
+    private <T> T createInstance(Class<T> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (IllegalAccessException e){
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

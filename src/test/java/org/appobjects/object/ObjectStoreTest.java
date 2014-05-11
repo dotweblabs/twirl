@@ -1,7 +1,9 @@
 package org.appobjects.object;
 
+import static org.boon.Lists.lists;
 import static org.junit.Assert.*;
 
+import com.google.appengine.labs.repackaged.com.google.common.collect.Lists;
 import org.appobjects.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
 import org.appobjects.ObjectStore;
@@ -11,6 +13,9 @@ import org.appobjects.LocalDatastoreTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by kerby on 4/27/14.
@@ -115,6 +120,26 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
     @Test
     public void testFind(){
+        store.put(new RootEntity("101", 5));
+        store.put(new RootEntity("102", 4));
+        store.put(new RootEntity("103", 3));
+        store.put(new RootEntity("104", 2));
+        store.put(new RootEntity("105", 1));
+
+        List<RootEntity> one = Lists.newArrayList(store.find(RootEntity.class).equal("__key__", "101").now());
+        List<RootEntity> four = Lists.newArrayList(store.find(RootEntity.class).greaterThan("__key__", "101").now());
+        List<RootEntity> all = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101").now());
+
+        List<RootEntity> all_reversed = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101")
+                .sortAscending("count").now());
+
+
+        assertEquals(1, one.size());
+        assertEquals(4, four.size());
+        assertEquals(5, all.size());
+        assertEquals(5, all_reversed.size());
+        assertEquals("105", all_reversed.get(4).getKey());
+        assertEquals("101", all_reversed.get(0).getKey());
 
     }
 
