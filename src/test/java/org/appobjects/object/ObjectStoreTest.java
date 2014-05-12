@@ -147,6 +147,10 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         assertEquals("101", all_reversed.get(0).getKey());
         assertEquals(5, all_count.size());
         assertEquals(2, two.size());
+
+        assertEquals("101", one.get(0).getKey());
+        assertEquals(5, one.get(0).getCount());
+
     }
 
     @Test
