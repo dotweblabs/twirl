@@ -1,6 +1,7 @@
 package org.appobjects.object;
 
-import static org.boon.Lists.lists;
+import static org.boon.Boon.puts;
+import static org.boon.Lists.list;
 import static org.junit.Assert.*;
 
 import com.google.common.collect.Lists;
@@ -160,7 +161,30 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
     @Test
     public void testUpdate(){
+        store.put(new RootEntity("101", 5));
+        store.put(new RootEntity("102", 4));
+        store.put(new RootEntity("103", 3));
+        store.put(new RootEntity("104", 2));
+        store.put(new RootEntity("105", 1));
 
+        RootEntity update101 = new RootEntity("101", 105);
+        RootEntity update102 = new RootEntity("102", 104);
+        RootEntity update103 = new RootEntity("103", 103);
+        RootEntity update104 = new RootEntity("104", 102);
+        RootEntity update105 = new RootEntity("105", 101);
+
+        List<RootEntity> update_all
+                = Lists.newArrayList(store.update(RootEntity.class)
+                    .greaterThanOrEqual("__key__", "101")
+                    .with(update101)
+                    .now());
+
+        assertEquals(5, update_all.size());
+        assertEquals(105, update_all.get(0).getCount());
+        assertEquals(105, update_all.get(1).getCount());
+        assertEquals(105, update_all.get(2).getCount());
+        assertEquals(105, update_all.get(3).getCount());
+        assertEquals(105, update_all.get(4).getCount());
     }
 
 

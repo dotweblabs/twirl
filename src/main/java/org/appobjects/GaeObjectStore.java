@@ -48,7 +48,6 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 
 import static org.boon.Lists.list;
-import static org.boon.Lists.lists;
 
 /**
  * Created by kerby on 4/27/14.
@@ -193,7 +192,7 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public <T> Update update(Class<T> clazz){
-        throw new RuntimeException("Not yet implemented");
+        return new Update(this, clazz, getKind(clazz));
     }
 
     @Override
