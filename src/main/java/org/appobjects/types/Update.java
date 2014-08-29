@@ -45,7 +45,7 @@ public class Update<V> {
     }
 
     public Update greaterThanOrEqual(String key, Object value){
-        filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.GREATER_THAN, value));
+        filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.GREATER_THAN_OR_EQUAL, value));
         return this;
     }
 
@@ -55,7 +55,7 @@ public class Update<V> {
     }
 
     public Update lessThanOrEqual(String key, Object value){
-        filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.LESS_THAN, value));
+        filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.LESS_THAN_OR_EQUAL, value));
         return this;
     }
 

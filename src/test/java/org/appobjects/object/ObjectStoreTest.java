@@ -173,41 +173,18 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         RootEntity update104 = new RootEntity("104", 102);
         RootEntity update105 = new RootEntity("105", 101);
 
-        puts("before");
-
-        List<RootEntity> all_count
-                = Lists.newArrayList(store.find(RootEntity.class)
-                .greaterThanOrEqual("count", 1)
-                .now());
-
-        for (RootEntity entity : all_count){
-            puts(entity);
-        }
-
         List<RootEntity> update_all
                 = Lists.newArrayList(store.update(RootEntity.class)
                     .greaterThanOrEqual("__key__", "101")
                     .with(update101)
                     .now());
 
-        for (RootEntity entity : update_all){
-            puts(entity);
-        }
-
-        all_count
-                = Lists.newArrayList(store.find(RootEntity.class)
-                    .greaterThanOrEqual("count", 101)
-                    .now());
-
-        puts("after");
-
-
-        for (RootEntity entity : all_count){
-            puts(entity);
-        }
-
-        assertEquals(5, all_count.size());
-
+        assertEquals(5, update_all.size());
+        assertEquals(105, update_all.get(0).getCount());
+        assertEquals(105, update_all.get(1).getCount());
+        assertEquals(105, update_all.get(2).getCount());
+        assertEquals(105, update_all.get(3).getCount());
+        assertEquals(105, update_all.get(4).getCount());
     }
 
 
