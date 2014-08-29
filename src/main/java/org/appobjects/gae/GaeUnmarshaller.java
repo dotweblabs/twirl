@@ -32,7 +32,7 @@ import org.boon.Maps;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import static org.boon.Lists.lists;
+import static org.boon.Lists.list;
 
 /**
  * Created by kerby on 4/28/14.
