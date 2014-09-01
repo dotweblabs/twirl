@@ -100,8 +100,8 @@ public class Update<V> {
     /**
      * Operator increments a value by a specified amount
      *
-     * @param field
-     * @param value
+     * @param field to increment
+     * @param value to set
      * @return
      */
     public Update increment(String field, long value){
@@ -111,8 +111,8 @@ public class Update<V> {
     /**
      * Operator multiplies a value by specified amount
      *
-     * @param field
-     * @param value
+     * @param field to increment
+     * @param value to set
      * @return
      */
     public Update multiply(String field, float value){
@@ -132,7 +132,7 @@ public class Update<V> {
      * Operator updates queried entity with the values of the
      * reference object {@code ref}
      *
-     * @param ref
+     * @param ref Reference object
      * @return
      */
     public Update with(Object ref){

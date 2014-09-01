@@ -248,7 +248,7 @@ public class GaeUnmarshaller implements Unmarshaller {
      * Process <code>EmbeddedEntity</code> and inner <code>EmbeddedEntity</code>
      * of this entity.
      *
-     * @param ee
+     * @param ee to unmarshall into {@code Map}
      * @return
      */
     public  Map<String,Object> getMapFromEmbeddedEntity(final EmbeddedEntity ee){
@@ -291,7 +291,7 @@ public class GaeUnmarshaller implements Unmarshaller {
      * And so on. And since it is stored a a  <code>EmbeddedEntity</code> then it is ambiguous to a
      * <code>Map</code> that is also stored in the same Datastore type.
      *
-     * @param ee
+     * @param ee entity to unmarshall into {@code List}
      * @return
      */
     public List<Object> getListFromEmbeddedEntity(final EmbeddedEntity ee){

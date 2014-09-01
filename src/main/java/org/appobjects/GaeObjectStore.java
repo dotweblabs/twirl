@@ -225,8 +225,17 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public <T> T get(Class<T> clazz, Long id) {
-        throw new RuntimeException("Not yet implemented");
-    }
+        T result = null;
+        try {
+            String kind = getKind(clazz);
+            Entity e = _ds.get(KeyStructure.createKey(kind, id));
+            result = createInstance(clazz);
+            unmarshaller().unmarshall(result, e);
+        } catch (EntityNotFoundException e1) {
+            // TODO: Wrap the exception
+            e1.printStackTrace();
+        }
+        return result;    }
 
     @Override
     public Iterable<Object> get(Iterable<Key> keys) {
@@ -339,7 +348,7 @@ public class GaeObjectStore implements ObjectStore {
     /**
      * Register the class into DS kind
      * TODO: Register or just call this check for each operation?
-     * @param clazz
+     * @param clazz type to register
      */
     public void register(Class<?> clazz){
         List<Annotation> annotations = Lists.newArrayList(clazz.getAnnotations());

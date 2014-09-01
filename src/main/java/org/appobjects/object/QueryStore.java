@@ -36,7 +36,7 @@ public class QueryStore extends AbstractStore {
     /**
      * Check whether entity with the given properties exist
      *
-     * @param props
+     * @param props entity to extract properties from
      * @return
      */
     protected boolean containsEntityWithFieldLike(String kind, Entity props){
@@ -132,7 +132,7 @@ public class QueryStore extends AbstractStore {
      *
      * FIXME - Fix query object filter/sort getting wiped out
      *
-     * @param sorts
+     * @param sorts {@code Map} of sort direction
      * @return
      */
     public Iterator<Entity> querySortedLike(String kind,
@@ -234,7 +234,7 @@ public class QueryStore extends AbstractStore {
      *
      * FIXME - Fix query object filter/sort getting wiped out
      *
-     * @param sorts
+     * @param sorts {@code Map} of sort direction
      * @return
      */
     protected Iterator<Entity> querySortedEntitiesLike(
@@ -354,7 +354,7 @@ public class QueryStore extends AbstractStore {
      * Validates a query before it gets passed into the GAE api.
      * Replace and/or transform an object into GAE Datastore supported type
      *
-     * @param query
+     * @param query pairs of {@code Query.FilterOperator} operators
      * @return the validated query object
      */
     protected Map<String, Pair<Query.FilterOperator, Object>> validateQuery(

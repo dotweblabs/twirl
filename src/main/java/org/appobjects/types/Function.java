@@ -22,8 +22,8 @@ package org.appobjects.types;
  * 
  * @author Kerby Martino
  *
- * @param <T>
- * @param <Y>
+ * @param <T> argument type
+ * @param <Y> return type
  */
 public interface Function<T,Y> {
 	public T execute(Y params);

@@ -9,7 +9,7 @@ public class Validator {
      * It checks for field value types and field values.
      * Checks for duplicated annotations.
      *
-     * @param instance
+     * @param instance to validate
      */
     public boolean validate(Object instance){
         return true;

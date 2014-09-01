@@ -16,10 +16,10 @@
  */
 package org.appobjects.gae;
 
-import org.appobjects.common.AppobjectsException;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Entity;
+import org.appobjects.common.AppobjectsException;
 import com.google.appengine.api.users.User;
 import com.google.common.base.Preconditions;
 import org.appobjects.GaeObjectStore;
@@ -64,7 +64,7 @@ public class GaeMarshaller implements Marshaller {
      * including its Parent-Child relationships (if necessary).
      *
      * @param parent parent of the generated Entity or Entities
-     * @param instance
+     * @param instance to marshall
      * @return
      */
     @Override
@@ -269,7 +269,7 @@ public class GaeMarshaller implements Marshaller {
     /**
      * Inspect the surface of object
      *
-     * @param instance
+     * @param instance key
      * @return
      */
     private Key inspectObjectAndCreateKey(Object instance){
@@ -301,8 +301,8 @@ public class GaeMarshaller implements Marshaller {
      * Creates a Key from a object instance, the kind is inspected in
      * the process.
      *
-     * @param parent
-     * @param instance
+     * @param parent key or null
+     * @param instance String, Long/long key object
      * @return
      */
     private static Key createKeyFrom(Key parent, Object instance){
@@ -341,11 +341,11 @@ public class GaeMarshaller implements Marshaller {
     /**
      * Create <code>EmbeddedEntity</code> from List
      *
-     * @param entity
+     * @param entity to marshall into {@code EmbeddedEntity}
      * @return
      */
     //TODO: This method is quite the most problematic part, since there is no list implementation in the datastore, unlike with a <code>Map</code>.
-    public  EmbeddedEntity createEmbeddedEntityFromList(List entity){
+    public EmbeddedEntity createEmbeddedEntityFromList(List entity){
         EmbeddedEntity ee = null;
         try {
             Preconditions.checkNotNull(entity, "List entity cannot be null");
@@ -383,7 +383,7 @@ public class GaeMarshaller implements Marshaller {
      * Creates a <code>EmbeddedEntity</code> from a <code>Map</code>
      * Which may include inner <code>EmbeddedEntity</code>.
      *
-     * @param map
+     * @param map to marshall into {@code EmbeddedEntity}
      * @return
      */
     public EmbeddedEntity createEmbeddedEntityFromMap(Map<String,Object> map){
@@ -495,7 +495,7 @@ public class GaeMarshaller implements Marshaller {
      * And so on. And since it is stored a a  <code>EmbeddedEntity</code> then it is ambiguous to a
      * <code>Map</code> that is also stored in the same Datastore type.
      *
-     * @param ee
+     * @param ee {@code EmbeddedEntity} to unmarshall
      * @return
      */
     private static List<Object> createListFromEmbeddedEntity(final EmbeddedEntity ee){
@@ -543,7 +543,7 @@ public class GaeMarshaller implements Marshaller {
      * Process <code>EmbeddedEntity</code> and inner <code>EmbeddedEntity</code>
      * of this entity.
      *
-     * @param ee
+     * @param ee {@code EmbeddedEntity} to unmarshall into map
      * @return
      */
     public static Map<String,Object> createMapFromEmbeddedEntity(final EmbeddedEntity ee){
@@ -573,10 +573,10 @@ public class GaeMarshaller implements Marshaller {
     }
 
     /**
-     * Used as a method in the chain of making a EmbeddedEntity from a given
+     * Used as a method in the chain of making a {@code EmbeddedEntity} from a given
      * POJO instance. Should not be used other than for EmbeddedEntity objects.
      *
-     * @param instance
+     * @param instance TODO
      * @return
      */
     public Map<String,Object> createMapFrom(Object instance){

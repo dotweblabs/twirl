@@ -24,8 +24,8 @@ import java.util.IdentityHashMap;
 public interface Marshaller {
     /**
      *
-     * @param parent
-     * @param object
+     * @param parent key or null
+     * @param object to marshall
      * @return
      */
     public abstract IdentityHashMap<Object, Entity> marshall(Key parent, Object object);
