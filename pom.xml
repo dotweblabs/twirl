@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.appobjects</groupId>
 	<artifactId>appobjects</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
-	<name>appobjects</name>
+	<name>appobjects-SNAPSHOT</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<version.slf4j>1.7.5</version.slf4j>
@@ -16,12 +16,16 @@
 	</properties>
 	
 	<repositories>
-        <!--
-		<repository>
-      		<id>my-alternate-repository</id>
-      		<url>http://myrepo.net/repo</url>
-    	</repository>	
-        -->
+        <repository>
+            <id>bintray</id>
+            <url>http://dl.bintray.com/pastekit/appobjects/org/appobjects/appobjects/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 		<repository>
                 <id>mvnrepository</id>
                 <url>http://repo1.maven.org/maven2</url>
@@ -176,28 +180,29 @@
 	</dependencies>
 	<build>
 	  <plugins>
+
 		<plugin>
 		    <artifactId>maven-deploy-plugin</artifactId>
 		    <version>2.7</version>
 		    <configuration>
 		        <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
 		    </configuration>
-		</plugin>	  
+		</plugin>
+
         <plugin>
             <groupId>com.github.github</groupId>
             <artifactId>site-maven-plugin</artifactId>
             <version>0.9</version>
             <configuration>
-                <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-                <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-                <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-                <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch key -->
+                <message>Maven artifacts for ${project.version}</message>
+                <noJekyll>true</noJekyll>
+                <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+                <branch>refs/heads/mvn-repo</branch>
                 <includes><include>**/*</include></includes>
-                <repositoryName>appobjects</repositoryName>      	<!-- github repo key -->
-                <repositoryOwner>appobjects</repositoryOwner>    <!-- github username  -->
+                <repositoryName>appobjects</repositoryName>
+                <repositoryOwner>appobjects</repositoryOwner>
             </configuration>
             <executions>
-              <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
               <execution>
                 <goals>
                   <goal>site</goal>
@@ -206,6 +211,7 @@
               </execution>
             </executions>
         </plugin>
+
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
@@ -215,15 +221,17 @@
                 <target>1.7</target>
             </configuration>
         </plugin>
+          <plugin>
+              <artifactId>maven-release-plugin</artifactId>
+              <version>2.4.1</version>
+              <configuration>
+                  <useReleaseProfile>false</useReleaseProfile>
+                  <releaseProfiles>release</releaseProfiles>
+                  <autoVersionSubmodules>true</autoVersionSubmodules>
+              </configuration>
+          </plugin>
 	  </plugins>
 	</build>
-	<distributionManagement>
-	    <repository>
-	        <id>github</id>
-	        <name>GitHub ${project.artifactId} Repository</name>
-	        <url>https://raw.github.com/appobjects/${project.artifactId}/mvn-repo</url>
-	    </repository>
-	</distributionManagement>	
     <pluginRepositories>
         <pluginRepository>
             <id>maven-gae-plugin-repo</id>
@@ -231,9 +239,28 @@
             <url>http://maven-gae-plugin.googlecode.com/svn/repository/</url>
         </pluginRepository>
         <pluginRepository>
+            <name>oss.sonatype.org-snapshots</name>
+            <id>oss.sonatype.org-snapshots</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </pluginRepository>
+        <pluginRepository>
             <name>oss.sonatype.org</name>
             <id>oss.sonatype.org</id>
             <url>http://oss.sonatype.org/content/groups/public</url>
         </pluginRepository>
     </pluginRepositories>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-pastekit-appobjects-appobjects</id>
+            <name>pastekit-appobjects-appobjects</name>
+            <url>https://api.bintray.com/maven/pastekit/appobjects/appobjects</url>
+        </repository>
+    </distributionManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:appobjects/appobjects.git</connection>
+        <url>scm:git:git@github.com:appobjects/appobjects.git</url>
+        <developerConnection>scm:git:git@github.com:appobjects/appobjects.git</developerConnection>
+    </scm>
 </project>

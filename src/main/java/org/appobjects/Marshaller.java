@@ -26,7 +26,7 @@ public interface Marshaller {
      *
      * @param parent key or null
      * @param object to marshall
-     * @return
+     * @return marshalled object
      */
     public abstract IdentityHashMap<Object, Entity> marshall(Key parent, Object object);
 }

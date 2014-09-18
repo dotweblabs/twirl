@@ -239,7 +239,7 @@ public class GaeMarshaller implements Marshaller {
      *
      * @param target Entity with Key that will be populated
      * @param obj to get properties from
-     * @return
+     * @return marshalled
      */
     public static Entity createEntityFromBasicTypes(Entity target, Object obj){
         Preconditions.checkNotNull(obj, "Object should not be null");
@@ -303,7 +303,7 @@ public class GaeMarshaller implements Marshaller {
      *
      * @param parent key or null
      * @param instance String, Long/long key object
-     * @return
+     * @return GAE {@code Key}
      */
     private static Key createKeyFrom(Key parent, Object instance){
         Key key = null;
@@ -342,7 +342,7 @@ public class GaeMarshaller implements Marshaller {
      * Create <code>EmbeddedEntity</code> from List
      *
      * @param entity to marshall into {@code EmbeddedEntity}
-     * @return
+     * @return marshalled
      */
     //TODO: This method is quite the most problematic part, since there is no list implementation in the datastore, unlike with a <code>Map</code>.
     public EmbeddedEntity createEmbeddedEntityFromList(List entity){
@@ -384,7 +384,7 @@ public class GaeMarshaller implements Marshaller {
      * Which may include inner <code>EmbeddedEntity</code>.
      *
      * @param map to marshall into {@code EmbeddedEntity}
-     * @return
+     * @return marshalled
      */
     public EmbeddedEntity createEmbeddedEntityFromMap(Map<String,Object> map){
 
@@ -496,7 +496,7 @@ public class GaeMarshaller implements Marshaller {
      * <code>Map</code> that is also stored in the same Datastore type.
      *
      * @param ee {@code EmbeddedEntity} to unmarshall
-     * @return
+     * @return {@code List} of unmarshalled {@code EmbeddedEntity}
      */
     private static List<Object> createListFromEmbeddedEntity(final EmbeddedEntity ee){
         List<Object> list = null;
@@ -544,7 +544,7 @@ public class GaeMarshaller implements Marshaller {
      * of this entity.
      *
      * @param ee {@code EmbeddedEntity} to unmarshall into map
-     * @return
+     * @return unmarshalled
      */
     public static Map<String,Object> createMapFromEmbeddedEntity(final EmbeddedEntity ee){
         Map<String,Object> map = null;
@@ -577,7 +577,7 @@ public class GaeMarshaller implements Marshaller {
      * POJO instance. Should not be used other than for EmbeddedEntity objects.
      *
      * @param instance TODO
-     * @return
+     * @return Map
      */
     public Map<String,Object> createMapFrom(Object instance){
         Map<String,Object> result = Maps.toMap(instance);
