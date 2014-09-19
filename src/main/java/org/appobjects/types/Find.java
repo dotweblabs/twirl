@@ -20,7 +20,6 @@ import com.google.appengine.api.datastore.DatastoreService;
 import org.appobjects.GaeObjectStore;
 import org.appobjects.ObjectStore;
 import org.appobjects.object.QueryStore;
-import org.appobjects.util.BoundedIterator;
 import org.appobjects.util.Pair;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Query;
@@ -132,7 +131,7 @@ public class Find<V> {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = _store.querySortedLike(_kind, filters, sorts);
+            final Iterator<Entity> eit = _store.querySortedLike(_kind, filters, sorts, max, skip);
             it = new Iterator<V>() {
                 public void remove() {
                     eit.remove();
@@ -154,17 +153,6 @@ public class Find<V> {
         } finally {
 
         }
-        if (it == null){
-            //LOG.debug("Returning null iterator");
-        }
-        if (max != null){
-            if (skip != null){
-                return new BoundedIterator<V>(skip, max, it);
-            } else {
-                return new BoundedIterator<V>(0, max, it);
-            }
-        }
-        //List asList = Lists.newArrayList(it);
         return it;
     }
 

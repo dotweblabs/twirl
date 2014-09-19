@@ -74,7 +74,7 @@ public class QueryStore extends AbstractStore {
 
     public Iterator<Map<String,Object>> query(String kind,
             Map<String, Pair<Query.FilterOperator, Object>> filters,
-            Map<String, Query.SortDirection> sorts, Integer _numToSkip, Integer _max){
+            Map<String, Query.SortDirection> sorts, Integer offset, Integer limit){
         if (filters == null){
             filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
         }
@@ -86,7 +86,7 @@ public class QueryStore extends AbstractStore {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = querySortedLike(kind, filters, sorts);
+            final Iterator<Entity> eit = querySortedLike(kind, filters, sorts, limit, offset);
             it = new Iterator<Map<String,Object>>() {
                 public void remove() {
                     eit.remove();
@@ -110,11 +110,11 @@ public class QueryStore extends AbstractStore {
         if (it == null){
             LOG.debug("Returning null iterator");
         }
-        if (_max != null){
-            if (_numToSkip != null){
-                return new BoundedIterator<Map<String,Object>>(_numToSkip, _max, it);
+        if (limit != null){
+            if (offset != null){
+                return new BoundedIterator<Map<String,Object>>(offset, limit, it);
             } else {
-                return new BoundedIterator<Map<String,Object>>(0, _max, it);
+                return new BoundedIterator<Map<String,Object>>(0, limit, it);
             }
         }
         //List asList = Lists.newArrayList(it);
@@ -136,16 +136,33 @@ public class QueryStore extends AbstractStore {
      * @return
      */
     public Iterator<Entity> querySortedLike(String kind,
-            Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts){
+            Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
+            Integer limit, Integer offset){
+
         Preconditions.checkNotNull(query, "Query object can't be null");
         Preconditions.checkNotNull(sorts, "Sort can't be null");
+
         LOG.debug("Query map="+query.toString());
 
         PreparedQuery pq = null;
 
+        // Limit & offset
+        FetchOptions fetchOptions = FetchOptions.Builder.withDefaults();
+        if(limit != null && offset != null){
+            fetchOptions = FetchOptions.Builder.withLimit(limit).offset(offset);
+        } else if(limit != null){
+            fetchOptions = FetchOptions.Builder.withLimit(limit);
+        } else if(offset != null){
+            if (fetchOptions == null) {
+                fetchOptions = FetchOptions.Builder.withDefaults();
+            }
+            fetchOptions.offset(offset);
+        }
+
         // Sort
         Iterator<Map.Entry<String, Query.SortDirection>> sortIterator = sorts.entrySet().iterator();
         Query q = new Query(kind);
+
         List<Query.Filter> subFilters = new ArrayList<Query.Filter>();
         if (!query.isEmpty()){
             // Apply filters and sorting for fields given in the filter query
@@ -178,7 +195,7 @@ public class QueryStore extends AbstractStore {
             }
         }
         pq = _ds.prepare(q);
-        Iterator<Entity> res = pq.asIterator();
+        Iterator<Entity> res = pq.asIterator(fetchOptions);
         return res;
     }
 
@@ -237,6 +254,7 @@ public class QueryStore extends AbstractStore {
      * @param sorts {@code Map} of sort direction
      * @return
      */
+    @Deprecated
     protected Iterator<Entity> querySortedEntitiesLike(
             String kind,
             Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts){
@@ -365,19 +383,9 @@ public class QueryStore extends AbstractStore {
         for (Map.Entry<String, Pair<Query.FilterOperator, Object>> entry : entrySet){
             String field = entry.getKey();
             Pair<Query.FilterOperator, Object> value = entry.getValue();
-//			if (valueType.getSecond() instanceof ObjectId){
-//				Pair<FilterOperator, Object> newValue
-//					= new Pair<QueryStore.FilterOperator, Object>(valueType.getFirst(),
-//							((ObjectId)valueType.getSecond()).toStringMongod());
-//				toReplace.put(field, newValue);
-//			} else if (!GAE_SUPPORTED_TYPES.contains(valueType.getSecond().getClass())) {
-//				throw new IllegalArgumentException("Unsupported filter compare valueType: " + valueType.getSecond().getClass());
-//			}
-
             if (!GAE_SUPPORTED_TYPES.contains(value.getSecond().getClass())) {
                 throw new IllegalArgumentException("Unsupported filter compare valueType: " + value.getSecond().getClass());
             }
-
         }
 
         Iterator<String> it = toReplace.keySet().iterator();
