@@ -2,6 +2,9 @@ package org.appobjects;
 
 import org.appobjects.annotations.*;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Created by kerby on 4/24/14.
  */
@@ -215,5 +218,46 @@ public class TestData {
         rootObject.setEmbeddedEntity(embeddedObject); // not included, @Embedded
 
         return rootObject;
+    }
+
+    public static class JSONEntity {
+
+        @Kind
+        private String kind;
+
+        @Id
+        private String id;
+        @Flat
+        private Map<String,Object> fields;
+
+        public Map<String, Object> getFields() {
+            if(fields == null){
+                fields = new LinkedHashMap<>();
+            }
+            return fields;
+        }
+
+        public void setFields(Map<String, Object> fields) {
+            if(fields == null){
+                fields = new LinkedHashMap<>();
+            }
+            this.fields = fields;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getKind() {
+            return kind;
+        }
+
+        public void setKind(String kind) {
+            this.kind = kind;
+        }
     }
 }

@@ -13,6 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ *                    _______ __    __            __
+ * .---.-.-----.-----|   _   |  |--|__.-----.----|  |_.-----.
+ * |  _  |  _  |  _  |.  |   |  _  |  |  -__|  __|   _|__ --|
+ * |___._|   __|   __|.  |   |_____|  |_____|____|____|_____|
+ *       |__|  |__|  |:  1   |    |___|
+ *                   |::.. . |
+ *                   `-------'
  */
 package org.appobjects.gae;
 

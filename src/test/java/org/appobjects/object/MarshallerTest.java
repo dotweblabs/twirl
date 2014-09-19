@@ -127,6 +127,24 @@ public class MarshallerTest extends LocalDatastoreTestCase {
         assertTrue(!stack.isEmpty());
     }
 
+    @Test
+    public void testMarshall_JSONEntity() {
+        TestData.JSONEntity json = new TestData.JSONEntity();
+
+        json.setKind("MyDocument");
+        json.setId("abcdef12345");
+        json.getFields().put("age", 28);
+        json.getFields().put("name", "Name");
+
+        IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, json);
+        Entity e = stack.get(json);
+
+        assertNotNull(stack);
+        assertTrue(!stack.isEmpty());
+
+        assertEquals("MyDocument", e.getKind());
+    }
+
 
 
 

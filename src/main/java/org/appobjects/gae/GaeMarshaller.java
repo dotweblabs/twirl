@@ -13,6 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ *                    _______ __    __            __
+ * .---.-.-----.-----|   _   |  |--|__.-----.----|  |_.-----.
+ * |  _  |  _  |  _  |.  |   |  _  |  |  -__|  __|   _|__ --|
+ * |___._|   __|   __|.  |   |_____|  |_____|____|____|_____|
+ *       |__|  |__|  |:  1   |    |___|
+ *                   |::.. . |
+ *                   `-------'
  */
 package org.appobjects.gae;
 
@@ -33,6 +40,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.boon.Maps;
+import org.boon.Lists;
 
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
@@ -70,7 +78,6 @@ public class GaeMarshaller implements Marshaller {
     @Override
     public IdentityHashMap marshall(Key parent, Object instance){
         Preconditions.checkNotNull(instance, "Object should not be null");
-        //stack.clear();
         Key key = createKeyFrom(parent, instance); // inspect kind and create key
         Map<String,Object> props = new LinkedHashMap<String, Object>();
         List<Entity> target = null;
@@ -113,14 +120,48 @@ public class GaeMarshaller implements Marshaller {
                     if (field.isAnnotationPresent(Embedded.class)){
                         setProperty(e, fieldName, createEmbeddedEntityFromList((List) fieldValue));
                     } else {
-                        throw new AppobjectsException("Map type should be annotated with @Embedded");
+                        throw new AppobjectsException("List type should be annotated with @Embedded or @Flat");
                     }
                 } else if(fieldValue instanceof Map){
                     LOG.debug( "Processing Map valueType");
                     if (field.isAnnotationPresent(Embedded.class)){
                         setProperty(e, fieldName, createEmbeddedEntityFromMap((Map) fieldValue));
+                    } else if (field.isAnnotationPresent(Flat.class)){
+                        Map<String,Object> flat = (Map)fieldValue;
+                        Iterator<Map.Entry<String, Object>> it = flat.entrySet().iterator();
+                        if (!it.hasNext()){
+                            LOG.debug("Iterator is empty");
+                        }
+                        while (it.hasNext()){
+                            Object entry = it.next();
+                            try {
+                                Map.Entry<Object, Object> mapEntry
+                                        = (Map.Entry<Object, Object>) entry;
+                                Object entryKey = mapEntry.getKey();
+                                Object entryVal = mapEntry.getValue();
+                                if (entryVal instanceof Map){
+                                    setProperty(e, (String) entryKey, createEmbeddedEntityFromMap((Map) entryVal));
+                                } else if (entryVal instanceof List){
+                                    throw new RuntimeException("List values are not yet supported");
+                                } else if (entryVal instanceof String
+                                        || entryVal instanceof Number
+                                        || entryVal instanceof Boolean
+                                        || entryVal instanceof Date
+                                        || entryVal instanceof User) {
+                                    setProperty(e, (String) entryKey, entryVal);
+                                } else {
+                                    throw new RuntimeException("Unsupported GAE property type");
+                                }
+                                Preconditions.checkNotNull(e, "Entity is null");
+                            } catch (ClassCastException ex) {
+                                // Something is wrong here
+                                ex.printStackTrace();
+                            } catch (Exception ex){
+                                ex.printStackTrace();
+                            }
+                        }
                     } else {
-                        throw new AppobjectsException("Map type should be annotated with @Embedded");
+                        throw new AppobjectsException("Map type should be annotated with @Embedded or @Flat");
                     }
                 } else {
                     // For primitives
@@ -282,9 +323,12 @@ public class GaeMarshaller implements Marshaller {
 
     private static String getKindOf(Object instance){
         String kind;
-        org.appobjects.annotations.Entity anno = (org.appobjects.annotations.Entity)
-                AnnotationUtil.getClassAnnotation(org.appobjects.annotations.Entity.class, instance);
-        if (anno != null){
+        org.appobjects.annotations.Entity anno
+                = (org.appobjects.annotations.Entity) AnnotationUtil.getClassAnnotation(org.appobjects.annotations.Entity.class, instance);
+        AnnotationUtil.AnnotatedField kindField = AnnotationUtil.getFieldWithAnnotation(Kind.class, instance);
+        if(kindField != null && kindField.getFieldValue() != null){
+            kind = (String) kindField.getFieldValue();
+        } else if (anno != null){
             // Get the kind
             if (anno.name() != null && !anno.name().isEmpty()){
                 kind = anno.name();
