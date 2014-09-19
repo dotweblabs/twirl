@@ -284,7 +284,6 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public Key put(Object object) {
-        //Transaction tx = _ds.beginTransaction(_options);
         Key result = null;
         try {
             Iterable<Entity> entities = marshall(object);
@@ -293,24 +292,39 @@ public class GaeObjectStore implements ObjectStore {
             result = Iterables.getLast(keys);
         } catch (Exception e) {
             e.printStackTrace();
-            //tx.rollback();
         } finally {
-            //if (tx.isActive()) {
-            //    tx.rollback();
-            //}
+
         }
         return result;
     }
 
     @Override
     public Iterable<Key> put(Iterable<Object> objects) {
-        throw new RuntimeException("Not yet implemented");
+        List<Key> keys = new LinkedList<>();
+        for (Object o : objects){
+           keys.add(put(o));
+        }
+        return keys;
     }
 
     @Override
     public Key putInTransaction(Object object) {
-        throw new RuntimeException("Not yet implemented");
-    }
+        Transaction tx = _ds.beginTransaction(_options);
+        Key result = null;
+        try {
+            Iterable<Entity> entities = marshall(object);
+            List<Key> keys = _ds.put(entities);
+            assert list(entities).size() == keys.size();
+            result = Iterables.getLast(keys);
+        } catch (Exception e) {
+            e.printStackTrace();
+            tx.rollback();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+        }
+        return result;    }
 
     @Override
     public Iterable<Key> putInTransaction(Iterable<Object> objects) {
