@@ -138,7 +138,12 @@ public class Find<V> {
                 }
                 public V next() {
                     Entity e = eit.next();
-                    V instance = createInstance(_clazz);
+                    V instance = null;
+                    if(_clazz.equals(Map.class)){
+                        instance = (V) new LinkedHashMap<>();
+                    } else {
+                        instance = createInstance(_clazz);
+                    }
                     objectStore.unmarshaller().unmarshall(instance, e);
                     return instance;
                 }

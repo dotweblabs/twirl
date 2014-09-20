@@ -181,6 +181,11 @@ public class GaeObjectStore implements ObjectStore {
     }
 
     @Override
+    public <T> Find find(Class<T> clazz, String kind) {
+        return new Find(this, clazz, kind);
+    }
+
+    @Override
     public <T> Find find(Class<T> clazz){
         return new Find(this, clazz, getKind(clazz));
     }
@@ -237,6 +242,41 @@ public class GaeObjectStore implements ObjectStore {
         }
         return result;
     }
+
+    @Override
+    public <T> T get(Class<T> clazz, String kind, String key) {
+        T result = null;
+        try {
+            Entity e = _ds.get(KeyStructure.createKey(kind, key));
+            if(clazz.equals(Map.class)){
+                result = (T) new LinkedHashMap<>();
+            } else {
+                result = createInstance(clazz);
+            }
+            unmarshaller().unmarshall(result, e);
+        } catch (EntityNotFoundException e1) {
+            // TODO: Wrap the exception
+            e1.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public <T> T get(Class<T> clazz, String kind, Long id) {
+        T result = null;
+        try {
+            Entity e = _ds.get(KeyStructure.createKey(kind, id));
+            if(clazz.equals(Map.class)){
+                result = (T) new LinkedHashMap<>();
+            } else {
+                result = createInstance(clazz);
+            }
+            unmarshaller().unmarshall(result, e);
+        } catch (EntityNotFoundException e1) {
+            // TODO: Wrap the exception
+            e1.printStackTrace();
+        }
+        return result;    }
 
     @Override
     public Iterable<Object> get(Iterable<Key> keys) {
