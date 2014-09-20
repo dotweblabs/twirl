@@ -94,6 +94,8 @@ public class GaeMarshaller implements Marshaller {
             } else if(field.isAnnotationPresent(Volatile.class)){
                 // skip
                 continue;
+            } else if(field.isAnnotationPresent(Kind.class)){
+                continue;
             }
             try {
                 boolean isAccessible = field.isAccessible();

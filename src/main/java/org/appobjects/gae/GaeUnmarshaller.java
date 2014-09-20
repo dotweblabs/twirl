@@ -93,10 +93,15 @@ public class GaeUnmarshaller implements Unmarshaller {
 
         assert validator.validate(destination) == true;
 
-        //Map<String, Object> unmarshalled = new LinkedHashMap<String, Object>();
         Map<String,Object> props = entity.getProperties();
-
         Key key = entity.getKey();
+
+        if(destination instanceof Map){
+            ((Map)destination).putAll(entity.getProperties());
+            ((Map)destination).put(Entity.KEY_RESERVED_PROPERTY, key.getName());
+            return;
+        }
+
         AnnotatedField idField
                 = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.key(), destination);
         if(idField.getFieldType().equals(String.class)){
@@ -178,77 +183,7 @@ public class GaeUnmarshaller implements Unmarshaller {
                     }
                 }
             }
-
-/*
-            if(fieldValue == null){
-                for (Field field : fcd err  ields){
-                    if(field.getName().equals(fieldName)){
-                        Class<?> fieldType = field.getType();
-                        setFieldValue(field, destination, fieldValue);
-                    }
-                }
-            } else if(fieldValue instanceof Key){ // child
-                try{
-                    Entity e = store.getDatastoreService()
-                            .get((com.google.appengine.api.datastore.Key)fieldValue);
-                    AnnotatedField annotatedField
-                            = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.child(), destination);
-                    Object childInstance = store.createInstance(annotatedField.getFieldType());
-                    unmarshall(childInstance, e);
-                } catch (EntityNotFoundException e){
-                    fieldValue = null;
-                }
-            } else if(fieldValue instanceof String
-                    || fieldValue instanceof Boolean
-                    || fieldValue instanceof Number) {
-                for (Field field : fields){
-                    if(field.getName().equals(fieldName)){
-                        Class<?> fieldType = field.getType();
-                        if (field.getType().equals(String.class)){
-                            setFieldValue(field, destination, String.valueOf(fieldValue));
-                        } else if (field.getType().equals(Boolean.class)){
-                            setFieldValue(field, destination, (Boolean)fieldValue);
-                        } else if (field.getType().equals(Long.class)){
-                            setFieldValue(field, destination, (Long) fieldValue);
-                        } else if (field.getType().equals(Integer.class)){
-                            if(fieldValue.getClass().equals(Long.class)){
-                                Long value = (Long) fieldValue;
-                                setFieldValue(field, destination, value.intValue());
-                            } else {
-                                setFieldValue(field, destination, (Integer)fieldValue);
-                            }
-                        } else if (field.getType().equals(int.class)){
-                            setFieldValue(field, destination, ((Integer)fieldValue).intValue());
-                        } else if (field.getType().equals(long.class)){
-                            setFieldValue(field, destination, ((Long)fieldValue).longValue());
-                        } else if (field.getType().equals(boolean.class)){
-                            setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
-                        }
-                    }
-                }
-            } else if (fieldValue instanceof EmbeddedEntity) { // POJO's
-                Class<?> fieldValueType = fieldValue.getClass();
-                EmbeddedEntity ee = (EmbeddedEntity) fieldValue;
-                Map<String,Object> map = ee.getProperties();
-                store.createInstance(fieldValueType);
-
-
-            } else if (fieldValue.getClass().isPrimitive()){
-                // TODO
-            }
-*/
         }
-
-//        for (Field f : destination.getClass().getDeclaredFields()){
-//            if(f.isAnnotationPresent(GaeObjectStore.key())) {
-//                // skip
-//            } else if(f.isAnnotationPresent(GaeObjectStore.parent())){
-//
-//            } else if(f.isAnnotationPresent(GaeObjectStore.child())){
-//                Object child = store.createInstance(f.getType());
-//                setFieldValue(f, destination, child);
-//            }
-//        }
     }
 
     /**

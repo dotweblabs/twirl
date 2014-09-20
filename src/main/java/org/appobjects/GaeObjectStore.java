@@ -235,7 +235,8 @@ public class GaeObjectStore implements ObjectStore {
             // TODO: Wrap the exception
             e1.printStackTrace();
         }
-        return result;    }
+        return result;
+    }
 
     @Override
     public Iterable<Object> get(Iterable<Key> keys) {

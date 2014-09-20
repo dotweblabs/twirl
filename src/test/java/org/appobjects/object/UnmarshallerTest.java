@@ -1,11 +1,13 @@
 package org.appobjects.object;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
+import com.google.appengine.api.datastore.Entity;
 import org.appobjects.GaeObjectStore;
 import org.appobjects.LocalDatastoreTestCase;
 import org.appobjects.gae.GaeUnmarshaller;
 import org.junit.Test;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.junit.Assert.*;
 
@@ -42,6 +44,19 @@ public class UnmarshallerTest extends LocalDatastoreTestCase {
         Object result = unmarshaller.getMapOrList(ee);
         assertTrue(result instanceof Map);
         assertEquals("TestValue", ((Map) result).get("TestProperty"));
+    }
+
+    @Test
+    public void testCreateMapFromEntity(){
+        Entity source = new Entity("TestKind");
+        source.setProperty("TestProperty", "TestValue");
+        source.setProperty("TestProperty2", "TestValue2");
+        Map<String,Object> destination = new LinkedHashMap<>();
+
+        unmarshaller.unmarshall(destination, source);
+
+        assertEquals("TestValue", destination.get("TestProperty"));
+        assertEquals("TestValue2", destination.get("TestProperty2"));
     }
 }
 
