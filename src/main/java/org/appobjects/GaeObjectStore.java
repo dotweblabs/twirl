@@ -412,7 +412,10 @@ public class GaeObjectStore implements ObjectStore {
             cls.put(clazz, kind);
         } else {
             for (Annotation annotation : annotations) {
-                org.appobjects.annotations.Entity entityAnnotation = (org.appobjects.annotations.Entity)annotation;
+                org.appobjects.annotations.Entity entityAnnotation = null;
+                if(annotation instanceof org.appobjects.annotations.Entity){
+                    entityAnnotation = (org.appobjects.annotations.Entity)annotation;
+                }
                 if(entityAnnotation != null){
                     String entityName = entityAnnotation.name();
                     String entitySpacer = entityAnnotation.spacer();
