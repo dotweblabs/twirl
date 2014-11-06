@@ -34,6 +34,14 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
+    public void testPut_noIdGiven(){
+        TestData.ChildEntity entity = new TestData.ChildEntity();
+        Key key = store.put(entity);
+        assertNotNull(key);
+        assertEquals(1L, key.getId());
+    }
+
+    @Test
     public void testPut_notRegistered(){
 
         RootEntity rootObject = new RootEntity(); // one Entity
