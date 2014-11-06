@@ -158,9 +158,21 @@ public class GaeUnmarshaller implements Unmarshaller {
                                     setFieldValue(field, destination, (Integer)fieldValue);
                                 }
                             } else if (field.getType().equals(int.class)){
-                                setFieldValue(field, destination, ((Integer)fieldValue).intValue());
+                                if(fieldValue.getClass().equals(Long.class) ||
+                                        fieldValue.getClass().equals(long.class)){
+                                    Long value = (Long) fieldValue;
+                                    setFieldValue(field, destination, value.intValue());
+                                } else {
+                                    setFieldValue(field, destination, ((Integer)fieldValue).intValue());
+                                }
                             } else if (field.getType().equals(long.class)){
-                                setFieldValue(field, destination, ((Long)fieldValue).longValue());
+                                if(fieldValue.getClass().equals(Integer.class) ||
+                                        fieldValue.getClass().equals(int.class)){
+                                    Integer value = (Integer) fieldValue;
+                                    setFieldValue(field, destination, value.longValue());
+                                } else {
+                                    setFieldValue(field, destination, ((Long)fieldValue).longValue());
+                                }
                             } else if (field.getType().equals(boolean.class)){
                                 setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
                             }
