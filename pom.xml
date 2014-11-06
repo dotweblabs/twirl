@@ -16,7 +16,7 @@
 	</properties>
 	
 	<repositories>
-        <repository>
+        <!--repository>
             <id>bintray</id>
             <url>http://dl.bintray.com/pastekit/appobjects/org/appobjects/appobjects/</url>
             <releases>
@@ -25,7 +25,7 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
+        </repository-->
 		<repository>
                 <id>mvnrepository</id>
                 <url>http://repo1.maven.org/maven2</url>
@@ -36,14 +36,6 @@
                     <enabled>true</enabled>
                 </releases>
        	</repository>
-        <repository>
-	        <id>gql</id>
-	        <url>https://raw.github.com/appobjects/gql/mvn-repo/</url>
-	        <snapshots>
-	            <enabled>true</enabled>
-	            <updatePolicy>always</updatePolicy>
-	        </snapshots>
-	    </repository>
   	</repositories>
 	
 	<dependencies>
@@ -88,11 +80,6 @@
 			<version>${appengine.target.version}</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>com.mungohq</groupId>
-            <artifactId>gql</artifactId>
-            <version>0.1.5</version>
-        </dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
@@ -180,7 +167,18 @@
 	</dependencies>
 	<build>
 	  <plugins>
-
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>attach-sources</id>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
 		<plugin>
 		    <artifactId>maven-deploy-plugin</artifactId>
 		    <version>2.7</version>
@@ -250,13 +248,13 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <distributionManagement>
+    <!--distributionManagement>
         <repository>
             <id>bintray-pastekit-appobjects-appobjects</id>
             <name>pastekit-appobjects-appobjects</name>
             <url>https://api.bintray.com/maven/pastekit/appobjects/appobjects</url>
         </repository>
-    </distributionManagement>
+    </distributionManagement-->
 
     <scm>
         <connection>scm:git:git@github.com:appobjects/appobjects.git</connection>
