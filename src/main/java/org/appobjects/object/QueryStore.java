@@ -86,7 +86,7 @@ public class QueryStore extends AbstractStore {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = querySortedLike(kind, filters, sorts, limit, offset);
+            final Iterator<Entity> eit = querySortedLike(kind, filters, sorts, limit, offset, false);
             it = new Iterator<Map<String,Object>>() {
                 public void remove() {
                     eit.remove();
@@ -137,7 +137,7 @@ public class QueryStore extends AbstractStore {
      */
     public Iterator<Entity> querySortedLike(String kind,
             Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
-            Integer limit, Integer offset){
+            Integer limit, Integer offset, boolean keysOnly){
 
         Preconditions.checkNotNull(query, "Query object can't be null");
         Preconditions.checkNotNull(sorts, "Sort can't be null");
@@ -167,7 +167,7 @@ public class QueryStore extends AbstractStore {
         if (!query.isEmpty()){
             // Apply filters and sorting for fields given in the filter query
             for (String propName : query.keySet()){
-                LOG.debug("Filter Property name="+propName);
+                LOG.debug("Filter Property name = " + propName + " and get keysOnly = " + keysOnly);
                 Pair<Query.FilterOperator, Object> filterAndValue = query.get(propName);
                 Query.FilterOperator operator = filterAndValue.getFirst();
                 Object value = filterAndValue.getSecond();
@@ -193,6 +193,9 @@ public class QueryStore extends AbstractStore {
                 Map.Entry<String, Query.SortDirection> sort = sortIterator.next();
                 q = new Query(kind).addSort(sort.getKey(), sort.getValue());
             }
+        }
+        if(keysOnly){
+            q.setKeysOnly();
         }
         pq = _ds.prepare(q);
         Iterator<Entity> res = pq.asIterator(fetchOptions);

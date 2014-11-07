@@ -36,6 +36,7 @@ public class Find<V> {
     protected List<String> projections;
     protected Integer skip;
     protected Integer max;
+    protected boolean keysOnly = false;
 
     final GaeObjectStore objectStore;
     final QueryStore _store;
@@ -107,6 +108,11 @@ public class Find<V> {
         return this;
     }
 
+    public Find keysOnly(){
+        this.keysOnly = true;
+        return this;
+    }
+
     public Find projection(String field){
         throw new RuntimeException("Not yet implemented");
     }
@@ -131,7 +137,7 @@ public class Find<V> {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = _store.querySortedLike(_kind, filters, sorts, max, skip);
+            final Iterator<Entity> eit = _store.querySortedLike(_kind, filters, sorts, max, skip, keysOnly);
             it = new Iterator<V>() {
                 public void remove() {
                     eit.remove();

@@ -99,6 +99,29 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
     }
 
     @Test
+    public void tesdFindByPropertyKeysOnly(){
+
+        Object testEntity = TestData.createTestRootEnity();
+
+        Key key = store.put(testEntity);
+        Iterator<RootEntity> result
+                = store.find(RootEntity.class).equal("count", 25).keysOnly().now();
+
+        assertNotNull(key);
+        assertEquals("TestRoot", key.getName());
+        assertNotNull(result);
+        assertTrue(result.hasNext());
+
+        RootEntity entity = result.next();
+
+        assertEquals("TestRoot", entity.getKey());
+
+        // Should be nulls because query is "keys only"
+        assertNull(entity.getNewChildEntity());
+        assertNull(entity.getEmbeddedEntity());
+    }
+
+    @Test
     public void testGetById(){
 
         Object testEntity = TestData.createTestRootEnity();
