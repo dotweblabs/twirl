@@ -78,10 +78,16 @@ public class GaeUnmarshaller implements Unmarshaller {
     private void setFieldValue(Field field, Object instance, Object value){
         boolean accessible = field.isAccessible();
         Class<?> clazz = field.getType();
-        field.setAccessible(true);
         try {
-            field.set(instance, value);
-            field.setAccessible(accessible);
+            if((field.getModifiers() & java.lang.reflect.Modifier.FINAL)
+                    == java.lang.reflect.Modifier.FINAL){
+                // do nothing for a final field
+                // usually static UID fields
+            } else {
+                field.setAccessible(true);
+                field.set(instance, value);
+                field.setAccessible(accessible);
+            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }

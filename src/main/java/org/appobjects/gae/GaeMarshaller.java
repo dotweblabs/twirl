@@ -87,6 +87,12 @@ public class GaeMarshaller implements Marshaller {
             if (target == null){
                 target = new LinkedList<Entity>();
             }
+            if((field.getModifiers() & java.lang.reflect.Modifier.FINAL)
+                    == java.lang.reflect.Modifier.FINAL){
+                // do nothing for a final field
+                // usually static UID fields
+                continue;
+            }
             String fieldName = field.getName();
             if(field.isAnnotationPresent(Id.class)){
                 // skip
