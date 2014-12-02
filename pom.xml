@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.appobjects</groupId>
-	<artifactId>appobjects</artifactId>
+	<groupId>com.textquo</groupId>
+	<artifactId>twist</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
-	<name>appobjects-SNAPSHOT</name>
+	<name>twist-SNAPSHOT</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<version.slf4j>1.7.5</version.slf4j>
@@ -18,7 +18,7 @@
 	<repositories>
         <!--repository>
             <id>bintray</id>
-            <url>http://dl.bintray.com/pastekit/appobjects/org/appobjects/appobjects/</url>
+            <url>http://dl.bintray.com/textquo/twist/com/textquo/twist/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -197,8 +197,8 @@
                 <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
                 <branch>refs/heads/mvn-repo</branch>
                 <includes><include>**/*</include></includes>
-                <repositoryName>appobjects</repositoryName>
-                <repositoryOwner>appobjects</repositoryOwner>
+                <repositoryName>twist</repositoryName>
+                <repositoryOwner>textquo</repositoryOwner>
             </configuration>
             <executions>
               <execution>
@@ -247,18 +247,10 @@
             <url>http://oss.sonatype.org/content/groups/public</url>
         </pluginRepository>
     </pluginRepositories>
-
-    <!--distributionManagement>
-        <repository>
-            <id>bintray-pastekit-appobjects-appobjects</id>
-            <name>pastekit-appobjects-appobjects</name>
-            <url>https://api.bintray.com/maven/pastekit/appobjects/appobjects</url>
-        </repository>
-    </distributionManagement-->
-
+a
     <scm>
-        <connection>scm:git:git@github.com:appobjects/appobjects.git</connection>
-        <url>scm:git:git@github.com:appobjects/appobjects.git</url>
-        <developerConnection>scm:git:git@github.com:appobjects/appobjects.git</developerConnection>
+        <connection>scm:git:git@github.com:textquo/twist.git</connection>
+        <url>scm:git:git@github.com:textquo/twist.git</url>
+        <developerConnection>scm:git:git@github.com:textquo/twist.git</developerConnection>
     </scm>
 </project>
