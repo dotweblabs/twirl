@@ -4,13 +4,12 @@ appObjects
 Yet Another Google App Engine Datastore ORM with a twist!
 
 ```
-                    _______ __    __            __         
- .---.-.-----.-----|   _   |  |--|__.-----.----|  |_.-----.
- |  _  |  _  |  _  |.  |   |  _  |  |  -__|  __|   _|__ --|
- |___._|   __|   __|.  |   |_____|  |_____|____|____|_____|
-       |__|  |__|  |:  1   |    |___|                      
-                   |::.. . |
-                   `-------'     
+  __            __       __   
+ |  |_.--.--.--|__.-----|  |_ 
+ |   _|  |  |  |  |__ --|   _|
+ |____|________|__|_____|____|
+ :: Twist :: Object Mapping ::
+                                
 ```
                                                            
 appObjects aims to provide a lightweight Object mapping framework. Without adding complexity into the api. 
