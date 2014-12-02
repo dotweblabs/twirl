@@ -12,9 +12,9 @@ Yet Another Google App Engine Datastore ORM with a twist!
                                 
 ```
                                                            
-appObjects aims to provide a lightweight Object mapping framework. Without adding complexity into the api. 
+twists aims to provide a lightweight Object mapping framework. Without adding complexity into the api.
 
-[![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/appObjects)
+[![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/twist)
 
 ###Setup
 
@@ -125,9 +125,10 @@ Version
 Tech
 -----------
 
-appObjects uses a number of open source projects to work properly:
+twist uses a number of open source projects to work properly:
 
 * [GAE SDK] - SDK for the AppEngine platform (GAE, AppScale or CapeDwarf)
+* boon
 
 Installation
 --------------
@@ -140,8 +141,8 @@ or add this to your POM:
 
     <repositories>
 	    <repository>
-	        <id>appobjects</id>
-	        <url>https://raw.github.com/appobjects/appobjects/mvn-repo/</url>
+	        <id>twist</id>
+	        <url>https://raw.github.com/textquo/twist/mvn-repo/</url>
 	        <snapshots>
 	            <enabled>true</enabled>
 	            <updatePolicy>always</updatePolicy>
@@ -153,8 +154,8 @@ Dependency
 --------------
 
         <dependency>
-		  <groupId>org.appobjects</groupId>
-		  <artifactId>appobjects</artifactId>
+		  <groupId>com.textquo</groupId>
+		  <artifactId>twist</artifactId>
 		  <version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
