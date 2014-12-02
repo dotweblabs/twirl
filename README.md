@@ -1,5 +1,5 @@
-appObjects
-==========
+twist
+=====
 
 Yet Another Google App Engine Datastore ORM with a twist!
 
