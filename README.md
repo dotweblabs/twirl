@@ -16,6 +16,8 @@ twists aims to provide a lightweight Object mapping framework. Without adding co
 
 [![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/twist)
 
+[![Build Status](https://travis-ci.org/textquo/twist.svg?branch=master)](https://travis-ci.org/textquo/twist)
+
 ###Setup
 
 ```java
