@@ -141,16 +141,14 @@ mvn clean install
 
 or add this to your POM:
 
-    <repositories>
-	    <repository>
-	        <id>twist</id>
-	        <url>https://raw.github.com/textquo/twist/mvn-repo/</url>
-	        <snapshots>
-	            <enabled>true</enabled>
-	            <updatePolicy>always</updatePolicy>
-	        </snapshots>
-	    </repository>
-    </repositories>
+        <repositories>
+            <!-- Snapshot repository -->
+            <repository>
+                <id>oss-jfrog-artifactory-snapshots</id>
+                <name>oss-jfrog-artifactory-snapshots</name>
+                <url>http://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+            </repository>
+        </repositories>
 
 Dependency
 --------------
