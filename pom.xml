@@ -179,15 +179,15 @@
                 </execution>
             </executions>
         </plugin>
-		<plugin>
+		<!--plugin>
 		    <artifactId>maven-deploy-plugin</artifactId>
 		    <version>2.7</version>
 		    <configuration>
 		        <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
 		    </configuration>
-		</plugin>
+		</plugin-->
 
-        <plugin>
+        <!--plugin>
             <groupId>com.github.github</groupId>
             <artifactId>site-maven-plugin</artifactId>
             <version>0.9</version>
@@ -208,7 +208,7 @@
                 <phase>deploy</phase>
               </execution>
             </executions>
-        </plugin>
+        </plugin-->
 
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -247,9 +247,16 @@
             <url>http://oss.sonatype.org/content/groups/public</url>
         </pluginRepository>
     </pluginRepositories>
-    <scm>
+    <!--scm>
         <connection>scm:git:git@github.com:textquo/twist.git</connection>
         <url>scm:git:git@github.com:textquo/twist.git</url>
         <developerConnection>scm:git:git@github.com:textquo/twist.git</developerConnection>
-    </scm>
+    </scm-->
+    <distributionManagement>
+        <repository>
+            <id>bintray-textquo-maven-twist</id>
+            <name>artifactory-snapshots</name>
+            <url>http://oss.jfrog.org/simple/oss-snapshot-local/com/textquo/twist/</url>
+        </repository>
+    </distributionManagement>
 </project>
