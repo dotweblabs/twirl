@@ -16,16 +16,6 @@
 	</properties>
 	
 	<repositories>
-        <!--repository>
-            <id>bintray</id>
-            <url>http://dl.bintray.com/textquo/twist/com/textquo/twist/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository-->
 		<repository>
                 <id>mvnrepository</id>
                 <url>http://repo1.maven.org/maven2</url>
@@ -179,37 +169,6 @@
                 </execution>
             </executions>
         </plugin>
-		<!--plugin>
-		    <artifactId>maven-deploy-plugin</artifactId>
-		    <version>2.7</version>
-		    <configuration>
-		        <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
-		    </configuration>
-		</plugin-->
-
-        <!--plugin>
-            <groupId>com.github.github</groupId>
-            <artifactId>site-maven-plugin</artifactId>
-            <version>0.9</version>
-            <configuration>
-                <message>Maven artifacts for ${project.version}</message>
-                <noJekyll>true</noJekyll>
-                <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
-                <branch>refs/heads/mvn-repo</branch>
-                <includes><include>**/*</include></includes>
-                <repositoryName>twist</repositoryName>
-                <repositoryOwner>textquo</repositoryOwner>
-            </configuration>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>site</goal>
-                </goals>
-                <phase>deploy</phase>
-              </execution>
-            </executions>
-        </plugin-->
-
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
@@ -247,16 +206,11 @@
             <url>http://oss.sonatype.org/content/groups/public</url>
         </pluginRepository>
     </pluginRepositories>
-    <!--scm>
-        <connection>scm:git:git@github.com:textquo/twist.git</connection>
-        <url>scm:git:git@github.com:textquo/twist.git</url>
-        <developerConnection>scm:git:git@github.com:textquo/twist.git</developerConnection>
-    </scm-->
     <distributionManagement>
-        <repository>
+        <snapshotRepository>
             <id>bintray-textquo-maven-twist</id>
-            <name>artifactory-snapshots</name>
-            <url>http://oss.jfrog.org/simple/oss-snapshot-local/com/textquo/twist/</url>
-        </repository>
+            <name>oss-jfrog-artifactory-snapshots</name>
+            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
