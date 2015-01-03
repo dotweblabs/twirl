@@ -34,6 +34,7 @@ import com.textquo.twist.annotations.*;
 import com.textquo.twist.common.AutoGenerateStringIdException;
 import com.textquo.twist.object.KeyStructure;
 import com.textquo.twist.util.AnnotationUtil;
+import com.textquo.twist.util.MapHelper;
 import com.textquo.twist.util.StringHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.LogManager;
@@ -81,165 +82,187 @@ public class GaeMarshaller implements Marshaller {
         Map<String,Object> props = new LinkedHashMap<String, Object>();
         List<Entity> target = null;
         Entity e = new Entity(key);
-        Field[] fields = instance.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (target == null){
-                target = new LinkedList<Entity>();
-            }
-            if((field.getModifiers() & java.lang.reflect.Modifier.FINAL)
-                    == java.lang.reflect.Modifier.FINAL){
-                // do nothing for a final field
-                // usually static UID fields
-                continue;
-            }
-            String fieldName = field.getName();
-            if(field.isAnnotationPresent(Id.class)){
-                // skip
-                continue;
-            } else if(field.isAnnotationPresent(Volatile.class)){
-                // skip
-                continue;
-            } else if(field.isAnnotationPresent(Kind.class)){
-                continue;
-            }
-            try {
-                boolean isAccessible = field.isAccessible();
-                field.setAccessible(true);
-                Class<?> fieldType = field.getType();
-                Object fieldValue = field.get(instance);
-                if (fieldValue == null){
-                    e.setProperty(fieldName, null);
-                } else if (fieldValue instanceof String) {
-                    setProperty(e, fieldName, fieldValue);
-                } else if(fieldValue instanceof Number
-                        || fieldValue instanceof Long
-                        || fieldValue instanceof Integer
-                        || fieldValue instanceof Short) {
-                    setProperty(e, fieldName, fieldValue);
-                } else if(fieldValue instanceof Boolean) {
-                    setProperty(e, fieldName, fieldValue);
-                } else if(fieldValue instanceof Date) {
-                    setProperty(e, fieldName, fieldValue);
-                } else if(fieldValue instanceof User) { // GAE support this type
-                    setProperty(e, fieldName, fieldValue);
-                } else if(fieldValue instanceof List) {
-                    LOG.debug( "Processing List valueType");
-                    if (field.isAnnotationPresent(Embedded.class)){
-                        setProperty(e, fieldName, createEmbeddedEntityFromList((List) fieldValue));
-                    } else {
-                        throw new TwistException("List type should be annotated with @Embedded or @Flat");
-                    }
-                } else if(fieldValue instanceof Map){
-                    LOG.debug( "Processing Map valueType");
-                    if (field.isAnnotationPresent(Embedded.class)){
-                        setProperty(e, fieldName, createEmbeddedEntityFromMap((Map) fieldValue));
-                    } else if (field.isAnnotationPresent(Flat.class)){
-                        Map<String,Object> flat = (Map)fieldValue;
-                        Iterator<Map.Entry<String, Object>> it = flat.entrySet().iterator();
-                        if (!it.hasNext()){
-                            LOG.debug("Iterator is empty");
-                        }
-                        while (it.hasNext()){
-                            Object entry = it.next();
-                            try {
-                                Map.Entry<Object, Object> mapEntry
-                                        = (Map.Entry<Object, Object>) entry;
-                                Object entryKey = mapEntry.getKey();
-                                Object entryVal = mapEntry.getValue();
-                                if (entryVal instanceof Map){
-                                    setProperty(e, (String) entryKey, createEmbeddedEntityFromMap((Map) entryVal));
-                                } else if (entryVal instanceof List){
-                                    throw new RuntimeException("List values are not yet supported");
-                                } else if (entryVal instanceof String
-                                        || entryVal instanceof Number
-                                        || entryVal instanceof Boolean
-                                        || entryVal instanceof Date
-                                        || entryVal instanceof User) {
-                                    setProperty(e, (String) entryKey, entryVal);
-                                } else {
-                                    throw new RuntimeException("Unsupported GAE property type");
-                                }
-                                Preconditions.checkNotNull(e, "Entity is null");
-                            } catch (ClassCastException ex) {
-                                // Something is wrong here
-                                ex.printStackTrace();
-                            } catch (Exception ex){
-                                ex.printStackTrace();
-                            }
-                        }
-                    } else {
-                        throw new TwistException("Map type should be annotated with @Embedded or @Flat");
-                    }
-                } else {
-                    // For primitives
-                    if (fieldType.equals(int.class)){
-                        int i = (Integer) fieldValue;
-                        setProperty(e, fieldName, i);
-                    } else if (fieldType.equals(boolean.class)){
-                        boolean i = (Boolean) fieldValue;
-                        setProperty(e, fieldName, i);
-                    } else if (fieldType.equals(byte.class)){
-                        byte i = (Byte) fieldValue;
-                        setProperty(e, fieldName, i);
-                    } else if (fieldType.equals(short.class)){
-                        short i = (Short) fieldValue;
-                        setProperty(e, fieldName, i);
-                    } else if (fieldType.equals(long.class)){
-                        long i = (Long) fieldValue;
-                        setProperty(e, fieldName, i);
-                    } else if (fieldType.equals(float.class)){
-                        float i = (Float) fieldValue;
-                        setProperty(e, fieldName, i);
-                    } else if (fieldType.equals(double.class)){
-                        double i = (Double) fieldValue;
-                        setProperty(e, fieldName, i);
-                    } else { // POJO
-                        if (field.isAnnotationPresent(Embedded.class)){
-                            Map<String,Object> map = createMapFrom(fieldValue);
-                            EmbeddedEntity ee = createEmbeddedEntityFromMap(map);
-                            setProperty(e, fieldName, ee);
-                        } else if (field.isAnnotationPresent(Parent.class)){
-                            // @Parent first before @Child, don't switch. @Child needs parent Key.
-                            if (parent != null){
-                                // Case where a Parent entity is marshalled then during the
-                                // iteration process, a @Child entity is found
-                                Entity _target = new Entity(createKeyFrom(parent, instance));
-                                _target.setPropertiesFrom(e);
-                                e = _target;
-                            } else {
-                                // Case where a Child entity is first marshalled
-                                // at this point this child is not yet in the stack
-                                // and the Parent entity is not yet also in the stack
-                                // so we will create a Key from the "not yet marshalled" parent instance
-                                // or is it not? Let's check.
-                                Object parentField = field.get(instance);
-                                Entity parentEntity = stack.get(parentField);
-                                if(parentEntity!=null){
-                                    Entity _target = new Entity(createKeyFrom(parentEntity.getKey(), instance));
-                                    _target.setPropertiesFrom(e);
-                                    e = _target;
-                                } else{
-                                    Key generatedParentKey = createKeyFrom(null, parentField);
-                                    Entity _target = new Entity(createKeyFrom(generatedParentKey, instance));
-                                    _target.setPropertiesFrom(e);
-                                    e = _target;
-                                    marshall(null, parentField);
-                                }
-                            }
-                        } else if (field.isAnnotationPresent(Child.class)){
-                            Object childField = field.get(instance);
-                            marshall(e.getKey(), childField);
-                            Entity childEntity = stack.get(childField);
-                            Key childEntityKey = childEntity.getKey();
-                            setProperty(e, fieldName, childEntityKey);
-                        } else {
-                            throw new RuntimeException("POJO's must be annotated with @Embedded, @Parent or @Child annotations.");
-                        }
+        // Marshall java.util.Map
+        if(instance instanceof Map){
+            Map map = (Map) instance;
+            if(String.class.getName().equals(MapHelper.getKeyType(map))){
+                Iterator<Map.Entry<String,Object>> it = map.entrySet().iterator();
+                while(it.hasNext()){
+                    Map.Entry<String,Object> entry = it.next();
+                    String entryKey = entry.getKey();
+                    Object entryVal = entry.getValue();
+                    if(!entryKey.equals(GaeObjectStore.KEY_RESERVED_PROPERTY)
+                            && !entryKey.equals(GaeObjectStore.KIND_RESERVED_PROPERTY)
+                            && !entryKey.equals(GaeObjectStore.NAMESPACE_RESERVED_PROPERTY)){
+                        setProperty(e, entryKey, entryVal);
                     }
                 }
-                field.setAccessible(isAccessible);
-            } catch(IllegalAccessException ex){
-                ex.printStackTrace();
+            } else {
+                throw new RuntimeException(String.class.getName()
+                        + " is the only supported " + Map.class.getName() + " key");
+            }
+        } else {
+            // Marshall all other object types
+            Field[] fields = instance.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if (target == null){
+                    target = new LinkedList<Entity>();
+                }
+                if((field.getModifiers() & java.lang.reflect.Modifier.FINAL)
+                        == java.lang.reflect.Modifier.FINAL){
+                    // do nothing for a final field
+                    // usually static UID fields
+                    continue;
+                }
+                String fieldName = field.getName();
+                if(field.isAnnotationPresent(Id.class)){
+                    // skip
+                    continue;
+                } else if(field.isAnnotationPresent(Volatile.class)){
+                    // skip
+                    continue;
+                } else if(field.isAnnotationPresent(Kind.class)){
+                    continue;
+                }
+                try {
+                    boolean isAccessible = field.isAccessible();
+                    field.setAccessible(true);
+                    Class<?> fieldType = field.getType();
+                    Object fieldValue = field.get(instance);
+                    if (fieldValue == null){
+                        e.setProperty(fieldName, null);
+                    } else if (fieldValue instanceof String) {
+                        setProperty(e, fieldName, fieldValue);
+                    } else if(fieldValue instanceof Number
+                            || fieldValue instanceof Long
+                            || fieldValue instanceof Integer
+                            || fieldValue instanceof Short) {
+                        setProperty(e, fieldName, fieldValue);
+                    } else if(fieldValue instanceof Boolean) {
+                        setProperty(e, fieldName, fieldValue);
+                    } else if(fieldValue instanceof Date) {
+                        setProperty(e, fieldName, fieldValue);
+                    } else if(fieldValue instanceof User) { // GAE support this type
+                        setProperty(e, fieldName, fieldValue);
+                    } else if(fieldValue instanceof List) {
+                        LOG.debug( "Processing List valueType");
+                        if (field.isAnnotationPresent(Embedded.class)){
+                            setProperty(e, fieldName, createEmbeddedEntityFromList((List) fieldValue));
+                        } else {
+                            throw new TwistException("List type should be annotated with @Embedded or @Flat");
+                        }
+                    } else if(fieldValue instanceof Map){
+                        LOG.debug( "Processing Map valueType");
+                        if (field.isAnnotationPresent(Embedded.class)){
+                            setProperty(e, fieldName, createEmbeddedEntityFromMap((Map) fieldValue));
+                        } else if (field.isAnnotationPresent(Flat.class)){
+                            Map<String,Object> flat = (Map)fieldValue;
+                            Iterator<Map.Entry<String, Object>> it = flat.entrySet().iterator();
+                            if (!it.hasNext()){
+                                LOG.debug("Iterator is empty");
+                            }
+                            while (it.hasNext()){
+                                Object entry = it.next();
+                                try {
+                                    Map.Entry<Object, Object> mapEntry
+                                            = (Map.Entry<Object, Object>) entry;
+                                    Object entryKey = mapEntry.getKey();
+                                    Object entryVal = mapEntry.getValue();
+                                    if (entryVal instanceof Map){
+                                        setProperty(e, (String) entryKey, createEmbeddedEntityFromMap((Map) entryVal));
+                                    } else if (entryVal instanceof List){
+                                        throw new RuntimeException("List values are not yet supported");
+                                    } else if (entryVal instanceof String
+                                            || entryVal instanceof Number
+                                            || entryVal instanceof Boolean
+                                            || entryVal instanceof Date
+                                            || entryVal instanceof User) {
+                                        setProperty(e, (String) entryKey, entryVal);
+                                    } else {
+                                        throw new RuntimeException("Unsupported GAE property type");
+                                    }
+                                    Preconditions.checkNotNull(e, "Entity is null");
+                                } catch (ClassCastException ex) {
+                                    // Something is wrong here
+                                    ex.printStackTrace();
+                                } catch (Exception ex){
+                                    ex.printStackTrace();
+                                }
+                            }
+                        } else {
+                            throw new TwistException("Map type should be annotated with @Embedded or @Flat");
+                        }
+                    } else {
+                        // For primitives
+                        if (fieldType.equals(int.class)){
+                            int i = (Integer) fieldValue;
+                            setProperty(e, fieldName, i);
+                        } else if (fieldType.equals(boolean.class)){
+                            boolean i = (Boolean) fieldValue;
+                            setProperty(e, fieldName, i);
+                        } else if (fieldType.equals(byte.class)){
+                            byte i = (Byte) fieldValue;
+                            setProperty(e, fieldName, i);
+                        } else if (fieldType.equals(short.class)){
+                            short i = (Short) fieldValue;
+                            setProperty(e, fieldName, i);
+                        } else if (fieldType.equals(long.class)){
+                            long i = (Long) fieldValue;
+                            setProperty(e, fieldName, i);
+                        } else if (fieldType.equals(float.class)){
+                            float i = (Float) fieldValue;
+                            setProperty(e, fieldName, i);
+                        } else if (fieldType.equals(double.class)){
+                            double i = (Double) fieldValue;
+                            setProperty(e, fieldName, i);
+                        } else { // POJO
+                            if (field.isAnnotationPresent(Embedded.class)){
+                                Map<String,Object> map = createMapFrom(fieldValue);
+                                EmbeddedEntity ee = createEmbeddedEntityFromMap(map);
+                                setProperty(e, fieldName, ee);
+                            } else if (field.isAnnotationPresent(Parent.class)){
+                                // @Parent first before @Child, don't switch. @Child needs parent Key.
+                                if (parent != null){
+                                    // Case where a Parent entity is marshalled then during the
+                                    // iteration process, a @Child entity is found
+                                    Entity _target = new Entity(createKeyFrom(parent, instance));
+                                    _target.setPropertiesFrom(e);
+                                    e = _target;
+                                } else {
+                                    // Case where a Child entity is first marshalled
+                                    // at this point this child is not yet in the stack
+                                    // and the Parent entity is not yet also in the stack
+                                    // so we will create a Key from the "not yet marshalled" parent instance
+                                    // or is it not? Let's check.
+                                    Object parentField = field.get(instance);
+                                    Entity parentEntity = stack.get(parentField);
+                                    if(parentEntity!=null){
+                                        Entity _target = new Entity(createKeyFrom(parentEntity.getKey(), instance));
+                                        _target.setPropertiesFrom(e);
+                                        e = _target;
+                                    } else{
+                                        Key generatedParentKey = createKeyFrom(null, parentField);
+                                        Entity _target = new Entity(createKeyFrom(generatedParentKey, instance));
+                                        _target.setPropertiesFrom(e);
+                                        e = _target;
+                                        marshall(null, parentField);
+                                    }
+                                }
+                            } else if (field.isAnnotationPresent(Child.class)){
+                                Object childField = field.get(instance);
+                                marshall(e.getKey(), childField);
+                                Entity childEntity = stack.get(childField);
+                                Key childEntityKey = childEntity.getKey();
+                                setProperty(e, fieldName, childEntityKey);
+                            } else {
+                                throw new RuntimeException("POJO's must be annotated with @Embedded, @Parent or @Child annotations.");
+                            }
+                        }
+                    }
+                    field.setAccessible(isAccessible);
+                } catch(IllegalAccessException ex){
+                    ex.printStackTrace();
+                }
             }
         }
         stack.put(instance, e);
@@ -330,6 +353,13 @@ public class GaeMarshaller implements Marshaller {
 
     private static String getKindOf(Object instance){
         String kind;
+        if(instance instanceof Map){
+            kind = (String) ((Map) instance).get(GaeObjectStore.KIND_RESERVED_PROPERTY);
+            if(kind == null || kind.isEmpty()){
+                kind = instance.getClass().getSimpleName();
+            }
+            return kind;
+        }
         com.textquo.twist.annotations.Entity anno
                 = (com.textquo.twist.annotations.Entity) AnnotationUtil.getClassAnnotation(com.textquo.twist.annotations.Entity.class, instance);
         AnnotationUtil.AnnotatedField kindField = AnnotationUtil.getFieldWithAnnotation(Kind.class, instance);
@@ -360,6 +390,22 @@ public class GaeMarshaller implements Marshaller {
         Key key = null;
         Object id = null;
         String kind = getKindOf(instance);
+        if(instance instanceof Map){
+            id = ((Map) instance).get(GaeObjectStore.KEY_RESERVED_PROPERTY);
+            if(id != null){
+                if(id instanceof Long || instance.getClass().equals(long.class)){
+                    key = KeyStructure.createKey(parent, kind, (Long)id);
+                } else if (id instanceof String){
+                    key = KeyStructure.createKey(parent, kind, (String)id);
+                } else {
+                    throw new RuntimeException("Unsupported " + GaeObjectStore.KEY_RESERVED_PROPERTY + ". Use String or Long type");
+                }
+            } else {
+                // auto-generate "key" when not supplied
+                key = KeyStructure.createKey(parent, kind, KeyStructure.autoLongId(kind));
+            }
+            return key;
+        }
         AnnotationUtil.AnnotatedField idField = AnnotationUtil.getFieldWithAnnotation(Id.class, instance);
         if (idField != null){
             Class<?> clazz = idField.getFieldType();
@@ -707,7 +753,7 @@ public class GaeMarshaller implements Marshaller {
         if (!GAE_SUPPORTED_TYPES.contains(value.getClass())
                 && !(value instanceof Blob) && !(value instanceof EmbeddedEntity)) {
             throw new RuntimeException("Unsupported type[class=" + value.
-                    getClass().getName() + "] in Latke GAE repository");
+                    getClass().getName() + "] in GAE repository");
         }
         if (value instanceof String) {
             final String valueString = (String) value;
