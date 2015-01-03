@@ -37,8 +37,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by kerby on 4/27/14.
@@ -100,6 +102,66 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         assertEquals("TestUser", key.getParent().getName());
         assertEquals(rootObject.getKey(), key.getParent().getName());
 
+    }
+
+    @Test
+    public void testPut_map(){
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("__key__", "testKey");
+        map.put("__kind__", "testKind");
+        map.put("testField", "testField");
+
+        Key key = store.put(map);
+
+        assertNotNull(key);
+        assertNull(key.getParent());
+        assertEquals("testKey", key.getName());
+        assertEquals("testKind", key.getKind());
+
+        Map result = store.get(Map.class, "testKind", "testKey");
+
+        assertNotNull(result);
+        assertEquals("testKey", map.get(GaeObjectStore.KEY_RESERVED_PROPERTY));
+        assertEquals("testKind", map.get(GaeObjectStore.KIND_RESERVED_PROPERTY));
+        assertEquals("testField", map.get("testField"));
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void testPut_innerMap(){
+        Map<String,Object> map = new HashMap<String,Object>();
+        Map<String,Object> inner = new HashMap<String,Object>();
+
+        inner.put("innerField1", "innerField1");
+
+        map.put("__key__", "testKey");
+        map.put("__kind__", "testKind");
+        map.put("testField", inner);
+
+        Key key = store.put(map);
+    }
+
+    @Test
+    public void testPut_map_noKey(){
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("__kind__", "testKind");
+        Key key = store.put(map);
+
+        assertNotNull(key);
+        assertNull(key.getParent());
+        assertNull(key.getName());
+        assertEquals("testKind", key.getKind());
+    }
+
+    @Test
+    public void testPut_map_noKeyNoKind(){
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("testField", "testField");
+        Key key = store.put(map);
+
+        assertNotNull(key);
+        assertNull(key.getParent());
+        assertNull(key.getName());
+        assertEquals(HashMap.class.getSimpleName(), key.getKind());
     }
 
     @Test

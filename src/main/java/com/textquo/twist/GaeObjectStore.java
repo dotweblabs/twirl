@@ -70,6 +70,8 @@ public class GaeObjectStore implements ObjectStore {
 
     protected static Logger LOG = LogManager.getLogger(GaeObjectStore.class.getName());
     public static String KEY_RESERVED_PROPERTY = Entity.KEY_RESERVED_PROPERTY;
+    public static String KIND_RESERVED_PROPERTY = "__kind__";
+    public static String NAMESPACE_RESERVED_PROPERTY = "__namespace__";
 
     protected DatastoreService _ds;
     protected static TransactionOptions _options;
@@ -272,7 +274,8 @@ public class GaeObjectStore implements ObjectStore {
             // TODO: Wrap the exception
             e1.printStackTrace();
         }
-        return result;    }
+        return result;
+    }
 
     @Override
     public Iterable<Object> get(Iterable<Key> keys) {
@@ -322,16 +325,10 @@ public class GaeObjectStore implements ObjectStore {
     @Override
     public Key put(Object object) {
         Key result = null;
-        try {
-            Iterable<Entity> entities = marshall(object);
-            List<Key> keys = _ds.put(entities);
-            assert list(entities).size() == keys.size();
-            result = Iterables.getLast(keys);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-
-        }
+        Iterable<Entity> entities = marshall(object);
+        List<Key> keys = _ds.put(entities);
+        assert list(entities).size() == keys.size();
+        result = Iterables.getLast(keys);
         return result;
     }
 
