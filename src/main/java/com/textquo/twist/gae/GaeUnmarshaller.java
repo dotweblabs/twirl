@@ -158,14 +158,16 @@ public class GaeUnmarshaller implements Unmarshaller {
         }
         AnnotatedField idField
                 = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.key(), destination);
-        if(idField.getFieldType().equals(String.class)){
-            idField.setFieldValue(key.getName());
-        } else if(idField.getFieldType().equals(Long.class)){
-            idField.setFieldValue(key.getId());
-        } else if(idField.getFieldType().equals(long.class)){
-            idField.setFieldValue(key.getId());
-        } else {
-            throw new RuntimeException("Invalid key was retrieved with type " + idField.getFieldType());
+        if(idField != null){
+            if(idField.getFieldType().equals(String.class)){
+                idField.setFieldValue(key.getName());
+            } else if(idField.getFieldType().equals(Long.class)){
+                idField.setFieldValue(key.getId());
+            } else if(idField.getFieldType().equals(long.class)){
+                idField.setFieldValue(key.getId());
+            } else {
+                throw new RuntimeException("Invalid key was retrieved with type " + idField.getFieldType());
+            }
         }
 
         Iterator<Map.Entry<String,Object>> it = props.entrySet().iterator();
