@@ -1,7 +1,7 @@
 twist
 =====
 
-Yet Another Google App Engine Datastore ORM with a twist!
+Yet Another Google App Engine Datastore ORM with a twist! (We need your support, fork it, and try it)
 
 ```
   __            __       __   
