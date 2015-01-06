@@ -24,7 +24,9 @@ package com.textquo.twist;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.textquo.twist.annotations.Cached;
 import com.textquo.twist.annotations.Child;
+import com.textquo.twist.annotations.Entity;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.AnnotationUtil.AnnotatedField;
 import org.junit.After;
@@ -56,6 +58,14 @@ public class AnnotationUtilTest {
         assertTrue(!fields.isEmpty());
 
 	}
+
+    @Test
+    public void test_Entity_annotation(){
+        TestData.RootEntityWithAnno e = new TestData.RootEntityWithAnno();
+        TestData.Post e1 = new TestData.Post();
+        assertTrue(AnnotationUtil.isClassAnnotated(Entity.class, e));
+        assertTrue(AnnotationUtil.isClassAnnotated(Cached.class, e1));
+    }
 
     @Test
     public void testGetAnnotatedField() {

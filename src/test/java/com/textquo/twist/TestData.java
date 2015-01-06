@@ -229,6 +229,35 @@ public class TestData {
 
     }
 
+    @Cached
+    @Entity
+    public static class Post {
+        @Id
+        private Long id;
+        private String userId;
+        private String message;
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
+
     public static RootEntity createTestRootEnity(){
         RootEntity rootObject = new RootEntity(); // one Entity
         ChildEntity childObject = new ChildEntity("TestChild");
