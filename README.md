@@ -14,6 +14,8 @@ Yet Another Google App Engine Datastore ORM with a twist!
                                                            
 twists aims to provide a lightweight Object mapping framework. Without adding complexity into the api.
 
+Persisting POJO's, Maps and (soon Primitive types) directly into the datastore. 
+
 [![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/twist)
 
 [![Build Status](https://travis-ci.org/textquo/twist.svg?branch=master)](https://travis-ci.org/textquo/twist)
