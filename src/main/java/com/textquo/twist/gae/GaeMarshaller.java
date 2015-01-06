@@ -734,7 +734,7 @@ public class GaeMarshaller implements Marshaller {
     }
 
     private static void setProperty(Entity entity, String key, Object value){
-        LOG.info("Setting property key: " + key);
+        LOG.debug("Setting property key: " + key);
 
         Preconditions.checkNotNull(entity, "Entity can't be null");
         Preconditions.checkNotNull(key, "Entity property key can't be null");
