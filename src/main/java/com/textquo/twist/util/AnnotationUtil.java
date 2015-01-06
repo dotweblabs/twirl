@@ -130,4 +130,8 @@ public class AnnotationUtil {
         return null;
     }
 
+    public static boolean isClassAnnotated(Class<? extends Annotation> clazz, Object instance){
+        return instance.getClass().isAnnotationPresent(clazz);
+    }
+
 }

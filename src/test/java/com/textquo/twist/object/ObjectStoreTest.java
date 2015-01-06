@@ -30,9 +30,8 @@ import com.google.common.collect.Lists;
 import com.textquo.twist.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.ObjectStore;
-import com.textquo.twist.TestData;
-import com.textquo.twist.TestData.RootEntity;
 import com.textquo.twist.LocalDatastoreTestCase;
+import com.textquo.twist.TestData;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -42,6 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static com.textquo.twist.TestData.*;
 /**
  * Created by kerby on 4/27/14.
  */
@@ -51,7 +51,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
 //    {
 //        GaeObjectStore.register(RootEntity.class);
-//        GaeObjectStore.register(TestData.ChildEntity.class);
+//        GaeObjectStore.register(ChildEntity.class);
 //    }
 
     @Rule
@@ -59,7 +59,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
     @Test
     public void testPut_noIdGiven(){
-        TestData.ChildEntity entity = new TestData.ChildEntity();
+        ChildEntity entity = new ChildEntity();
         Key key = store.put(entity);
         assertNotNull(key);
         assertEquals(1L, key.getId());
@@ -71,8 +71,8 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         RootEntity rootObject = new RootEntity(); // one Entity
 
         // String not set
-        //TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
-        //TestData.ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
+        //ChildEntity childObject = new ChildEntity("Test City");
+        //ChildEntity embeddedObject = new ChildEntity("Old Test City");
 
         rootObject.setId("TestParent");
         rootObject.setCount(25);
@@ -90,7 +90,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
         RootEntity rootObject = new RootEntity(); // one Entity
 
         // String not set
-        TestData.ChildEntity childObject = new TestData.ChildEntity("Test City");
+        ChildEntity childObject = new ChildEntity("Test City");
         childObject.setParent(rootObject);
         rootObject.setId("TestUser");
         rootObject.setCount(25);
@@ -165,9 +165,22 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
     }
 
     @Test
+    public void testPut_cached(){
+        TestData.Post post = new TestData.Post();
+        post.setUserId("testUserId");
+        post.setMessage("Test Message");
+        Key key = store.put(post);
+        Post saved = store.get(Post.class, key);
+
+        assertNotNull(saved);
+        assertEquals("testUserId", saved.getUserId());
+        assertEquals("Test Message", saved.getMessage());
+    }
+
+    @Test
     public void testGetByKey(){
 
-        Object testEntity = TestData.createTestRootEnity();
+        Object testEntity = createTestRootEnity();
         Key key = store.put(testEntity);
         RootEntity result = store.get(RootEntity.class, key);
 
@@ -185,7 +198,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
     @Test
     public void tesdFindByPropertyKeysOnly(){
 
-        Object testEntity = TestData.createTestRootEnity();
+        Object testEntity = createTestRootEnity();
 
         Key key = store.put(testEntity);
         Iterator<RootEntity> result
@@ -208,7 +221,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
     @Test
     public void testGetById(){
 
-        Object testEntity = TestData.createTestRootEnity();
+        Object testEntity = createTestRootEnity();
         Key key = store.put(testEntity);
         RootEntity result = store.get(RootEntity.class, "TestRoot");
 
@@ -225,7 +238,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
     @Test
     public void testDelete(){
-//        Object testEntity = TestData.createTestRootEnity();
+//        Object testEntity = createTestRootEnity();
 //        Key key = store.put(testEntity);
 //        RootEntity result = store.get(RootEntity.class, key);
 //        assertNotNull(result);

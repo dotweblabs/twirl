@@ -24,10 +24,15 @@ package com.textquo.twist;
 
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.textquo.twist.annotations.Cached;
 import com.textquo.twist.annotations.Child;
 import com.textquo.twist.annotations.Id;
+import com.textquo.twist.common.CacheInconsistencyException;
+import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.gae.GaeMarshaller;
 import com.textquo.twist.gae.GaeUnmarshaller;
 import com.textquo.twist.object.KeyStructure;
@@ -35,6 +40,7 @@ import com.textquo.twist.serializer.ObjectSerializer;
 import com.textquo.twist.types.Find;
 import com.textquo.twist.types.FindOne;
 import com.textquo.twist.types.Update;
+import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.StringHelper;
 import com.textquo.twist.annotations.Parent;
 import com.textquo.twist.wrappers.PrimitiveWrapper;
@@ -46,9 +52,6 @@ import java.util.*;
 
 import static org.boon.Lists.list;
 
-/**
- * Created by kerby on 4/27/14.
- */
 public class GaeObjectStore implements ObjectStore {
 
     public static Class<com.textquo.twist.annotations.Entity> entity(){
@@ -75,6 +78,7 @@ public class GaeObjectStore implements ObjectStore {
     public static String NAMESPACE_RESERVED_PROPERTY = "__namespace__";
 
     protected DatastoreService _ds;
+    protected MemcacheService _cache;
     protected static TransactionOptions _options;
     protected ObjectSerializer _serializer;
 
@@ -88,7 +92,10 @@ public class GaeObjectStore implements ObjectStore {
         if (_ds == null) {
             _ds = DatastoreServiceFactory.getDatastoreService();
             _options = TransactionOptions.Builder.withXG(true);
-            LOG.info("Create a new DatastoreService instance");
+            LOG.debug("Create a new DatastoreService instance");
+        }
+        if(_cache == null){
+            _cache = MemcacheServiceFactory.getMemcacheService();
         }
     }
 
@@ -210,10 +217,17 @@ public class GaeObjectStore implements ObjectStore {
                 unmarshaller().unmarshall(wrapper, e);
                 instance = wrapper.getValue();
             } else {
+                if (isCached(instance)) {
+                    Object cached = _cache.get(key);
+                    if(cached != null && cached.getClass().equals(Entity.class)){
+                        unmarshaller().unmarshall(instance, (Entity) cached);
+                        return (T) instance;
+                    }
+                }
                 unmarshaller().unmarshall(instance, e);
             }
         } catch (EntityNotFoundException e1) {
-            e1.printStackTrace();
+            throw new ObjectNotFoundException("Object with key=" + key.getName() + " not found");
         }
         return instance;
     }
@@ -233,8 +247,7 @@ public class GaeObjectStore implements ObjectStore {
                 unmarshaller().unmarshall(result, e);
             }
         } catch (EntityNotFoundException e1) {
-            // TODO: Wrap the exception
-            e1.printStackTrace();
+            throw new ObjectNotFoundException("Object with key=" + key + " not found");
         }
         return result;
     }
@@ -254,8 +267,7 @@ public class GaeObjectStore implements ObjectStore {
                 unmarshaller().unmarshall(result, e);
             }
         } catch (EntityNotFoundException e1) {
-            // TODO: Wrap the exception
-            e1.printStackTrace();
+            throw new ObjectNotFoundException("Object with id=" + id + " not found");
         }
         return result;
     }
@@ -272,8 +284,7 @@ public class GaeObjectStore implements ObjectStore {
             }
             unmarshaller().unmarshall(result, e);
         } catch (EntityNotFoundException e1) {
-            // TODO: Wrap the exception
-            e1.printStackTrace();
+            throw new ObjectNotFoundException("Object with key=" + key + " not found");
         }
         return result;
     }
@@ -290,8 +301,7 @@ public class GaeObjectStore implements ObjectStore {
             }
             unmarshaller().unmarshall(result, e);
         } catch (EntityNotFoundException e1) {
-            // TODO: Wrap the exception
-            e1.printStackTrace();
+            throw new ObjectNotFoundException("Object with id=" + id + " not found");
         }
         return result;
     }
@@ -302,7 +312,7 @@ public class GaeObjectStore implements ObjectStore {
         try {
             Map<Key,Entity> entities = _ds.get(keys);
         } catch (Exception e) {
-            // TODO: Wrap the exception
+            throw new ObjectNotFoundException("Object with keys=" + keys + " not found");
         }
         return result;
     }
@@ -343,12 +353,15 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public Key put(Object object) {
-        Key result = null;
+        Key key = null;
         Iterable<Entity> entities = marshall(object);
         List<Key> keys = _ds.put(entities);
         assert list(entities).size() == keys.size();
-        result = Iterables.getLast(keys);
-        return result;
+        key = Iterables.getLast(keys);
+        if(isCached(object)){
+            _cache.put(key, Iterables.getLast(entities));
+        }
+        return key;
     }
 
     @Override
@@ -508,6 +521,11 @@ public class GaeObjectStore implements ObjectStore {
             return true;
         }
         return false;
+    }
+
+    public boolean isCached(Object object){
+        boolean isCached = AnnotationUtil.isClassAnnotated(Cached.class, object);
+        return isCached;
     }
 
 }
