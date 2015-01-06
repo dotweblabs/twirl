@@ -65,7 +65,6 @@ public class GaeMarshaller implements Marshaller {
         stack.clear();
     }
 
-
     /**
      *
      * Create Entity objects that can be persisted into the GAE datastore,

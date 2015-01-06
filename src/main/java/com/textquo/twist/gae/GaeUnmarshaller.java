@@ -105,6 +105,23 @@ public class GaeUnmarshaller implements Unmarshaller {
             ((Map)destination).putAll(entity.getProperties());
             ((Map)destination).put(Entity.KEY_RESERVED_PROPERTY, key.getName());
             return;
+        } else if(destination.getClass().equals(String.class)){
+            throw new RuntimeException("Not yet implemented");
+        } else if(destination.getClass().equals(Long.class)
+                || destination.getClass().equals(long.class)){
+            throw new RuntimeException("Not yet implemented");
+        } else if(destination.getClass().equals(Integer.class)
+                || destination.getClass().equals(int.class)){
+            throw new RuntimeException("Not yet implemented");
+        } else if(destination.getClass().equals(Double.class)
+                || destination.getClass().equals(double.class)){
+            throw new RuntimeException("Not yet implemented");
+        } else if(destination.getClass().equals(Float.class)
+                || destination.getClass().equals(float.class)){
+            throw new RuntimeException("Not yet implemented");
+        } else if(destination.getClass().equals(Boolean.class)
+                || destination.getClass().equals(boolean.class)){
+            throw new RuntimeException("Not yet implemented");
         }
 
         AnnotatedField idField
