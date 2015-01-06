@@ -31,7 +31,10 @@ import com.textquo.twist.Unmarshaller;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.AnnotationUtil.AnnotatedField;
 import com.textquo.twist.validation.Validator;
+import com.textquo.twist.wrappers.PrimitiveWrapper;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.boon.Maps;
 
 
@@ -44,6 +47,9 @@ import static org.boon.Lists.list;
  * Created by kerby on 4/28/14.
  */
 public class GaeUnmarshaller implements Unmarshaller {
+
+    protected static Logger LOG = LogManager.getLogger(GaeUnmarshaller.class.getName());
+
 
     private final GaeObjectStore store;
     private final Validator validator = new Validator();
@@ -92,6 +98,29 @@ public class GaeUnmarshaller implements Unmarshaller {
         }
     }
 
+    private Object doUnmarshallPrimitive(Object destination, Transaction transaction, Entity entity){
+        if(destination.getClass().isPrimitive()
+                || destination.getClass().equals(String.class)
+                || destination.getClass().equals(Integer.class)
+                || destination.getClass().equals(Long.class)
+                || destination.getClass().equals(Double.class)
+                || destination.getClass().equals(Float.class)
+                || destination.getClass().equals(Boolean.class)){
+            if(entity.getProperties().size() > 1){
+                LOG.warn("Unmarshalling entity with multiple properties into primitive type will be serialized");
+                // TODO: Implement XStream serializer
+                throw new RuntimeException("Serializing multiple properties into primitve not yet implemented");
+            } else if (entity.getProperties().size() == 1){
+                String entityKey = entity.getProperties().keySet().iterator().next();
+                destination = entity.getProperty(entityKey);
+            } else {
+                // No items
+                destination = null;
+            }
+        }
+        return destination;
+    }
+
     private void doUnmarshall(Object destination, Transaction transaction, Entity entity){
         Preconditions.checkNotNull(destination, "Destination object cannot be null");
         Preconditions.checkNotNull(entity, "Source entity cannot be null");
@@ -100,30 +129,33 @@ public class GaeUnmarshaller implements Unmarshaller {
 
         Map<String,Object> props = entity.getProperties();
         Key key = entity.getKey();
+        String name = entity.getKey().getName();
 
-        if(destination instanceof Map){
+        if(destination instanceof PrimitiveWrapper){
+            PrimitiveWrapper wrapper = (PrimitiveWrapper) destination;
+            Object wrapped = wrapper.getValue();
+            if(wrapped.getClass().isPrimitive()
+                    || wrapped.getClass().equals(String.class)
+                    || wrapped.getClass().equals(Integer.class)
+                    || wrapped.getClass().equals(Long.class)
+                    || wrapped.getClass().equals(Double.class)
+                    || wrapped.getClass().equals(Float.class)
+                    || wrapped.getClass().equals(Boolean.class)){
+                if(entity.getProperties().size() > 1){
+                    LOG.warn("Unmarshalling entity with multiple properties into primitive type will be serialized");
+                    // TODO: Implement XStream serializer
+                    throw new RuntimeException("Serializing multiple properties into primitve not yet implemented");
+                } else if (entity.getProperties().size() == 1){
+                    String entityKey = entity.getProperties().keySet().iterator().next();
+                    wrapper.setValue(entity.getProperty(entityKey));
+                }
+            }
+            return;
+        } else if(destination instanceof Map){
             ((Map)destination).putAll(entity.getProperties());
             ((Map)destination).put(Entity.KEY_RESERVED_PROPERTY, key.getName());
             return;
-        } else if(destination.getClass().equals(String.class)){
-            throw new RuntimeException("Not yet implemented");
-        } else if(destination.getClass().equals(Long.class)
-                || destination.getClass().equals(long.class)){
-            throw new RuntimeException("Not yet implemented");
-        } else if(destination.getClass().equals(Integer.class)
-                || destination.getClass().equals(int.class)){
-            throw new RuntimeException("Not yet implemented");
-        } else if(destination.getClass().equals(Double.class)
-                || destination.getClass().equals(double.class)){
-            throw new RuntimeException("Not yet implemented");
-        } else if(destination.getClass().equals(Float.class)
-                || destination.getClass().equals(float.class)){
-            throw new RuntimeException("Not yet implemented");
-        } else if(destination.getClass().equals(Boolean.class)
-                || destination.getClass().equals(boolean.class)){
-            throw new RuntimeException("Not yet implemented");
         }
-
         AnnotatedField idField
                 = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.key(), destination);
         if(idField.getFieldType().equals(String.class)){

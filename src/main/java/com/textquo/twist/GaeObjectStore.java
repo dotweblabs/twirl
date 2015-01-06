@@ -37,6 +37,7 @@ import com.textquo.twist.types.FindOne;
 import com.textquo.twist.types.Update;
 import com.textquo.twist.util.StringHelper;
 import com.textquo.twist.annotations.Parent;
+import com.textquo.twist.wrappers.PrimitiveWrapper;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -204,7 +205,13 @@ public class GaeObjectStore implements ObjectStore {
         try {
             Entity e = _ds.get(key);
             instance = createInstance(clazz);
-            unmarshaller().unmarshall(instance, e);
+            if(isPrimitive(clazz)){
+                PrimitiveWrapper<T> wrapper = new PrimitiveWrapper<T>(instance);
+                unmarshaller().unmarshall(wrapper, e);
+                instance = wrapper.getValue();
+            } else {
+                unmarshaller().unmarshall(instance, e);
+            }
         } catch (EntityNotFoundException e1) {
             e1.printStackTrace();
         }
@@ -218,7 +225,13 @@ public class GaeObjectStore implements ObjectStore {
             String kind = getKind(clazz);
             Entity e = _ds.get(KeyStructure.createKey(kind, key));
             result = createInstance(clazz);
-            unmarshaller().unmarshall(result, e);
+            if(isPrimitive(clazz)){
+                PrimitiveWrapper<T> wrapper = new PrimitiveWrapper<T>(result);
+                unmarshaller().unmarshall(wrapper, e);
+                result = wrapper.getValue();
+            } else {
+                unmarshaller().unmarshall(result, e);
+            }
         } catch (EntityNotFoundException e1) {
             // TODO: Wrap the exception
             e1.printStackTrace();
@@ -233,7 +246,13 @@ public class GaeObjectStore implements ObjectStore {
             String kind = getKind(clazz);
             Entity e = _ds.get(KeyStructure.createKey(kind, id));
             result = createInstance(clazz);
-            unmarshaller().unmarshall(result, e);
+            if(isPrimitive(clazz)){
+                PrimitiveWrapper<T> wrapper = new PrimitiveWrapper<T>(result);
+                unmarshaller().unmarshall(wrapper, e);
+                result = wrapper.getValue();
+            } else {
+                unmarshaller().unmarshall(result, e);
+            }
         } catch (EntityNotFoundException e1) {
             // TODO: Wrap the exception
             e1.printStackTrace();
@@ -450,6 +469,20 @@ public class GaeObjectStore implements ObjectStore {
 
     public <T> T createInstance(Class<T> clazz) {
         try {
+            // TODO: This could be very dangerous
+            if(clazz.equals(String.class)){
+                return (T) new String();
+            } else  if(clazz.equals(Long.class) || clazz.equals(long.class)){
+                return (T) new Long(0);
+            } else  if(clazz.equals(Float.class) || clazz.equals(float.class)){
+                return (T) new Float(0);
+            } else  if(clazz.equals(Integer.class) || clazz.equals(int.class)){
+                return (T) new Integer(0);
+            } else  if(clazz.equals(Double.class) || clazz.equals(double.class)){
+                return (T) new Double(0);
+            } else  if(clazz.equals(Boolean.class) || clazz.equals(boolean.class)){
+                return (T) new Boolean(false);
+            }
             return clazz.newInstance();
         } catch (IllegalAccessException e){
             e.printStackTrace();
@@ -457,6 +490,24 @@ public class GaeObjectStore implements ObjectStore {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean isPrimitive(Class<?> clazz){
+        // TODO: This could be very dangerous
+        if(clazz.equals(String.class)){
+            return true;
+        } else  if(clazz.equals(Long.class) || clazz.equals(long.class)){
+            return true;
+        } else  if(clazz.equals(Float.class) || clazz.equals(float.class)){
+            return true;
+        } else  if(clazz.equals(Integer.class) || clazz.equals(int.class)){
+            return true;
+        } else  if(clazz.equals(Double.class) || clazz.equals(double.class)){
+            return true;
+        } else  if(clazz.equals(Boolean.class) || clazz.equals(boolean.class)){
+            return true;
+        }
+        return false;
     }
 
 }
