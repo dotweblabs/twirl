@@ -25,7 +25,7 @@ package com.textquo.twist.object;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.textquo.twist.GaeObjectStore;
-import com.textquo.twist.LocalDatastoreTestCase;
+import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.gae.GaeUnmarshaller;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 /**
  * Created by kerby on 4/28/14.
  */
-public class UnmarshallerTest extends LocalDatastoreTestCase {
+public class UnmarshallerTest extends LocalDatastoreTestBase {
 
 
     GaeUnmarshaller unmarshaller;

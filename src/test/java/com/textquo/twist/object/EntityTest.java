@@ -23,7 +23,7 @@
 package com.textquo.twist.object;
 
 import com.google.appengine.api.datastore.*;
-import com.textquo.twist.LocalDatastoreTestCase;
+import com.textquo.twist.LocalDatastoreTestBase;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 /**
  * Created by kerby on 5/2/14.
  */
-public class EntityTest extends LocalDatastoreTestCase {
+public class EntityTest extends LocalDatastoreTestBase {
 
     DatastoreService _ds = DatastoreServiceFactory.getDatastoreService();
 

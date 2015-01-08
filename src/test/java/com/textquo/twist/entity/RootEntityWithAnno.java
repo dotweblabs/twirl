@@ -20,18 +20,15 @@
  * :: Twist :: Object Mapping ::
  *
  */
-package com.textquo.twist.annotations;
+package com.textquo.twist.entity;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.RetentionPolicy;
+import com.textquo.twist.annotations.Entity;
 
 /**
- * Use this annotation to specify that a given POJO field to store the
- * field as a child entity, stored as a EmbeddedEntity into the com.textquo.twist.datastore
+ * Note, getDeclaredField is empty for this class
  */
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Child {
+@Entity(name = "CustomEntityName")
+public class RootEntityWithAnno extends RootEntity {
 }
+
+

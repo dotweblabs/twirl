@@ -22,21 +22,19 @@
  */
 package com.textquo.twist.util;
 
-import com.textquo.twist.LocalDatastoreTestCase;
-import com.textquo.twist.TestData;
+import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.annotations.Entity;
+import com.textquo.twist.entity.RootEntityWithAnno;
+import com.textquo.twist.entity.RootEntityWithNoAnno;
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
 import static org.junit.Assert.*;
 
-/**
- * Created by kerby on 4/23/14.
- */
-public class AnnotationUtilTest extends LocalDatastoreTestCase {
+public class AnnotationUtilTest extends LocalDatastoreTestBase {
     @Test
     public void test(){
-        Annotation a = AnnotationUtil.getClassAnnotation(Entity.class, new TestData.RootEntityWithNoAnno());
+        Annotation a = AnnotationUtil.getClassAnnotation(Entity.class, new RootEntityWithNoAnno());
         assertNotNull(a);
         assertTrue(a instanceof Entity);
         Entity e = (Entity) a;
@@ -45,7 +43,7 @@ public class AnnotationUtilTest extends LocalDatastoreTestCase {
 
     @Test
     public void testWithCustomName(){
-        Annotation a = AnnotationUtil.getClassAnnotation(Entity.class, new TestData.RootEntityWithAnno());
+        Annotation a = AnnotationUtil.getClassAnnotation(Entity.class, new RootEntityWithAnno());
         assertNotNull(a);
         assertTrue(a instanceof Entity);
         Entity e = (Entity) a;

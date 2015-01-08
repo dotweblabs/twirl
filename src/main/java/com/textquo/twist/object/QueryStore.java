@@ -46,7 +46,7 @@ public class QueryStore extends AbstractStore {
      * @return
      */
     protected boolean containsEntityWithFieldLike(String kind, Entity props){
-        Preconditions.checkNotNull(props, "Entity cannot be null");
+        Preconditions.checkNotNull(props, "entity cannot be null");
         boolean contains = false;
         Map<String,Object> m = props.getProperties();
         Transaction tx = _ds.beginTransaction();
@@ -128,7 +128,7 @@ public class QueryStore extends AbstractStore {
     }
 
     /**
-     * Builds a query filter from the given <code>Entity</code> property names and values and add sorting from
+     * Builds a query filter from the given <code>entity</code> property names and values and add sorting from
      * <code>Map</code> sorts.
      *
      * <br>
@@ -250,7 +250,7 @@ public class QueryStore extends AbstractStore {
 
 
     /**
-     * Builds a query filter from the given <code>Entity</code> property names and values and add sorting from
+     * Builds a query filter from the given <code>entity</code> property names and values and add sorting from
      * <code>Map</code> sorts.
      *
      * <br>
@@ -356,7 +356,7 @@ public class QueryStore extends AbstractStore {
 
     /**
      * Get a list of entities that matches the properties of a given
-     * <code>Entity</code>.
+     * <code>entity</code>.
      * This does not include the id.
      *
      * @return

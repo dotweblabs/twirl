@@ -22,8 +22,9 @@
  */
 package com.textquo.twist.object;
 
-import com.textquo.twist.LocalDatastoreTestCase;
+import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.TestData;
+import com.textquo.twist.entity.RootEntity;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -32,12 +33,12 @@ import static com.textquo.twist.ObjectStoreService.store;
 /**
  * Created by kerby on 5/16/14.
  */
-public class ObjecstoreServiceTest extends LocalDatastoreTestCase {
+public class ObjecstoreServiceTest extends LocalDatastoreTestBase {
     @Test
     public void testStore(){
-        TestData.RootEntity entity = TestData.createTestRootEnity();
+        RootEntity entity = TestData.createTestRootEnity();
         store().put(entity);
-        TestData.RootEntity one = store().get(TestData.RootEntity.class, "TestRoot");
+        RootEntity one = store().get(RootEntity.class, "TestRoot");
         
         assertNotNull(one);
     }

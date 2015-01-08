@@ -20,18 +20,37 @@
  * :: Twist :: Object Mapping ::
  *
  */
-package com.textquo.twist.annotations;
+package com.textquo.twist.entity;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.RetentionPolicy;
+import com.textquo.twist.annotations.Cached;
+import com.textquo.twist.annotations.Entity;
+import com.textquo.twist.annotations.Id;
 
-/**
- * Use this annotation to specify that a given POJO field to store the
- * field as a child entity, stored as a EmbeddedEntity into the com.textquo.twist.datastore
- */
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Child {
+@Cached
+@Entity
+public class Post {
+    @Id
+    private Long id;
+    private String userId;
+    private String message;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

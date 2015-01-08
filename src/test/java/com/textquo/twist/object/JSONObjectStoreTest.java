@@ -23,11 +23,11 @@
 package com.textquo.twist.object;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.common.collect.Lists;
 import com.textquo.twist.GaeObjectStore;
-import com.textquo.twist.LocalDatastoreTestCase;
+import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.ObjectStore;
 import com.textquo.twist.TestData;
+import com.textquo.twist.entity.JSONEntity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -35,21 +35,16 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class JSONObjectStoreTest extends LocalDatastoreTestCase {
+public class JSONObjectStoreTest extends LocalDatastoreTestBase {
 
     ObjectStore store = new GaeObjectStore();
-
-//    {
-//        GaeObjectStore.register(RootEntity.class);
-//        GaeObjectStore.register(TestData.ChildEntity.class);
-//    }
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void testPut_notRegistered(){
-        TestData.JSONEntity entity = new TestData.JSONEntity();
+        JSONEntity entity = new JSONEntity();
         entity.setKind("TestKind");
         entity.setId("TestId");
         entity.getFields().put("TestField1", "Test Value 1");
@@ -69,7 +64,7 @@ public class JSONObjectStoreTest extends LocalDatastoreTestCase {
 
     @Test
     public void testGetByKey(){
-        TestData.JSONEntity entity = new TestData.JSONEntity();
+        JSONEntity entity = new JSONEntity();
         entity.setKind("TestKind");
         entity.setId("TestId");
         entity.getFields().put("TestField1", "Test Value 1");
