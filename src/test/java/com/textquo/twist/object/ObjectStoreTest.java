@@ -22,7 +22,6 @@
  */
 package com.textquo.twist.object;
 
-import static org.boon.Boon.puts;
 import static org.boon.Lists.list;
 import static org.junit.Assert.*;
 
@@ -30,8 +29,11 @@ import com.google.common.collect.Lists;
 import com.textquo.twist.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.ObjectStore;
-import com.textquo.twist.LocalDatastoreTestCase;
+import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.TestData;
+import com.textquo.twist.entity.ChildEntity;
+import com.textquo.twist.entity.Post;
+import com.textquo.twist.entity.RootEntity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -45,7 +47,7 @@ import static com.textquo.twist.TestData.*;
 /**
  * Created by kerby on 4/27/14.
  */
-public class ObjectStoreTest extends LocalDatastoreTestCase {
+public class ObjectStoreTest extends LocalDatastoreTestBase {
 
     ObjectStore store = new GaeObjectStore();
 
@@ -68,7 +70,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
     @Test
     public void testPut_notRegistered(){
 
-        RootEntity rootObject = new RootEntity(); // one Entity
+        RootEntity rootObject = new RootEntity(); // one entity
 
         // String not set
         //ChildEntity childObject = new ChildEntity("Test City");
@@ -76,7 +78,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
         rootObject.setId("TestParent");
         rootObject.setCount(25);
-        //rootObject.setNewChildEntity(childObject); // one Entity
+        //rootObject.setNewChildEntity(childObject); // one entity
         //rootObject.setEmbeddedEntity(embeddedObject); // not included, @Embedded
 
         Key key = store.put(rootObject);
@@ -87,14 +89,14 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
     @Test
     public void testPut_child(){
-        RootEntity rootObject = new RootEntity(); // one Entity
+        RootEntity rootObject = new RootEntity(); // one entity
 
         // String not set
         ChildEntity childObject = new ChildEntity("Test City");
         childObject.setParent(rootObject);
         rootObject.setId("TestUser");
         rootObject.setCount(25);
-        //rootObject.setNewChildEntity(childObject); // one Entity, causes stackoverflow error
+        //rootObject.setNewChildEntity(childObject); // one entity, causes stackoverflow error
 
         Key key = store.put(childObject); // FIXME not consistent, RootEntity is not on last item!
 
@@ -166,7 +168,7 @@ public class ObjectStoreTest extends LocalDatastoreTestCase {
 
     @Test
     public void testPut_cached(){
-        TestData.Post post = new TestData.Post();
+        Post post = new Post();
         post.setUserId("testUserId");
         post.setMessage("Test Message");
         Key key = store.put(post);

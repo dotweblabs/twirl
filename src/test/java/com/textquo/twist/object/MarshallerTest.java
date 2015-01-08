@@ -29,11 +29,13 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.Marshaller;
 import com.textquo.twist.TestData;
-import com.textquo.twist.TestData.RootEntity;
-import com.textquo.twist.TestData.ChildEntity;
 import com.textquo.twist.common.AutoGenerateStringIdException;
+import com.textquo.twist.entity.ChildChildEntity;
+import com.textquo.twist.entity.ChildEntity;
+import com.textquo.twist.entity.JSONEntity;
+import com.textquo.twist.entity.RootEntity;
 import com.textquo.twist.gae.GaeMarshaller;
-import com.textquo.twist.LocalDatastoreTestCase;
+import com.textquo.twist.LocalDatastoreTestBase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -43,7 +45,7 @@ import java.util.IdentityHashMap;
 /**
  * Created by kerby on 4/23/14.
  */
-public class MarshallerTest extends LocalDatastoreTestCase {
+public class MarshallerTest extends LocalDatastoreTestBase {
 
     Marshaller testMarshaller =  new GaeMarshaller();
 
@@ -57,7 +59,7 @@ public class MarshallerTest extends LocalDatastoreTestCase {
 
     @Test
     public void testMarshall_withoutStringKey_shouldThrowError(){
-        RootEntity rootObject = new RootEntity(); // one Entity
+        RootEntity rootObject = new RootEntity(); // one entity
         thrown.expect(AutoGenerateStringIdException.class);
         IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, rootObject);
     }
@@ -78,12 +80,12 @@ public class MarshallerTest extends LocalDatastoreTestCase {
 
     @Test
     public void testMarshall_Child(){
-        RootEntity rootObject = new RootEntity(); // one Entity
-        ChildEntity childObject = new TestData.ChildEntity("Test City");
+        RootEntity rootObject = new RootEntity(); // one entity
+        ChildEntity childObject = new ChildEntity("Test City");
         rootObject.setId("TestUser");
         rootObject.setCount(25);
         childObject.setParent(rootObject);
-        rootObject.setNewChildEntity(childObject); // one Entity
+        rootObject.setNewChildEntity(childObject); // one entity
 
         IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, rootObject);
 
@@ -102,15 +104,15 @@ public class MarshallerTest extends LocalDatastoreTestCase {
 
     @Test
     public void testMarshall_Embedded(){
-        RootEntity rootObject = new RootEntity(); // one Entity
-        ChildEntity childObject = new TestData.ChildEntity("Test City");
-        ChildEntity embeddedObject = new TestData.ChildEntity("Old Test City");
+        RootEntity rootObject = new RootEntity(); // one entity
+        ChildEntity childObject = new ChildEntity("Test City");
+        ChildEntity embeddedObject = new ChildEntity("Old Test City");
         embeddedObject.setId(1L);
         embeddedObject.setType("EmbeddedType");
         rootObject.setId("TestUser");
         rootObject.setCount(25);
         childObject.setParent(rootObject);
-        rootObject.setNewChildEntity(childObject); // one Entity
+        rootObject.setNewChildEntity(childObject); // one entity
         rootObject.setEmbeddedEntity(embeddedObject); // not included, @Embedded
 
         IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, rootObject);
@@ -137,7 +139,7 @@ public class MarshallerTest extends LocalDatastoreTestCase {
     @Test
     public void testMarshall_ChildChild(){
         RootEntity rootObject = new RootEntity();
-        TestData.ChildChildEntity cc = new TestData.ChildChildEntity();
+        ChildChildEntity cc = new ChildChildEntity();
         ChildEntity child = new ChildEntity();
         child.setType("ChildType");
         child.setParent(rootObject);
@@ -151,7 +153,7 @@ public class MarshallerTest extends LocalDatastoreTestCase {
 
     @Test
     public void testMarshall_JSONEntity() {
-        TestData.JSONEntity json = new TestData.JSONEntity();
+        JSONEntity json = new JSONEntity();
 
         json.setKind("MyDocument");
         json.setId("abcdef12345");

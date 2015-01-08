@@ -22,18 +22,19 @@
  */
 package com.textquo.twist.util;
 
-import com.textquo.twist.LocalDatastoreTestCase;
+import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.TestData;
+import com.textquo.twist.entity.RootEntity;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
  * Created by kerby on 4/23/14.
  */
-public class RegexTest extends LocalDatastoreTestCase {
+public class RegexTest extends LocalDatastoreTestBase {
     @Test
     public void testGetClassNameFromString(){
-        String result = StringHelper.getClassNameFrom(TestData.RootEntity.class.getName());
+        String result = StringHelper.getClassNameFrom(RootEntity.class.getName());
         assertEquals("RootEntity" , result);
     }
 
@@ -50,7 +51,7 @@ public class RegexTest extends LocalDatastoreTestCase {
 
     @Test
     public void testGetClassNameFromObject(){
-        String result = StringHelper.getClassNameOf(new TestData.RootEntity());
+        String result = StringHelper.getClassNameOf(new RootEntity());
         assertEquals("RootEntity" , result);
     }
 

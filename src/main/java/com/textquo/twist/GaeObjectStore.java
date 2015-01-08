@@ -83,7 +83,7 @@ public class GaeObjectStore implements ObjectStore {
     protected ObjectSerializer _serializer;
 
     /**
-     * GAE datastore supported types.
+     * GAE com.textquo.twist.datastore supported types.
      */
     protected static final Set<Class<?>> GAE_SUPPORTED_TYPES =
             DataTypeUtils.getSupportedTypes();

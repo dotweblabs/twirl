@@ -55,7 +55,7 @@ public class GaeMarshaller implements Marshaller {
     private IdentityHashMap<Object,Entity> stack = new IdentityHashMap<Object, Entity>();
 
     /**
-     * GAE datastore supported types.
+     * GAE com.textquo.twist.datastore supported types.
      */
     protected static final Set<Class<?>> GAE_SUPPORTED_TYPES =
             DataTypeUtils.getSupportedTypes();
@@ -67,10 +67,10 @@ public class GaeMarshaller implements Marshaller {
 
     /**
      *
-     * Create Entity objects that can be persisted into the GAE datastore,
+     * Create entity objects that can be persisted into the GAE com.textquo.twist.datastore,
      * including its Parent-Child relationships (if necessary).
      *
-     * @param parent parent of the generated Entity or Entities
+     * @param parent parent of the generated entity or Entities
      * @param instance to marshall
      * @return
      */
@@ -180,7 +180,7 @@ public class GaeMarshaller implements Marshaller {
                                     } else {
                                         throw new RuntimeException("Unsupported GAE property type");
                                     }
-                                    Preconditions.checkNotNull(e, "Entity is null");
+                                    Preconditions.checkNotNull(e, "entity is null");
                                 } catch (ClassCastException ex) {
                                     // Something is wrong here
                                     ex.printStackTrace();
@@ -303,11 +303,11 @@ public class GaeMarshaller implements Marshaller {
 
     /**
      *
-     * Create a new Entity from Java primitive types, String, Number, Boolean
-     * When obj is a primitive type, or String, Number, Boolean, the Entity that will be created
-     * is a single property Entity with key from {@code target} and a single value of obj
+     * Create a new entity from Java primitive types, String, Number, Boolean
+     * When obj is a primitive type, or String, Number, Boolean, the entity that will be created
+     * is a single property entity with key from {@code target} and a single value of obj
      *
-     * @param target Entity with Key that will be populated
+     * @param target entity with Key that will be populated
      * @param obj to get properties from
      * @return marshalled
      */
@@ -440,7 +440,7 @@ public class GaeMarshaller implements Marshaller {
      * @param entity to marshall into {@code EmbeddedEntity}
      * @return marshalled
      */
-    //TODO: This method is quite the most problematic part, since there is no list implementation in the datastore, unlike with a <code>Map</code>.
+    //TODO: This method is quite the most problematic part, since there is no list implementation in the com.textquo.twist.datastore, unlike with a <code>Map</code>.
     public EmbeddedEntity createEmbeddedEntityFromList(List entity){
         EmbeddedEntity ee = null;
         try {
@@ -552,7 +552,7 @@ public class GaeMarshaller implements Marshaller {
      * a <code>List</code> or a <code>Map</code> instance.
      *
      * An <code>EmbeddedEntity</code> was chosen approach than directly mapping the list into the
-     * parent Entity because JSON array can contain arbitrary values and even objects too.
+     * parent entity because JSON array can contain arbitrary values and even objects too.
      *
      * This method will read all the property names of the entity and if all of its properties have
      * a dot-number prefix then it will be transformed into a List, otherwise a Map
@@ -694,7 +694,7 @@ public class GaeMarshaller implements Marshaller {
     }
 
     /**
-     * Helper method to convert a retrieved Date object from the GAE datastore
+     * Helper method to convert a retrieved Date object from the GAE com.textquo.twist.datastore
      * to a string format that Google Gson library can map to a Date field on a POJO
      *
      * @param map
@@ -736,11 +736,11 @@ public class GaeMarshaller implements Marshaller {
     private static void setProperty(Entity entity, String key, Object value){
         LOG.debug("Setting property key: " + key);
 
-        Preconditions.checkNotNull(entity, "Entity can't be null");
-        Preconditions.checkNotNull(key, "Entity property key can't be null");
+        Preconditions.checkNotNull(entity, "entity can't be null");
+        Preconditions.checkNotNull(key, "entity property key can't be null");
 
         if (key.isEmpty()){
-            throw new IllegalArgumentException("Entity property key can't be empty");
+            throw new IllegalArgumentException("entity property key can't be empty");
         }
 
 

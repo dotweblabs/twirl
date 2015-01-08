@@ -356,7 +356,7 @@ public class GaeUnmarshaller implements Unmarshaller {
      * a <code>List</code> or a <code>Map</code> instance.
      *
      * An <code>EmbeddedEntity</code> was chosen approach than directly mapping the list into the
-     * parent Entity because JSON array can contain arbitrary values and even objects too.
+     * parent entity because JSON array can contain arbitrary values and even objects too.
      *
      * This method will read all the property names of the entity and if all of its properties have
      * a dot-number prefix then it will be transformed into a List, otherwise a Map
