@@ -361,6 +361,7 @@ public class GaeObjectStore implements ObjectStore {
         if(isCached(object)){
             _cache.put(key, Iterables.getLast(entities));
         }
+        updateObjectKey(key, object);
         return key;
     }
 
@@ -368,7 +369,9 @@ public class GaeObjectStore implements ObjectStore {
     public Iterable<Key> put(Iterable<Object> objects) {
         List<Key> keys = new LinkedList<>();
         for (Object o : objects){
-           keys.add(put(o));
+            Key key = put(o);
+            updateObjectKey(key, o);
+            keys.add(key);
         }
         return keys;
     }
@@ -390,7 +393,9 @@ public class GaeObjectStore implements ObjectStore {
                 tx.rollback();
             }
         }
-        return result;    }
+        updateObjectKey(result, object);
+        return result;
+    }
 
     @Override
     public Iterable<Key> putInTransaction(Iterable<Object> objects) {
@@ -423,6 +428,25 @@ public class GaeObjectStore implements ObjectStore {
         }
         entities.add(root);
         return entities;
+    }
+
+    /**
+     * Updates @Id field of object from key
+     *
+     * @param key
+     * @param object
+     */
+    private void updateObjectKey(Key key, Object object){
+        AnnotationUtil.AnnotatedField field = AnnotationUtil.getFieldWithAnnotation(key(), object);
+        if(field != null && key !=null){
+            if(field.getFieldType().equals(String.class)){
+                field.setFieldValue(key.getName());
+            } else if(field.getFieldType().equals(Long.class)){
+                field.setFieldValue(key.getId());
+            } else if(field.getFieldType().equals(Integer.class)){
+                throw new RuntimeException("Not yet supported");
+            }
+        }
     }
 
     /**
