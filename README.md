@@ -20,7 +20,7 @@ Persisting POJO's, Maps and (soon Primitive types) directly into the com.textquo
 
 [![Build Status](https://travis-ci.org/textquo/twist.svg?branch=master)](https://travis-ci.org/textquo/twist)
 
-###Setup
+##Setup
 
 ```java
 @Inject
@@ -38,7 +38,7 @@ Friend one = store.findOne(Friend.class).greaterThanOrEqual("name", "Joe").now()
 ```
 
 
-###Updating
+##Updating
 
 ####Save
 
@@ -71,7 +71,7 @@ store.delete(key);
 store.delete(friend.getId());
 ```
 
-###Object Mapping
+##Object Mapping
 ```java
 @Entity(name="CloseFriends") // Optional name
 public class Friend {
@@ -92,7 +92,7 @@ public class Friend {
 ```
 
 
-###Querying
+##Querying
 ```java
 ```
 
