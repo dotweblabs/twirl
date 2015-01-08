@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.boon.Maps;
 import org.boon.Lists;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -413,7 +414,15 @@ public class GaeMarshaller implements Marshaller {
                 if(id !=null){
                     key = KeyStructure.createKey(parent, kind, (String)id);
                 } else {
-                    throw new AutoGenerateStringIdException();
+                    Id annotation = (Id) idField.annotation();
+                    String prefix = annotation.prefix();
+                    if(prefix != null && !prefix.isEmpty()){
+                        Key auto = KeyStructure.createKey(parent, kind, KeyStructure.autoLongId(kind));
+                        Long autoId = auto.getId();
+                        key = KeyStructure.createKey(parent, kind, prefix + autoId);
+                    } else {
+                        throw new AutoGenerateStringIdException();
+                    }
                 }
             } else if (clazz.equals(Long.class)){
                 if(id != null){

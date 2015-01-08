@@ -32,6 +32,7 @@ public class AnnotationUtil {
 
     public static class AnnotatedField  {
         private Class<?> clazz;
+        private Class<? extends Annotation> type;
         private Field field;
         private Object obj;
 
@@ -39,7 +40,8 @@ public class AnnotationUtil {
         private Object fieldValue;
 
         public AnnotatedField(){};
-        public AnnotatedField(Object obj, Field field){
+        public AnnotatedField(Class<? extends Annotation> type, Object obj, Field field){
+            this.type = type;
             this.field = field;
             this.obj = obj;
             this.clazz = obj.getClass();
@@ -78,12 +80,16 @@ public class AnnotationUtil {
                 ex.printStackTrace(); // TODO
             }
         }
+
+        public Annotation annotation(){
+            return field.getAnnotation(type);
+        }
     }
 
     public static AnnotatedField getFieldWithAnnotation(Class<? extends Annotation> clazz, Object instance){
         for (Field field : instance.getClass().getDeclaredFields()){
             if (field.isAnnotationPresent(clazz)){
-                return new AnnotatedField(instance, field);
+                return new AnnotatedField(clazz, instance, field);
             }
         }
         return null;
@@ -106,7 +112,7 @@ public class AnnotationUtil {
                     if (fields==null){
                         fields = new LinkedList<AnnotatedField>();
                     }
-                    fields.add(new AnnotatedField(instance, field));
+                    fields.add(new AnnotatedField(clazz, instance, field));
                 }
                 field.setAccessible(isAccessible);
             } catch (Exception e){
