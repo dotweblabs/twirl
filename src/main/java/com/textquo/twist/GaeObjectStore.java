@@ -161,29 +161,27 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public <T> void delete(Class<T> clazz, String key) {
-        T result = null;
-        try {
-            String kind = getKind(clazz);
-            _ds.delete(KeyStructure.createKey(kind, key));
-        } catch (Exception e1) {
-            // TODO: Wrap the exception
-            // e.g store.getLastError();
-            e1.printStackTrace();
-        }
+        String kind = getKind(clazz);
+        _ds.delete(KeyStructure.createKey(kind, key));
     }
 
     @Override
     public <T> void delete(Class<T> clazz, Long id) {
-        T result = null;
-        try {
-            String kind = getKind(clazz);
-            assert kind != null;
-            _ds.delete(KeyStructure.createKey(kind, id));
-        } catch (Exception e1) {
-            // TODO: Wrap the exception
-            // e.g store.getLastError();
-            e1.printStackTrace();
-        }
+        String kind = getKind(clazz);
+        assert kind != null;
+        _ds.delete(KeyStructure.createKey(kind, id));
+    }
+
+    @Override
+    public <T> void delete(Class<T> clazz, String kind, Long id){
+        Key key = KeyStructure.createKey(kind, id);
+        _ds.delete(key);
+    }
+
+    @Override
+    public <T> void delete(Class<T> clazz, String kind, String key){
+        Key _key = KeyStructure.createKey(kind, key);
+        _ds.delete(_key);
     }
 
     @Override

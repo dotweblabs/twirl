@@ -41,6 +41,8 @@ public interface ObjectStore {
     public void deleteInTransaction(Iterable<Key> keys);
     public <T> void delete(Class<T> clazz, String key);
     public <T> void delete(Class<T> clazz, Long id);
+    public <T> void delete(Class<T> clazz, String kind, Long id);
+    public <T> void delete(Class<T> clazz, String kind, String key);
 
     public <T> T get(Class<T> clazz, Key key);
     public <T> T get(Class<T> clazz, String key);

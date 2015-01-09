@@ -27,6 +27,9 @@ import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * Note: Entity to be stored must have empty constructor
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Entity {

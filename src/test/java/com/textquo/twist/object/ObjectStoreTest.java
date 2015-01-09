@@ -32,6 +32,7 @@ import com.textquo.twist.ObjectStore;
 import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.TestData;
 import com.textquo.twist.entity.ChildEntity;
+import com.textquo.twist.entity.CustomKind;
 import com.textquo.twist.entity.Post;
 import com.textquo.twist.entity.RootEntity;
 import org.junit.Rule;
@@ -282,6 +283,19 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("101", one.get(0).getKey());
         assertEquals(5, one.get(0).getCount());
 
+    }
+
+    @Test
+    public void testFindKind(){
+        store.put(new CustomKind("Count", 5L));
+        store.put(new CustomKind("Count", 4L));
+        store.put(new CustomKind("Count", 3L));
+        store.put(new CustomKind("Count", 2L));
+        store.put(new CustomKind("Count", 1L));
+        Iterator<CustomKind> it = store.find(CustomKind.class, "Count").limit(100).now();
+        assertTrue(it.hasNext());
+        long value = ((CustomKind) it.next()).getValue();
+        assertEquals(5L, value);
     }
 
     @Test
