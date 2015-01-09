@@ -24,6 +24,7 @@ package com.textquo.twist;
 
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.common.collect.Iterables;
@@ -413,8 +414,9 @@ public class GaeObjectStore implements ObjectStore {
 
     private Iterable<Entity> marshall(Object instance){
         List<Entity> entities = new LinkedList<Entity>();
+        Key parent = getParentKey(instance);
         IdentityHashMap<Object, Entity> stack
-                = marshaller().marshall(null, instance);
+                = marshaller().marshall(parent, instance);
         Entity root = stack.get(instance);
         assert root != null;
         stack.remove(instance);
@@ -526,6 +528,21 @@ public class GaeObjectStore implements ObjectStore {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Returns parent key or null
+     *
+     * @param instance
+     * @return
+     */
+    private static Key getParentKey(Object instance){
+        Key parent = null;
+        AnnotationUtil.AnnotatedField parentKeyField = AnnotationUtil.getFieldWithAnnotation(ParentKey.class, instance);
+        if(parentKeyField != null){
+            parent = (Key) parentKeyField.getFieldValue();
+        }
+        return parent;
     }
 
     public boolean isPrimitive(Class<?> clazz){

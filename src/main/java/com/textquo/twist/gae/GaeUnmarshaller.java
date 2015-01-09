@@ -29,6 +29,7 @@ import com.google.appengine.api.users.User;
 import com.google.common.base.Preconditions;
 import com.textquo.twist.Unmarshaller;
 import com.textquo.twist.annotations.Flat;
+import com.textquo.twist.annotations.ParentKey;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.AnnotationUtil.AnnotatedField;
 import com.textquo.twist.validation.Validator;
@@ -157,6 +158,17 @@ public class GaeUnmarshaller implements Unmarshaller {
             ((Map)destination).put(Entity.KEY_RESERVED_PROPERTY, key.getName());
             return;
         }
+
+        AnnotatedField parentKeyField
+                = AnnotationUtil.getFieldWithAnnotation(ParentKey.class, destination);
+        if(parentKeyField !=null){
+            if(parentKeyField.getFieldType().equals(Key.class)){
+                parentKeyField.setFieldValue(entity.getParent());
+            } else {
+                throw new RuntimeException("Only GAE Key can be used as @ParentKey");
+            }
+        }
+
         AnnotatedField idField
                 = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.key(), destination);
         if(idField != null){

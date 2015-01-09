@@ -25,16 +25,15 @@ package com.textquo.twist.object;
 import static org.boon.Lists.list;
 import static org.junit.Assert.*;
 
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.common.collect.Lists;
 import com.textquo.twist.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.ObjectStore;
 import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.TestData;
-import com.textquo.twist.entity.ChildEntity;
-import com.textquo.twist.entity.CustomKind;
-import com.textquo.twist.entity.Post;
-import com.textquo.twist.entity.RootEntity;
+import com.textquo.twist.annotations.Entity;
+import com.textquo.twist.entity.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -102,6 +101,20 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("TestUser", key.getParent().getName());
         assertEquals(rootObject.getKey(), key.getParent().getName());
 
+    }
+
+    @Test
+    public void testPut_noIdwithParentKey(){
+        Key parentKey = KeyFactory.createKey("Guestbook", "demo");
+        EntityNoId entity = new EntityNoId();
+        entity.setContent("Sample content");
+        entity.setParent(parentKey);
+        Key key = store.put(entity);
+        EntityNoId saved = store.get(EntityNoId.class, key);
+        assertNotNull(key);
+        assertNotNull(saved);
+        assertEquals(parentKey, saved.getParent());
+        assertEquals("Sample content", saved.getContent());
     }
 
     @Test

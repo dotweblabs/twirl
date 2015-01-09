@@ -25,6 +25,7 @@ package com.textquo.twist.gae;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.common.TwistException;
 import com.google.appengine.api.users.User;
 import com.google.common.base.Preconditions;
@@ -78,10 +79,17 @@ public class GaeMarshaller implements Marshaller {
     @Override
     public IdentityHashMap marshall(Key parent, Object instance){
         Preconditions.checkNotNull(instance, "Object should not be null");
-        Key key = createKeyFrom(parent, instance); // inspect kind and create key
+        Entity e = null;
+        // Its possible that a Entity to be saved without id and just a parent key
+        if(parent != null && hasNoIdField(instance)){
+            String kind = getKindOf(instance);
+            e = new Entity(kind, parent);
+        } else {
+            Key key = createKeyFrom(parent, instance); // inspect kind and create key
+            e = new Entity(key);
+        }
         Map<String,Object> props = new LinkedHashMap<String, Object>();
         List<Entity> target = null;
-        Entity e = new Entity(key);
         // Marshall java.util.Map
         if(instance instanceof Map){
             Map map = (Map) instance;
@@ -254,6 +262,8 @@ public class GaeMarshaller implements Marshaller {
                                 Entity childEntity = stack.get(childField);
                                 Key childEntityKey = childEntity.getKey();
                                 setProperty(e, fieldName, childEntityKey);
+                            } else if (field.isAnnotationPresent(ParentKey.class)){
+                                // already processed above, skip it
                             } else {
                                 throw new RuntimeException("POJO's must be annotated with @Embedded, @Parent or @Child annotations.");
                             }
@@ -376,6 +386,11 @@ public class GaeMarshaller implements Marshaller {
             kind = StringHelper.getClassNameOf(instance);
         }
         return kind;
+    }
+
+    private static boolean hasNoIdField(Object instance){
+        AnnotationUtil.AnnotatedField idField = AnnotationUtil.getFieldWithAnnotation(Id.class, instance);
+        return idField == null ? true : false;
     }
 
     /**
