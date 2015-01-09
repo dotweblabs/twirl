@@ -191,18 +191,41 @@ public class QueryStore extends AbstractStore {
                 }
                 Query.Filter prevFilter = q.getFilter();
                 if (sorts.get(propName) != null){
-                    q = new Query(kind).setFilter(prevFilter).setFilter(_filter)
-                            .addSort(propName, sorts.get(propName));
-                    sorts.remove(propName); // remove it
+                    if(ancestor != null){
+                        q = new Query(kind, ancestor)
+                                .setFilter(prevFilter).setFilter(_filter)
+                                .addSort(propName, sorts.get(propName));
+                        sorts.remove(propName); // remove it
+                    } else {
+                        q = new Query(kind).setFilter(prevFilter)
+                                .setFilter(_filter)
+                                .addSort(propName, sorts.get(propName));
+                        sorts.remove(propName); // remove it
+                    }
                 } else {
-                    q = new Query(kind).setFilter(prevFilter).setFilter(_filter);
+                    if(ancestor != null){
+                        q = new Query(kind, ancestor)
+                                .setFilter(prevFilter)
+                                .setFilter(_filter);
+                    } else {
+                        q = new Query(kind)
+                                .setFilter(prevFilter)
+                                .setFilter(_filter);
+                    }
                 }
                 subFilters.add(_filter);
             }
         } else if (query == null || query.isEmpty()){
             while(sortIterator.hasNext()){
+                // TODO: Bug! ancestor query gets lost here!
                 Map.Entry<String, Query.SortDirection> sort = sortIterator.next();
-                q = new Query(kind).addSort(sort.getKey(), sort.getValue());
+                if(ancestor != null){
+                    q = new Query(kind, ancestor)
+                            .addSort(sort.getKey(), sort.getValue());
+                } else {
+                    q = new Query(kind)
+                            .addSort(sort.getKey(), sort.getValue());
+                }
             }
         }
         if(keysOnly){
