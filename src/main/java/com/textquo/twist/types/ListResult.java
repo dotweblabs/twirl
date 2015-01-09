@@ -1,12 +1,13 @@
 package com.textquo.twist.types;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ListResult<T> {
     private String websafeCursor;
-    private List<T> list;
+    private List<T> list = new LinkedList<>();
+
+    public ListResult(){}
 
     public ListResult(String websafeCursor, List<T> list) {
         this.websafeCursor = websafeCursor;

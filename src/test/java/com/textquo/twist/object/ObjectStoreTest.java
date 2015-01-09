@@ -321,6 +321,23 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testFind_asList(){
+        store.put(new RootEntity("101", 5));
+        store.put(new RootEntity("102", 4));
+        store.put(new RootEntity("103", 3));
+        store.put(new RootEntity("104", 2));
+        store.put(new RootEntity("105", 1));
+
+        List<RootEntity> entities = store.find(RootEntity.class).asList().getList();
+        List<RootEntity> limited = store.find(RootEntity.class).limit(3).asList().getList();
+
+        assertTrue(!entities.isEmpty());
+        assertTrue(!limited.isEmpty());
+        assertEquals(5, entities.size());
+        assertEquals(3, limited.size());
+    }
+
+    @Test
     public void testUpdate(){
         store.put(new RootEntity("101", 5));
         store.put(new RootEntity("102", 4));
