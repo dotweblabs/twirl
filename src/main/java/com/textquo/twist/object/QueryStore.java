@@ -78,7 +78,7 @@ public class QueryStore extends AbstractStore {
     }
 
 
-    public Iterator<Map<String,Object>> query(String kind,
+    public Iterator<Map<String,Object>> query(Key ancestor, String kind,
             Map<String, Pair<Query.FilterOperator, Object>> filters,
             Map<String, Query.SortDirection> sorts, Integer offset, Integer limit){
         if (filters == null){
@@ -92,7 +92,7 @@ public class QueryStore extends AbstractStore {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = querySortedLike(kind, filters, sorts, limit, offset, false);
+            final Iterator<Entity> eit = querySortedLike(ancestor, kind, filters, sorts, limit, offset, false);
             it = new Iterator<Map<String,Object>>() {
                 public void remove() {
                     eit.remove();
@@ -141,7 +141,7 @@ public class QueryStore extends AbstractStore {
      * @param sorts {@code Map} of sort direction
      * @return
      */
-    public Iterator<Entity> querySortedLike(String kind,
+    public Iterator<Entity> querySortedLike(Key ancestor, String kind,
             Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
             Integer limit, Integer offset, boolean keysOnly){
 
@@ -167,7 +167,12 @@ public class QueryStore extends AbstractStore {
 
         // Sort
         Iterator<Map.Entry<String, Query.SortDirection>> sortIterator = sorts.entrySet().iterator();
-        Query q = new Query(kind);
+        Query q = null;
+        if(ancestor != null){
+            q = new Query(kind, ancestor);
+        } else {
+            q = new Query(kind);
+        }
 
         List<Query.Filter> subFilters = new ArrayList<Query.Filter>();
         if (!query.isEmpty()){

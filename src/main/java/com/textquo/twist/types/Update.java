@@ -23,6 +23,7 @@
 package com.textquo.twist.types;
 
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
 import com.textquo.twist.GaeObjectStore;
@@ -46,10 +47,17 @@ public class Update<V> {
     protected Map<String, Query.SortDirection> sorts;
     protected Object ref;
 
+    private Key _ancestor;
+
     final GaeObjectStore objectStore;
     final QueryStore _store;
     final Class<V> _clazz;
     final String _kind;
+
+    public Update(GaeObjectStore store, Class<V> clazz, String kind, Key ancestor){
+        this(store, clazz, kind);
+        _ancestor = ancestor;
+    }
 
     public Update(GaeObjectStore store, Class<V> clazz, String kind){
         filters = new LinkedHashMap<String, Pair<Query.FilterOperator, Object>>();
@@ -149,7 +157,7 @@ public class Update<V> {
          */
         Iterator<V> it = null;
         try {
-            final Iterator<Entity> eit = _store.querySortedLike(_kind, filters, sorts, null, null, false);
+            final Iterator<Entity> eit = _store.querySortedLike(_ancestor, _kind, filters, sorts, null, null, false);
             it = new Iterator<V>() {
                 public void remove() {
                     eit.remove();

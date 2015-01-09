@@ -186,6 +186,11 @@ public class GaeObjectStore implements ObjectStore {
     }
 
     @Override
+    public <T> Find find(Class<T> clazz, String kind, Key ancestor) {
+        return new Find(this, clazz, kind, ancestor);
+    }
+
+    @Override
     public <T> Find find(Class<T> clazz, String kind) {
         return new Find(this, clazz, kind);
     }

@@ -58,6 +58,7 @@ public interface ObjectStore {
     public Key putInTransaction(Object object);
     public Iterable<Key> putInTransaction(Iterable<Object> objects);
 
+    public <T> Find find(Class<T> clazz, String kind, Key ancestor);
     public <T> Find find(Class<T> clazz, String kind);
     public <T> Find find(Class<T> clazz);
     public <T> FindOne findOne(Class<T> clazz);

@@ -23,6 +23,7 @@
 package com.textquo.twist.types;
 
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.GaeObjectStore;
 import com.textquo.twist.object.QueryStore;
 import com.textquo.twist.util.Pair;
@@ -43,10 +44,16 @@ public class Find<V> {
     protected Integer max;
     protected boolean keysOnly = false;
 
-    final GaeObjectStore objectStore;
-    final QueryStore _store;
-    final Class<V> _clazz;
-    final String _kind;
+    private Key _ancestor;
+    private final GaeObjectStore objectStore;
+    private final QueryStore _store;
+    private final Class<V> _clazz;
+    private final String _kind;
+
+    public Find(GaeObjectStore store, Class<V> clazz, String kind, Key ancestor){
+        this(store, clazz, kind);
+        _ancestor = ancestor;
+    }
 
     public Find(GaeObjectStore store, Class<V> clazz, String kind){
         filters = new LinkedHashMap<String, Pair<Query.FilterOperator, Object>>();
@@ -142,7 +149,7 @@ public class Find<V> {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = _store.querySortedLike(_kind, filters, sorts, max, skip, keysOnly);
+            final Iterator<Entity> eit = _store.querySortedLike(_ancestor, _kind, filters, sorts, max, skip, keysOnly);
             it = new Iterator<V>() {
                 public void remove() {
                     eit.remove();
