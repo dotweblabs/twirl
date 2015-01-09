@@ -276,6 +276,10 @@ public class GaeUnmarshaller implements Unmarshaller {
                                 setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
                             }
                         }
+                    } else if (fieldValue instanceof Date){
+                        setFieldValue(field, destination, fieldValue);
+                    } else if (fieldValue instanceof User) {
+                        setFieldValue(field, destination, fieldValue);
                     } else if (fieldValue instanceof EmbeddedEntity) { // List or Java  primitive types and standard types, Map or  POJO's
                         Class<?> fieldValueType = fieldValue.getClass();
                         EmbeddedEntity ee = (EmbeddedEntity) fieldValue;
