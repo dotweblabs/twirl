@@ -22,6 +22,10 @@ Persisting POJO's, Maps and (soon Primitive types) directly into the com.textquo
 
 [![Build Status](https://travis-ci.org/textquo/twist.svg?branch=master)](https://travis-ci.org/textquo/twist)
 
+##Sample
+
+Usage sample can be found here: https://github.com/kerbymart/twist-appengine-guestbook-java
+
 ##Setup
 
 ```java
