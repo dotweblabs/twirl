@@ -149,7 +149,8 @@ public class Find<V> {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = _store.querySortedLike(_ancestor, _kind, filters, sorts, max, skip, keysOnly);
+            final Iterator<Entity> eit
+                    = (Iterator<Entity>) _store.querySortedLike(_ancestor, _kind, filters, sorts, max, skip, keysOnly, false);
             it = new Iterator<V>() {
                 public void remove() {
                     eit.remove();
@@ -177,6 +178,46 @@ public class Find<V> {
 
         }
         return it;
+    }
+
+    // TODO: Add test!
+    public ListResult<V> asList(){
+        ListResult<V> result = null;
+        if (filters == null){
+            filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
+        }
+        List<Entity> entities = (List<Entity>) _store.querySortedLike(_ancestor, _kind, filters, sorts, max, skip, keysOnly, true);
+        for(Entity e : entities){
+            V instance = null;
+            if(_clazz.equals(Map.class)){
+                instance = (V) new LinkedHashMap<>();
+            } else {
+                instance = createInstance(_clazz);
+            }
+            objectStore.unmarshaller().unmarshall(instance, e);
+            result.getList().add(instance);
+        }
+        return result;
+    }
+
+    // TODO: Finish this
+    public ListResult<V> asList(String websafeCursor){
+        ListResult<V> result = null;
+        if (filters == null){
+            filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
+        }
+        List<Entity> entities = (List<Entity>) _store.querySortedLike(_ancestor, _kind, filters, sorts, max, skip, keysOnly, true);
+        for(Entity e : entities){
+            V instance = null;
+            if(_clazz.equals(Map.class)){
+                instance = (V) new LinkedHashMap<>();
+            } else {
+                instance = createInstance(_clazz);
+            }
+            objectStore.unmarshaller().unmarshall(instance, e);
+            result.getList().add(instance);
+        }
+        return result;
     }
 
     private <T> T createInstance(Class<T> clazz) {

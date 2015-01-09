@@ -92,7 +92,7 @@ public class QueryStore extends AbstractStore {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = querySortedLike(ancestor, kind, filters, sorts, limit, offset, false);
+            final Iterator<Entity> eit = (Iterator<Entity>) querySortedLike(ancestor, kind, filters, sorts, limit, offset, false, false);
             it = new Iterator<Map<String,Object>>() {
                 public void remove() {
                     eit.remove();
@@ -139,11 +139,11 @@ public class QueryStore extends AbstractStore {
      * FIXME - Fix query object filter/sort getting wiped out
      *
      * @param sorts {@code Map} of sort direction
-     * @return
+     * @return List or Iterator
      */
-    public Iterator<Entity> querySortedLike(Key ancestor, String kind,
+    public Object querySortedLike(Key ancestor, String kind,
             Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
-            Integer limit, Integer offset, boolean keysOnly){
+            Integer limit, Integer offset, boolean keysOnly, boolean asList){
 
         Preconditions.checkNotNull(query, "Query object can't be null");
         Preconditions.checkNotNull(sorts, "Sort can't be null");
@@ -209,8 +209,20 @@ public class QueryStore extends AbstractStore {
             q.setKeysOnly();
         }
         pq = _ds.prepare(q);
-        Iterator<Entity> res = pq.asIterator(fetchOptions);
+        Object res = null;
+        if(asList){
+            res = pq.asList(fetchOptions);
+        } else {
+            res = pq.asIterator(fetchOptions);
+        }
         return res;
+    }
+
+    // TODO: With cursor
+    public Iterator<Entity> querySortedLikeAsList(Key ancestor, String kind,
+                                            Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
+                                            Integer limit, Integer offset, boolean keysOnly){
+        return null;
     }
 
 

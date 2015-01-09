@@ -157,7 +157,8 @@ public class Update<V> {
          */
         Iterator<V> it = null;
         try {
-            final Iterator<Entity> eit = _store.querySortedLike(_ancestor, _kind, filters, sorts, null, null, false);
+            final Iterator<Entity> eit
+                    = (Iterator<Entity>) _store.querySortedLike(_ancestor, _kind, filters, sorts, null, null, false, false);
             it = new Iterator<V>() {
                 public void remove() {
                     eit.remove();
