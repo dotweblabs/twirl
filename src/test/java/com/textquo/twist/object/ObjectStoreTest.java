@@ -39,10 +39,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.textquo.twist.TestData.*;
 /**
@@ -287,7 +284,11 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
 
     @Test
     public void testFindKind(){
-        store.put(new CustomKind("Count", 5L));
+        CustomKind first = new CustomKind("Count", 5L);
+        Map fields = new LinkedHashMap();
+        fields.put("field1", 1);
+        first.setFields(fields);
+        store.put(first);
         store.put(new CustomKind("Count", 4L));
         store.put(new CustomKind("Count", 3L));
         store.put(new CustomKind("Count", 2L));
@@ -298,6 +299,7 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         long value = saved.getValue();
         assertEquals(5L, value);
         assertEquals("Count", saved.getKind());
+        assertNotNull(saved.getFields());
     }
 
     @Test

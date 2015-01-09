@@ -28,6 +28,7 @@ import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.users.User;
 import com.google.common.base.Preconditions;
 import com.textquo.twist.Unmarshaller;
+import com.textquo.twist.annotations.Flat;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.AnnotationUtil.AnnotatedField;
 import com.textquo.twist.validation.Validator;
@@ -180,6 +181,26 @@ public class GaeUnmarshaller implements Unmarshaller {
             }
         }
 
+        AnnotatedField flatField
+                = AnnotationUtil.getFieldWithAnnotation(Flat.class, destination);
+        if(flatField != null){
+            if(flatField.getFieldType().equals(Map.class)){
+                Iterator<Map.Entry<String,Object>> it = props.entrySet().iterator();
+                Map map = new LinkedHashMap();
+                while(it.hasNext()){
+                    Map.Entry<String,Object> entry = it.next();
+                    String fieldName = entry.getKey();
+                    Object fieldValue = entry.getValue();
+                    map.put(fieldName, fieldValue);
+                }
+                Field field = flatField.getField();
+                setFieldValue(field, destination, map);
+            } else {
+                throw new RuntimeException("Only java.util.Map should be used for @Flat fields");
+            }
+
+        }
+
         Iterator<Map.Entry<String,Object>> it = props.entrySet().iterator();
         Class<?> clazz = destination.getClass();
         List<Field> fields = Lists.newArrayList(clazz.getDeclaredFields());
@@ -257,7 +278,7 @@ public class GaeUnmarshaller implements Unmarshaller {
                             setFieldValue(field, destination, pojo);
                         }
                     } else if (fieldValue.getClass().isPrimitive()){
-                        // TODO
+                        throw new RuntimeException("Not yet implemented");
                     }
                 }
             }

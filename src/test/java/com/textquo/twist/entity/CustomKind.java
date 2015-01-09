@@ -1,8 +1,11 @@
 package com.textquo.twist.entity;
 
 import com.textquo.twist.annotations.Entity;
+import com.textquo.twist.annotations.Flat;
 import com.textquo.twist.annotations.Id;
 import com.textquo.twist.annotations.Kind;
+
+import java.util.Map;
 
 /**
  * Created by kmartino on 1/9/15.
@@ -16,6 +19,9 @@ public class CustomKind {
     private Long id;
 
     private Long value;
+
+    @Flat
+    private Map fields;
 
     public CustomKind(){}
 
@@ -38,5 +44,13 @@ public class CustomKind {
 
     public void setValue(Long value) {
         this.value = value;
+    }
+
+    public Map getFields() {
+        return fields;
+    }
+
+    public void setFields(Map fields) {
+        this.fields = fields;
     }
 }
