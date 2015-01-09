@@ -28,9 +28,7 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.textquo.twist.annotations.Cached;
-import com.textquo.twist.annotations.Child;
-import com.textquo.twist.annotations.Id;
+import com.textquo.twist.annotations.*;
 import com.textquo.twist.common.CacheInconsistencyException;
 import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.gae.GaeMarshaller;
@@ -42,7 +40,6 @@ import com.textquo.twist.types.FindOne;
 import com.textquo.twist.types.Update;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.StringHelper;
-import com.textquo.twist.annotations.Parent;
 import com.textquo.twist.wrappers.PrimitiveWrapper;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -60,6 +57,10 @@ public class GaeObjectStore implements ObjectStore {
 
     public static Class<Id> key(){
         return Id.class;
+    }
+
+    public static Class<Kind> kind(){
+        return Kind.class;
     }
 
     public static Class<Parent> parent(){

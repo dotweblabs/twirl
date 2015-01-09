@@ -294,8 +294,10 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         store.put(new CustomKind("Count", 1L));
         Iterator<CustomKind> it = store.find(CustomKind.class, "Count").limit(100).now();
         assertTrue(it.hasNext());
-        long value = ((CustomKind) it.next()).getValue();
+        CustomKind saved = ((CustomKind) it.next());
+        long value = saved.getValue();
         assertEquals(5L, value);
+        assertEquals("Count", saved.getKind());
     }
 
     @Test

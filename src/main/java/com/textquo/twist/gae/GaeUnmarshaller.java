@@ -170,6 +170,16 @@ public class GaeUnmarshaller implements Unmarshaller {
             }
         }
 
+        AnnotatedField kindField
+                = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.kind(), destination);
+        if(kindField != null){
+            if(kindField.getFieldType().equals(String.class)){
+                kindField.setFieldValue(entity.getKind());
+            } else {
+                throw new RuntimeException("Invalid @Kind field is found for " + destination.getClass().getName());
+            }
+        }
+
         Iterator<Map.Entry<String,Object>> it = props.entrySet().iterator();
         Class<?> clazz = destination.getClass();
         List<Field> fields = Lists.newArrayList(clazz.getDeclaredFields());
