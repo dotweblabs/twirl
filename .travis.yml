@@ -1,1 +1,8 @@
 language: java
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/8653cf8417465d069837
+    on_success: change  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: false     # default: false

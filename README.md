@@ -1,6 +1,8 @@
 twist
 =====
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/textquo/twist?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Yet Another Google App Engine Datastore ORM with a twist! (We need your support, fork it, and try it)
 
 ```
