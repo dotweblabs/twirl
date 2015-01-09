@@ -191,6 +191,11 @@ public class GaeObjectStore implements ObjectStore {
     }
 
     @Override
+    public <T> Find find(Class<T> clazz, Key ancestor) {
+        return new Find(this, clazz, getKind(clazz), ancestor);
+    }
+
+    @Override
     public <T> Find find(Class<T> clazz, String kind) {
         return new Find(this, clazz, kind);
     }
@@ -231,7 +236,7 @@ public class GaeObjectStore implements ObjectStore {
                 unmarshaller().unmarshall(instance, e);
             }
         } catch (EntityNotFoundException e1) {
-            throw new ObjectNotFoundException("Object with key=" + key.getName() + " not found");
+            throw new ObjectNotFoundException("Object with key=" + key + " not found");
         }
         return instance;
     }

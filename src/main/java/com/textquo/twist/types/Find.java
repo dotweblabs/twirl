@@ -182,7 +182,7 @@ public class Find<V> {
 
     // TODO: Add test!
     public ListResult<V> asList(){
-        ListResult<V> result = new ListResult<>();
+        ListResult<V> result = new ListResult<V>();
         if (filters == null){
             filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
         }
@@ -202,7 +202,7 @@ public class Find<V> {
 
     // TODO: Finish this
     public ListResult<V> asList(String websafeCursor){
-        ListResult<V> result = new ListResult<>();
+        ListResult<V> result = new ListResult<V>();
         if (filters == null){
             filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
         }

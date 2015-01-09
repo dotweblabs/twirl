@@ -33,6 +33,7 @@ import com.textquo.twist.ObjectStore;
 import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.TestData;
 import com.textquo.twist.annotations.Entity;
+import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.entity.*;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,16 +106,47 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
 
     @Test
     public void testPut_noIdwithParentKey(){
-        Key parentKey = KeyFactory.createKey("Guestbook", "demo");
+        Key demoParentKey = KeyFactory.createKey("Guestbook", "demo");
         EntityNoId entity = new EntityNoId();
         entity.setContent("Sample content");
-        entity.setParent(parentKey);
+        entity.setParent(demoParentKey);
         Key key = store.put(entity);
         EntityNoId saved = store.get(EntityNoId.class, key);
         assertNotNull(key);
         assertNotNull(saved);
-        assertEquals(parentKey, saved.getParent());
+        assertEquals(demoParentKey, saved.getParent());
         assertEquals("Sample content", saved.getContent());
+    }
+
+    @Test(expected = ObjectNotFoundException.class)
+    public void testPut_noIdwithParentKeyAncestor(){
+        Key demoParentKey = KeyFactory.createKey("Guestbook", "demo");
+        EntityNoId entity = new EntityNoId();
+        entity.setContent("Sample content");
+        entity.setParent(demoParentKey);
+        Key key = store.put(entity);
+        List<EntityNoId> entities = store.find(EntityNoId.class, demoParentKey).asList().getList();
+        EntityNoId saved = entities.get(0);
+        assertNotNull(key);
+        assertNotNull(saved);
+        assertEquals(demoParentKey, saved.getParent());
+        assertEquals("Sample content", saved.getContent());
+
+        // Special test should not return the same items above
+        // as it is from different ancestor
+        Key otherParentKey = KeyFactory.createKey("Guestbook", "other");
+        List<EntityNoId> otherEntitites = store.find(EntityNoId.class, otherParentKey).asList().getList();
+        EntityNoId otherSaved = otherEntitites.get(0);
+        assertNull(otherSaved);
+
+        EntityNoId otherEntity = new EntityNoId();
+        otherEntity.setParent(otherParentKey);
+        otherEntity.setContent("Other content");
+        store.put(otherEntity);
+
+        otherSaved = store.get(EntityNoId.class, otherParentKey);
+        assertNotNull(otherSaved);
+        assertEquals("Other content", otherSaved.getContent());
     }
 
     @Test
