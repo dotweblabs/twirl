@@ -41,9 +41,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.boon.Maps;
-import org.boon.Lists;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -262,7 +260,7 @@ public class GaeMarshaller implements Marshaller {
                                 Entity childEntity = stack.get(childField);
                                 Key childEntityKey = childEntity.getKey();
                                 setProperty(e, fieldName, childEntityKey);
-                            } else if (field.isAnnotationPresent(ParentKey.class)){
+                            } else if (field.isAnnotationPresent(Ancestor.class)){
                                 // already processed above, skip it
                             } else {
                                 throw new RuntimeException("POJO's must be annotated with @Embedded, @Parent or @Child annotations.");

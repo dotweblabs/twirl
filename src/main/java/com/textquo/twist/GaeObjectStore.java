@@ -30,7 +30,6 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.textquo.twist.annotations.*;
-import com.textquo.twist.common.CacheInconsistencyException;
 import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.gae.GaeMarshaller;
 import com.textquo.twist.gae.GaeUnmarshaller;
@@ -538,7 +537,7 @@ public class GaeObjectStore implements ObjectStore {
      */
     private static Key getParentKey(Object instance){
         Key parent = null;
-        AnnotationUtil.AnnotatedField parentKeyField = AnnotationUtil.getFieldWithAnnotation(ParentKey.class, instance);
+        AnnotationUtil.AnnotatedField parentKeyField = AnnotationUtil.getFieldWithAnnotation(Ancestor.class, instance);
         if(parentKeyField != null){
             parent = (Key) parentKeyField.getFieldValue();
         }

@@ -2,11 +2,11 @@ package com.textquo.twist.entity;
 
 import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.annotations.Entity;
-import com.textquo.twist.annotations.ParentKey;
+import com.textquo.twist.annotations.Ancestor;
 
 @Entity
 public class EntityNoId {
-    @ParentKey
+    @Ancestor
     private Key parent;
 
     private String content;

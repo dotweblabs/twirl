@@ -29,7 +29,7 @@ import com.google.appengine.api.users.User;
 import com.google.common.base.Preconditions;
 import com.textquo.twist.Unmarshaller;
 import com.textquo.twist.annotations.Flat;
-import com.textquo.twist.annotations.ParentKey;
+import com.textquo.twist.annotations.Ancestor;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.AnnotationUtil.AnnotatedField;
 import com.textquo.twist.validation.Validator;
@@ -160,7 +160,7 @@ public class GaeUnmarshaller implements Unmarshaller {
         }
 
         AnnotatedField parentKeyField
-                = AnnotationUtil.getFieldWithAnnotation(ParentKey.class, destination);
+                = AnnotationUtil.getFieldWithAnnotation(Ancestor.class, destination);
         if(parentKeyField !=null){
             if(parentKeyField.getFieldType().equals(Key.class)){
                 parentKeyField.setFieldValue(entity.getParent());
