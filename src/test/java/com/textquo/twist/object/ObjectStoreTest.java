@@ -125,7 +125,9 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         entity.setContent("Sample content");
         entity.setParent(demoParentKey);
         Key key = store.put(entity);
-        List<EntityNoId> entities = store.find(EntityNoId.class, demoParentKey).asList().getList();
+        List<EntityNoId> entities = store.find(EntityNoId.class, demoParentKey)
+                .sortDescending("content")
+                .asList().getList();
         EntityNoId saved = entities.get(0);
         assertNotNull(key);
         assertNotNull(saved);
@@ -135,7 +137,9 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         // Special test should not return the same items above
         // as it is from different ancestor
         Key otherParentKey = KeyFactory.createKey("Guestbook", "other");
-        List<EntityNoId> otherEntitites = store.find(EntityNoId.class, otherParentKey).asList().getList();
+        List<EntityNoId> otherEntitites = store.find(EntityNoId.class, otherParentKey)
+                .sortDescending("content")
+                .asList().getList();
         assertTrue(otherEntitites.isEmpty());
 
         EntityNoId otherEntity = new EntityNoId();
