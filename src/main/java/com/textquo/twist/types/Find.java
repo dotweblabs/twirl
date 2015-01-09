@@ -220,6 +220,13 @@ public class Find<V> {
         return result;
     }
 
+    public V first(){
+        if(asList().getList().iterator().hasNext()){
+            return asList().getList().iterator().next();
+        }
+        return null;
+    }
+
     private <T> T createInstance(Class<T> clazz) {
         try {
             return clazz.newInstance();
