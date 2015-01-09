@@ -118,7 +118,7 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("Sample content", saved.getContent());
     }
 
-    @Test(expected = ObjectNotFoundException.class)
+    @Test//(expected = ObjectNotFoundException.class)
     public void testPut_noIdwithParentKeyAncestor(){
         Key demoParentKey = KeyFactory.createKey("Guestbook", "demo");
         EntityNoId entity = new EntityNoId();
@@ -136,15 +136,18 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         // as it is from different ancestor
         Key otherParentKey = KeyFactory.createKey("Guestbook", "other");
         List<EntityNoId> otherEntitites = store.find(EntityNoId.class, otherParentKey).asList().getList();
-        EntityNoId otherSaved = otherEntitites.get(0);
-        assertNull(otherSaved);
+        assertTrue(otherEntitites.isEmpty());
 
         EntityNoId otherEntity = new EntityNoId();
         otherEntity.setParent(otherParentKey);
         otherEntity.setContent("Other content");
         store.put(otherEntity);
 
-        otherSaved = store.get(EntityNoId.class, otherParentKey);
+        otherEntitites = store.find(EntityNoId.class, otherParentKey).asList().getList();
+        assertTrue(!otherEntitites.isEmpty());
+        assertEquals(1, otherEntitites.size());
+
+        EntityNoId otherSaved = otherEntitites.get(0);
         assertNotNull(otherSaved);
         assertEquals("Other content", otherSaved.getContent());
     }
