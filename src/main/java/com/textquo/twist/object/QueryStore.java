@@ -253,15 +253,19 @@ public class QueryStore extends AbstractStore {
         pq = _ds.prepare(q);
         Object res = null;
         if(asList){
-            if(startCursor != null){
+            if(startCursor != null && startCursor.getWebSafeString() != null){
                 fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor.getWebSafeString()));
+                res = pq.asQueryResultList(fetchOptions);
+            } else if(startCursor != null && startCursor.getWebSafeString() == null) {
                 res = pq.asQueryResultList(fetchOptions);
             } else {
                 res = pq.asList(fetchOptions);
             }
         } else {
-            if(startCursor != null){
+            if(startCursor != null && startCursor.getWebSafeString() != null){
                 fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor.getWebSafeString()));
+                res = pq.asQueryResultIterable(fetchOptions);
+            } else if(startCursor != null && startCursor.getWebSafeString() == null){
                 res = pq.asQueryResultIterable(fetchOptions);
             } else {
                 res = pq.asIterator(fetchOptions);

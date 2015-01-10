@@ -35,6 +35,8 @@ import com.textquo.twist.TestData;
 import com.textquo.twist.annotations.Entity;
 import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.entity.*;
+import com.textquo.twist.types.Cursor;
+import com.textquo.twist.types.ListResult;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -374,6 +376,56 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertTrue(!limited.isEmpty());
         assertEquals(5, entities.size());
         assertEquals(3, limited.size());
+    }
+
+    @Test
+    public void testFind_asList_withCursor(){
+        store.put(new RootEntity("101", 5));
+        store.put(new RootEntity("102", 4));
+        store.put(new RootEntity("103", 3));
+        store.put(new RootEntity("104", 2));
+        store.put(new RootEntity("105", 1));
+
+        ListResult<RootEntity> entities = store.find(RootEntity.class)
+                .greaterThanOrEqual("count", 1)
+                .limit(2)
+                .withCursor()
+                .sortAscending("count")
+                .asList();
+
+        Cursor nextCursor = entities.getCursor();
+
+        assertFalse(entities.getList().isEmpty());
+        assertEquals(2, entities.getList().size());
+        assertEquals("105", entities.getList().get(0).getKey());
+        assertNotNull(nextCursor);
+
+        entities = store.find(RootEntity.class)
+                .greaterThanOrEqual("count", 1)
+                .limit(2)
+                .sortAscending("count")
+                .withCursor(nextCursor)
+                .asList();
+
+        nextCursor = entities.getCursor();
+
+        assertFalse(entities.getList().isEmpty());
+        assertEquals(2, entities.getList().size());
+        assertEquals("103", entities.getList().get(0).getKey());
+
+        entities = store.find(RootEntity.class)
+                .greaterThanOrEqual("count", 1)
+                .limit(2)
+                .sortAscending("count")
+                .withCursor(nextCursor)
+                .asList();
+
+        nextCursor = entities.getCursor();
+
+        assertFalse(entities.getList().isEmpty());
+        assertEquals(1, entities.getList().size());
+        assertEquals("101", entities.getList().get(0).getKey());
+
     }
 
     @Test

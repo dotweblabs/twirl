@@ -3,6 +3,8 @@ package com.textquo.twist.types;
 public class Cursor {
     private String webSafeString;
 
+    public Cursor(){}
+
     public Cursor(String webSafeString){
         this.webSafeString = webSafeString;
     }

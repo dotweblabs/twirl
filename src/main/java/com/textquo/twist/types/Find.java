@@ -140,6 +140,11 @@ public class Find<V> {
         return this;
     }
 
+    public Find withCursor(){
+        this.cursor = new Cursor();
+        return this;
+    }
+
     public Iterator<V> now() {
         if (filters == null){
             filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
@@ -220,12 +225,10 @@ public class Find<V> {
             filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
         }
         if(cursor != null){
-            Cursor nextCursor;
             QueryResultList<Entity> entities
                     = (QueryResultList<Entity>) _store.querySortedLike(
                     _ancestor, _kind, filters, sorts,
                     max, skip, cursor, keysOnly, true);
-            nextCursor = new Cursor(entities.getCursor().toWebSafeString());
             for(Entity e : entities){
                 V instance = null;
                 if(_clazz.equals(Map.class)){
@@ -236,6 +239,7 @@ public class Find<V> {
                 objectStore.unmarshaller().unmarshall(instance, e);
                 result.getList().add(instance);
             }
+            result.setWebsafeCursor(entities.getCursor().toWebSafeString());
         } else {
             List<Entity> entities
                     = (List<Entity>) _store.querySortedLike(
