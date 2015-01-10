@@ -28,6 +28,8 @@ import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.users.User;
 import com.google.common.base.Preconditions;
 import com.textquo.twist.Unmarshaller;
+import com.textquo.twist.annotations.Flat;
+import com.textquo.twist.annotations.Ancestor;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.AnnotationUtil.AnnotatedField;
 import com.textquo.twist.validation.Validator;
@@ -156,6 +158,17 @@ public class GaeUnmarshaller implements Unmarshaller {
             ((Map)destination).put(Entity.KEY_RESERVED_PROPERTY, key.getName());
             return;
         }
+
+        AnnotatedField parentKeyField
+                = AnnotationUtil.getFieldWithAnnotation(Ancestor.class, destination);
+        if(parentKeyField !=null){
+            if(parentKeyField.getFieldType().equals(Key.class)){
+                parentKeyField.setFieldValue(entity.getParent());
+            } else {
+                throw new RuntimeException("Only GAE Key can be used as @ParentKey");
+            }
+        }
+
         AnnotatedField idField
                 = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.key(), destination);
         if(idField != null){
@@ -178,6 +191,26 @@ public class GaeUnmarshaller implements Unmarshaller {
             } else {
                 throw new RuntimeException("Invalid @Kind field is found for " + destination.getClass().getName());
             }
+        }
+
+        AnnotatedField flatField
+                = AnnotationUtil.getFieldWithAnnotation(Flat.class, destination);
+        if(flatField != null){
+            if(flatField.getFieldType().equals(Map.class)){
+                Iterator<Map.Entry<String,Object>> it = props.entrySet().iterator();
+                Map map = new LinkedHashMap();
+                while(it.hasNext()){
+                    Map.Entry<String,Object> entry = it.next();
+                    String fieldName = entry.getKey();
+                    Object fieldValue = entry.getValue();
+                    map.put(fieldName, fieldValue);
+                }
+                Field field = flatField.getField();
+                setFieldValue(field, destination, map);
+            } else {
+                throw new RuntimeException("Only java.util.Map should be used for @Flat fields");
+            }
+
         }
 
         Iterator<Map.Entry<String,Object>> it = props.entrySet().iterator();
@@ -243,6 +276,10 @@ public class GaeUnmarshaller implements Unmarshaller {
                                 setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
                             }
                         }
+                    } else if (fieldValue instanceof Date){
+                        setFieldValue(field, destination, fieldValue);
+                    } else if (fieldValue instanceof User) {
+                        setFieldValue(field, destination, fieldValue);
                     } else if (fieldValue instanceof EmbeddedEntity) { // List or Java  primitive types and standard types, Map or  POJO's
                         Class<?> fieldValueType = fieldValue.getClass();
                         EmbeddedEntity ee = (EmbeddedEntity) fieldValue;
@@ -257,7 +294,7 @@ public class GaeUnmarshaller implements Unmarshaller {
                             setFieldValue(field, destination, pojo);
                         }
                     } else if (fieldValue.getClass().isPrimitive()){
-                        // TODO
+                        throw new RuntimeException("Not yet implemented");
                     }
                 }
             }

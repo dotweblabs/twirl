@@ -78,7 +78,7 @@ public class QueryStore extends AbstractStore {
     }
 
 
-    public Iterator<Map<String,Object>> query(String kind,
+    public Iterator<Map<String,Object>> query(Key ancestor, String kind,
             Map<String, Pair<Query.FilterOperator, Object>> filters,
             Map<String, Query.SortDirection> sorts, Integer offset, Integer limit){
         if (filters == null){
@@ -92,7 +92,7 @@ public class QueryStore extends AbstractStore {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = querySortedLike(kind, filters, sorts, limit, offset, false);
+            final Iterator<Entity> eit = (Iterator<Entity>) querySortedLike(ancestor, kind, filters, sorts, limit, offset, false, false);
             it = new Iterator<Map<String,Object>>() {
                 public void remove() {
                     eit.remove();
@@ -139,11 +139,11 @@ public class QueryStore extends AbstractStore {
      * FIXME - Fix query object filter/sort getting wiped out
      *
      * @param sorts {@code Map} of sort direction
-     * @return
+     * @return List or Iterator
      */
-    public Iterator<Entity> querySortedLike(String kind,
+    public Object querySortedLike(Key ancestor, String kind,
             Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
-            Integer limit, Integer offset, boolean keysOnly){
+            Integer limit, Integer offset, boolean keysOnly, boolean asList){
 
         Preconditions.checkNotNull(query, "Query object can't be null");
         Preconditions.checkNotNull(sorts, "Sort can't be null");
@@ -167,7 +167,12 @@ public class QueryStore extends AbstractStore {
 
         // Sort
         Iterator<Map.Entry<String, Query.SortDirection>> sortIterator = sorts.entrySet().iterator();
-        Query q = new Query(kind);
+        Query q = null;
+        if(ancestor != null){
+            q = new Query(kind, ancestor);
+        } else {
+            q = new Query(kind);
+        }
 
         List<Query.Filter> subFilters = new ArrayList<Query.Filter>();
         if (!query.isEmpty()){
@@ -186,26 +191,61 @@ public class QueryStore extends AbstractStore {
                 }
                 Query.Filter prevFilter = q.getFilter();
                 if (sorts.get(propName) != null){
-                    q = new Query(kind).setFilter(prevFilter).setFilter(_filter)
-                            .addSort(propName, sorts.get(propName));
-                    sorts.remove(propName); // remove it
+                    if(ancestor != null){
+                        q = new Query(kind, ancestor)
+                                .setFilter(prevFilter).setFilter(_filter)
+                                .addSort(propName, sorts.get(propName));
+                        sorts.remove(propName); // remove it
+                    } else {
+                        q = new Query(kind).setFilter(prevFilter)
+                                .setFilter(_filter)
+                                .addSort(propName, sorts.get(propName));
+                        sorts.remove(propName); // remove it
+                    }
                 } else {
-                    q = new Query(kind).setFilter(prevFilter).setFilter(_filter);
+                    if(ancestor != null){
+                        q = new Query(kind, ancestor)
+                                .setFilter(prevFilter)
+                                .setFilter(_filter);
+                    } else {
+                        q = new Query(kind)
+                                .setFilter(prevFilter)
+                                .setFilter(_filter);
+                    }
                 }
                 subFilters.add(_filter);
             }
         } else if (query == null || query.isEmpty()){
             while(sortIterator.hasNext()){
+                // TODO: Bug! ancestor query gets lost here!
                 Map.Entry<String, Query.SortDirection> sort = sortIterator.next();
-                q = new Query(kind).addSort(sort.getKey(), sort.getValue());
+                if(ancestor != null){
+                    q = new Query(kind, ancestor)
+                            .addSort(sort.getKey(), sort.getValue());
+                } else {
+                    q = new Query(kind)
+                            .addSort(sort.getKey(), sort.getValue());
+                }
             }
         }
         if(keysOnly){
             q.setKeysOnly();
         }
         pq = _ds.prepare(q);
-        Iterator<Entity> res = pq.asIterator(fetchOptions);
+        Object res = null;
+        if(asList){
+            res = pq.asList(fetchOptions);
+        } else {
+            res = pq.asIterator(fetchOptions);
+        }
         return res;
+    }
+
+    // TODO: With cursor
+    public Iterator<Entity> querySortedLikeAsList(Key ancestor, String kind,
+                                            Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
+                                            Integer limit, Integer offset, boolean keysOnly){
+        return null;
     }
 
 

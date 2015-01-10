@@ -25,24 +25,21 @@ package com.textquo.twist.object;
 import static org.boon.Lists.list;
 import static org.junit.Assert.*;
 
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.common.collect.Lists;
 import com.textquo.twist.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.ObjectStore;
 import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.TestData;
-import com.textquo.twist.entity.ChildEntity;
-import com.textquo.twist.entity.CustomKind;
-import com.textquo.twist.entity.Post;
-import com.textquo.twist.entity.RootEntity;
+import com.textquo.twist.annotations.Entity;
+import com.textquo.twist.common.ObjectNotFoundException;
+import com.textquo.twist.entity.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.textquo.twist.TestData.*;
 /**
@@ -105,6 +102,58 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("TestUser", key.getParent().getName());
         assertEquals(rootObject.getKey(), key.getParent().getName());
 
+    }
+
+    @Test
+    public void testPut_noIdwithParentKey(){
+        Key demoParentKey = KeyFactory.createKey("Guestbook", "demo");
+        EntityNoId entity = new EntityNoId();
+        entity.setContent("Sample content");
+        entity.setParent(demoParentKey);
+        Key key = store.put(entity);
+        EntityNoId saved = store.get(EntityNoId.class, key);
+        assertNotNull(key);
+        assertNotNull(saved);
+        assertEquals(demoParentKey, saved.getParent());
+        assertEquals("Sample content", saved.getContent());
+    }
+
+    @Test//(expected = ObjectNotFoundException.class)
+    public void testPut_noIdwithParentKeyAncestor(){
+        Key demoParentKey = KeyFactory.createKey("Guestbook", "demo");
+        EntityNoId entity = new EntityNoId();
+        entity.setContent("Sample content");
+        entity.setParent(demoParentKey);
+        Key key = store.put(entity);
+        List<EntityNoId> entities = store.find(EntityNoId.class, demoParentKey)
+                .sortDescending("content")
+                .asList().getList();
+        EntityNoId saved = entities.get(0);
+        assertNotNull(key);
+        assertNotNull(saved);
+        assertEquals(demoParentKey, saved.getParent());
+        assertEquals("Sample content", saved.getContent());
+
+        // Special test should not return the same items above
+        // as it is from different ancestor
+        Key otherParentKey = KeyFactory.createKey("Guestbook", "other");
+        List<EntityNoId> otherEntitites = store.find(EntityNoId.class, otherParentKey)
+                .sortDescending("content")
+                .asList().getList();
+        assertTrue(otherEntitites.isEmpty());
+
+        EntityNoId otherEntity = new EntityNoId();
+        otherEntity.setParent(otherParentKey);
+        otherEntity.setContent("Other content");
+        store.put(otherEntity);
+
+        otherEntitites = store.find(EntityNoId.class, otherParentKey).asList().getList();
+        assertTrue(!otherEntitites.isEmpty());
+        assertEquals(1, otherEntitites.size());
+
+        EntityNoId otherSaved = otherEntitites.get(0);
+        assertNotNull(otherSaved);
+        assertEquals("Other content", otherSaved.getContent());
     }
 
     @Test
@@ -287,7 +336,11 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
 
     @Test
     public void testFindKind(){
-        store.put(new CustomKind("Count", 5L));
+        CustomKind first = new CustomKind("Count", 5L);
+        Map fields = new LinkedHashMap();
+        fields.put("field1", 1);
+        first.setFields(fields);
+        store.put(first);
         store.put(new CustomKind("Count", 4L));
         store.put(new CustomKind("Count", 3L));
         store.put(new CustomKind("Count", 2L));
@@ -298,11 +351,29 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         long value = saved.getValue();
         assertEquals(5L, value);
         assertEquals("Count", saved.getKind());
+        assertNotNull(saved.getFields());
     }
 
     @Test
     public void testFindOne(){
 
+    }
+
+    @Test
+    public void testFind_asList(){
+        store.put(new RootEntity("101", 5));
+        store.put(new RootEntity("102", 4));
+        store.put(new RootEntity("103", 3));
+        store.put(new RootEntity("104", 2));
+        store.put(new RootEntity("105", 1));
+
+        List<RootEntity> entities = store.find(RootEntity.class).asList().getList();
+        List<RootEntity> limited = store.find(RootEntity.class).limit(3).asList().getList();
+
+        assertTrue(!entities.isEmpty());
+        assertTrue(!limited.isEmpty());
+        assertEquals(5, entities.size());
+        assertEquals(3, limited.size());
     }
 
     @Test

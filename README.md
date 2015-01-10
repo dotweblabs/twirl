@@ -1,6 +1,8 @@
 twist
 =====
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/textquo/twist?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Yet Another Google App Engine Datastore ORM with a twist! (We need your support, fork it, and try it)
 
 ```
@@ -19,6 +21,10 @@ Persisting POJO's, Maps and (soon Primitive types) directly into the com.textquo
 [![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/twist)
 
 [![Build Status](https://travis-ci.org/textquo/twist.svg?branch=master)](https://travis-ci.org/textquo/twist)
+
+##Sample
+
+Usage sample can be found here: https://github.com/kerbymart/twist-appengine-guestbook-java
 
 ##Setup
 
@@ -118,6 +124,56 @@ store.find(Friend.class).sortDescending("lastName").now();
 store.find(Friend.class).skip(20).now();
 store.find(Friend.class).limit(10).now();
 ```
+
+##Features
+```java
+```
+
+####Easy for JSON storage
+
+```java
+// Note: Working but needs more work:
+String jsonString = "{\"content\" : {\"Sample post\"}";
+Map deserialized = deserialize(jsonString);
+deserialized.put("__kind__", "Post");
+store.put(deserialized);
+```
+
+Or using a POJO :
+
+```java
+public class JSONEntity {
+    @Kind
+    private String kind;
+    @Id
+    private String id;
+    @Flat
+    private Map<String,Object> fields;
+}
+
+JSONEntity entity = new JSONEntity();
+
+entity.setKind("Post");
+entity.setId("msgid:456");
+entity.getFields().put("content", "Sample post");
+entity.getFields().put("uid", 123);
+
+store.put(entity);
+```
+
+
+
+####Storing Primitive and Basic Java types
+
+Using the keyvalue-extenstion:
+```java
+KeyValueStore<String,String> messages = new StringKeyValueStore("Messages");
+messages.put("uid:123:msgid:456", "Ahoy! We are saving primitives.");
+String message = messages.get("uid:123:msgid:456");
+```
+
+See: https://github.com/textquo/twist-keyvalue-extension
+
 
 
 

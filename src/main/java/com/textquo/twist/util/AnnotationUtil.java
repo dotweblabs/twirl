@@ -81,6 +81,10 @@ public class AnnotationUtil {
             }
         }
 
+        public Field getField(){
+            return this.field;
+        }
+
         public Annotation annotation(){
             return field.getAnnotation(type);
         }
