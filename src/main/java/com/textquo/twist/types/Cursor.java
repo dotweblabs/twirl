@@ -1,12 +1,14 @@
 package com.textquo.twist.types;
 
 public class Cursor {
-    private String webSafeString;
+    private String webSafeString = null;
 
     public Cursor(){}
 
     public Cursor(String webSafeString){
-        this.webSafeString = webSafeString;
+        if(webSafeString != null && !webSafeString.isEmpty()){
+            this.webSafeString = webSafeString;
+        }
     }
 
     public String getWebSafeString() {
@@ -14,6 +16,8 @@ public class Cursor {
     }
 
     public void setWebSafeString(String webSafeString) {
-        this.webSafeString = webSafeString;
+        if(webSafeString != null && !webSafeString.isEmpty()){
+            this.webSafeString = webSafeString;
+        }
     }
 }

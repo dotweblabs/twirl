@@ -239,7 +239,8 @@ public class Find<V> {
                 objectStore.unmarshaller().unmarshall(instance, e);
                 result.getList().add(instance);
             }
-            result.setWebsafeCursor(entities.getCursor().toWebSafeString());
+            String cursor = entities.getCursor().toWebSafeString();
+            result.setWebsafeCursor(cursor);
         } else {
             List<Entity> entities
                     = (List<Entity>) _store.querySortedLike(

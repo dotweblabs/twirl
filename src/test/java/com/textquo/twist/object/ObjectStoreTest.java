@@ -37,6 +37,8 @@ import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.entity.*;
 import com.textquo.twist.types.Cursor;
 import com.textquo.twist.types.ListResult;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -48,6 +50,8 @@ import static com.textquo.twist.TestData.*;
  * Created by kerby on 4/27/14.
  */
 public class ObjectStoreTest extends LocalDatastoreTestBase {
+
+    protected static Logger LOG = LogManager.getLogger(ObjectStoreTest.class.getName());
 
     ObjectStore store = new GaeObjectStore();
 
@@ -386,20 +390,27 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         store.put(new RootEntity("104", 2));
         store.put(new RootEntity("105", 1));
 
+        String oldCursorString = "";
+
         ListResult<RootEntity> entities = store.find(RootEntity.class)
                 .greaterThanOrEqual("count", 1)
                 .limit(2)
-                .withCursor()
+                .withCursor(new Cursor(oldCursorString))
                 .sortAscending("count")
                 .asList();
 
         Cursor nextCursor = entities.getCursor();
+        String newCursorString = nextCursor.getWebSafeString();
 
+        LOG.info("Old Cursor=" + oldCursorString + "\n"
+                + "New Cursor=" + newCursorString);
+        assertFalse(newCursorString.equals(oldCursorString));
         assertFalse(entities.getList().isEmpty());
         assertEquals(2, entities.getList().size());
         assertEquals("105", entities.getList().get(0).getKey());
         assertNotNull(nextCursor);
 
+        oldCursorString = nextCursor.getWebSafeString();
         entities = store.find(RootEntity.class)
                 .greaterThanOrEqual("count", 1)
                 .limit(2)
@@ -408,23 +419,43 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
                 .asList();
 
         nextCursor = entities.getCursor();
+        newCursorString = nextCursor.getWebSafeString();
 
+        LOG.info("Old Cursor=" + oldCursorString + "\n"
+                + "New Cursor=" + newCursorString);
+        assertFalse(newCursorString.equals(oldCursorString));
         assertFalse(entities.getList().isEmpty());
         assertEquals(2, entities.getList().size());
         assertEquals("103", entities.getList().get(0).getKey());
 
+        oldCursorString = nextCursor.getWebSafeString();
         entities = store.find(RootEntity.class)
                 .greaterThanOrEqual("count", 1)
                 .limit(2)
                 .sortAscending("count")
                 .withCursor(nextCursor)
                 .asList();
-
         nextCursor = entities.getCursor();
+        newCursorString = nextCursor.getWebSafeString();
+
+        assertNotSame(newCursorString, oldCursorString);
 
         assertFalse(entities.getList().isEmpty());
         assertEquals(1, entities.getList().size());
         assertEquals("101", entities.getList().get(0).getKey());
+
+        oldCursorString = nextCursor.getWebSafeString();
+        entities = store.find(RootEntity.class)
+                .greaterThanOrEqual("count", 1)
+                .limit(2)
+                .sortAscending("count")
+                .withCursor(nextCursor)
+                .asList();
+        nextCursor = entities.getCursor();
+        newCursorString = nextCursor.getWebSafeString();
+
+        assertNotSame(newCursorString, oldCursorString);
+        assertTrue(entities.getList().isEmpty());
 
     }
 
