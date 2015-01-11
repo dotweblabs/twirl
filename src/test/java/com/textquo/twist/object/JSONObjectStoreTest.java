@@ -32,6 +32,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -71,11 +74,15 @@ public class JSONObjectStoreTest extends LocalDatastoreTestBase {
         entity.getFields().put("TestField2", "Test Value 2");
         entity.getFields().put("TestField3", "Test Value 3");
 
+        Map innerField = new LinkedHashMap<>();
+        entity.getFields().put("innerField", innerField);
+
         Key key = store.put(entity);
-
-
         assertNotNull(key);
         assertEquals("TestId", key.getName());
+
+        JSONEntity saved = store.get(JSONEntity.class, key);
+        assertNotNull(saved);
     }
 
     @Test
