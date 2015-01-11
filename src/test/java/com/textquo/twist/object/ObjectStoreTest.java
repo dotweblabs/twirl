@@ -184,7 +184,7 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("testField", map.get("testField"));
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test//(expected=RuntimeException.class)
     public void testPut_innerMap(){
         Map<String,Object> map = new HashMap<String,Object>();
         Map<String,Object> inner = new HashMap<String,Object>();
@@ -196,6 +196,10 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         map.put("testField", inner);
 
         Key key = store.put(map);
+        Map saved = store.get(Map.class, key);
+        Map savedInner = (Map) saved.get("testField");
+        assertNotNull(saved);
+        assertNotNull(savedInner);
     }
 
     @Test

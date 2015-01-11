@@ -100,7 +100,13 @@ public class GaeMarshaller implements Marshaller {
                     if(!entryKey.equals(GaeObjectStore.KEY_RESERVED_PROPERTY)
                             && !entryKey.equals(GaeObjectStore.KIND_RESERVED_PROPERTY)
                             && !entryKey.equals(GaeObjectStore.NAMESPACE_RESERVED_PROPERTY)){
-                        setProperty(e, entryKey, entryVal);
+                        if(entryVal instanceof Map){
+                            setProperty(e, entryKey, createEmbeddedEntityFromMap((Map) entryVal));
+                        } else if(entryVal instanceof List){
+                            setProperty(e, entryKey, createEmbeddedEntityFromList((List)entryVal));
+                        } else {
+                            setProperty(e, entryKey, entryVal);
+                        }
                     }
                 }
             } else {

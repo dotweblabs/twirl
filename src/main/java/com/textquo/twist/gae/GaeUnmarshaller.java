@@ -154,7 +154,20 @@ public class GaeUnmarshaller implements Unmarshaller {
             }
             return;
         } else if(destination instanceof Map){
-            ((Map)destination).putAll(entity.getProperties());
+            Iterator<Map.Entry<String,Object>> it
+                    = entity.getProperties().entrySet().iterator();
+            while(it.hasNext()){
+                Map.Entry<String,Object> entry = it.next();
+                String entryKey = entry.getKey();
+                Object entryVal = entry.getValue();
+                if(entryVal instanceof EmbeddedEntity){
+                    EmbeddedEntity ee = (EmbeddedEntity) entryVal;
+                    Object mapOrList = GaeMarshaller.getMapOrList(ee);
+                    ((Map)destination).put(entryKey, mapOrList);
+                } else {
+                    ((Map) destination).put(entryKey, entryVal);
+                }
+            }
             ((Map)destination).put(Entity.KEY_RESERVED_PROPERTY, key.getName());
             return;
         }

@@ -529,6 +529,10 @@ public class GaeObjectStore implements ObjectStore {
                 return (T) new Double(0);
             } else  if(clazz.equals(Boolean.class) || clazz.equals(boolean.class)){
                 return (T) new Boolean(false);
+            } else if(clazz.equals(Map.class)){
+                return (T) new LinkedHashMap<>();
+            } else if(clazz.equals(List.class)){
+                return (T) new LinkedList<>();
             }
             return clazz.newInstance();
         } catch (IllegalAccessException e){
