@@ -22,13 +22,10 @@
  */
 package com.textquo.twist.types;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.*;
 import com.textquo.twist.GaeObjectStore;
 import com.textquo.twist.object.QueryStore;
 import com.textquo.twist.util.Pair;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Query;
 
 import java.util.*;
 
@@ -43,8 +40,9 @@ public class Find<V> {
     protected Integer skip;
     protected Integer max;
     protected boolean keysOnly = false;
+    protected Key _ancestor;
+    protected Cursor cursor;
 
-    private Key _ancestor;
     private final GaeObjectStore objectStore;
     private final QueryStore _store;
     private final Class<V> _clazz;
@@ -137,6 +135,16 @@ public class Find<V> {
         throw new RuntimeException("Not yet implemented");
     }
 
+    public Find withCursor(Cursor cursor){
+        this.cursor = cursor;
+        return this;
+    }
+
+    public Find withCursor(){
+        this.cursor = new Cursor();
+        return this;
+    }
+
     public Iterator<V> now() {
         if (filters == null){
             filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
@@ -145,31 +153,61 @@ public class Find<V> {
          * Map of fields and its matching filter operator and compare valueType
          */
         Iterator<V> it = null;
+        // TODO: How to pass this back to the caller?
+        Cursor nextCursor = null;
         try {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit
-                    = (Iterator<Entity>) _store.querySortedLike(_ancestor, _kind, filters, sorts, max, skip, keysOnly, false);
-            it = new Iterator<V>() {
-                public void remove() {
-                    eit.remove();
-                }
-                public V next() {
-                    Entity e = eit.next();
-                    V instance = null;
-                    if(_clazz.equals(Map.class)){
-                        instance = (V) new LinkedHashMap<>();
-                    } else {
-                        instance = createInstance(_clazz);
+            if(cursor != null){
+                final QueryResultIterator<Entity> eit
+                        = (QueryResultIterator<Entity>) _store.querySortedLike(
+                        _ancestor, _kind, filters, sorts,
+                        max, skip, cursor,
+                        keysOnly, false);
+                nextCursor = new Cursor(eit.getCursor().toWebSafeString());
+                it = new Iterator<V>() {
+                    public void remove() {
+                        eit.remove();
                     }
-                    objectStore.unmarshaller().unmarshall(instance, e);
-                    return instance;
-                }
-                public boolean hasNext() {
-                    return eit.hasNext();
-                }
-            };
+                    public V next() {
+                        Entity e = eit.next();
+                        V instance = null;
+                        if(_clazz.equals(Map.class)){
+                            instance = (V) new LinkedHashMap<>();
+                        } else {
+                            instance = createInstance(_clazz);
+                        }
+                        objectStore.unmarshaller().unmarshall(instance, e);
+                        return instance;
+                    }
+                    public boolean hasNext() {
+                        return eit.hasNext();
+                    }
+                };
+            } else {
+                final Iterator<Entity> eit
+                        = (Iterator<Entity>) _store.querySortedLike(_ancestor, _kind, filters, sorts, max, skip, null, keysOnly, false);
+                it = new Iterator<V>() {
+                    public void remove() {
+                        eit.remove();
+                    }
+                    public V next() {
+                        Entity e = eit.next();
+                        V instance = null;
+                        if(_clazz.equals(Map.class)){
+                            instance = (V) new LinkedHashMap<>();
+                        } else {
+                            instance = createInstance(_clazz);
+                        }
+                        objectStore.unmarshaller().unmarshall(instance, e);
+                        return instance;
+                    }
+                    public boolean hasNext() {
+                        return eit.hasNext();
+                    }
+                };
+            }
         } catch (Exception e) {
             // TODO Handle exception
             e.printStackTrace();
@@ -186,37 +224,39 @@ public class Find<V> {
         if (filters == null){
             filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
         }
-        List<Entity> entities = (List<Entity>) _store.querySortedLike(_ancestor, _kind, filters, sorts, max, skip, keysOnly, true);
-        for(Entity e : entities){
-            V instance = null;
-            if(_clazz.equals(Map.class)){
-                instance = (V) new LinkedHashMap<>();
-            } else {
-                instance = createInstance(_clazz);
+        if(cursor != null){
+            QueryResultList<Entity> entities
+                    = (QueryResultList<Entity>) _store.querySortedLike(
+                    _ancestor, _kind, filters, sorts,
+                    max, skip, cursor, keysOnly, true);
+            for(Entity e : entities){
+                V instance = null;
+                if(_clazz.equals(Map.class)){
+                    instance = (V) new LinkedHashMap<>();
+                } else {
+                    instance = createInstance(_clazz);
+                }
+                objectStore.unmarshaller().unmarshall(instance, e);
+                result.getList().add(instance);
             }
-            objectStore.unmarshaller().unmarshall(instance, e);
-            result.getList().add(instance);
+            result.setWebsafeCursor(entities.getCursor().toWebSafeString());
+        } else {
+            List<Entity> entities
+                    = (List<Entity>) _store.querySortedLike(
+                    _ancestor, _kind, filters, sorts,
+                    max, skip, null, keysOnly, true);
+            for(Entity e : entities){
+                V instance = null;
+                if(_clazz.equals(Map.class)){
+                    instance = (V) new LinkedHashMap<>();
+                } else {
+                    instance = createInstance(_clazz);
+                }
+                objectStore.unmarshaller().unmarshall(instance, e);
+                result.getList().add(instance);
+            }
         }
-        return result;
-    }
 
-    // TODO: Finish this
-    public ListResult<V> asList(String websafeCursor){
-        ListResult<V> result = new ListResult<V>();
-        if (filters == null){
-            filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
-        }
-        List<Entity> entities = (List<Entity>) _store.querySortedLike(_ancestor, _kind, filters, sorts, max, skip, keysOnly, true);
-        for(Entity e : entities){
-            V instance = null;
-            if(_clazz.equals(Map.class)){
-                instance = (V) new LinkedHashMap<>();
-            } else {
-                instance = createInstance(_clazz);
-            }
-            objectStore.unmarshaller().unmarshall(instance, e);
-            result.getList().add(instance);
-        }
         return result;
     }
 

@@ -80,7 +80,8 @@ public class QueryStore extends AbstractStore {
 
     public Iterator<Map<String,Object>> query(Key ancestor, String kind,
             Map<String, Pair<Query.FilterOperator, Object>> filters,
-            Map<String, Query.SortDirection> sorts, Integer offset, Integer limit){
+            Map<String, Query.SortDirection> sorts, Integer offset, Integer limit,
+            com.textquo.twist.types.Cursor startCursor){
         if (filters == null){
             filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
         }
@@ -92,20 +93,37 @@ public class QueryStore extends AbstractStore {
             if (sorts == null){
                 sorts = new HashMap<String, Query.SortDirection>();
             }
-            final Iterator<Entity> eit = (Iterator<Entity>) querySortedLike(ancestor, kind, filters, sorts, limit, offset, false, false);
-            it = new Iterator<Map<String,Object>>() {
-                public void remove() {
-                    eit.remove();
-                }
-                public Map<String,Object> next() {
-                    Entity e = eit.next();
-                    return null; //TODO!
-                    //return EntityMapper.createMapObjectFromEntity(e);
-                }
-                public boolean hasNext() {
-                    return eit.hasNext();
-                }
-            };
+            if(startCursor != null){
+                final Iterator<Entity> eit = (Iterator<Entity>) querySortedLike(ancestor, kind, filters, sorts, limit, offset, startCursor, false, false);
+                it = new Iterator<Map<String,Object>>() {
+                    public void remove() {
+                        eit.remove();
+                    }
+                    public Map<String,Object> next() {
+                        Entity e = eit.next();
+                        return null; //TODO!
+                        //return EntityMapper.createMapObjectFromEntity(e);
+                    }
+                    public boolean hasNext() {
+                        return eit.hasNext();
+                    }
+                };
+            } else {
+                final Iterator<Entity> eit = (Iterator<Entity>) querySortedLike(ancestor, kind, filters, sorts, limit, offset, null, false, false);
+                it = new Iterator<Map<String,Object>>() {
+                    public void remove() {
+                        eit.remove();
+                    }
+                    public Map<String,Object> next() {
+                        Entity e = eit.next();
+                        return null; //TODO!
+                        //return EntityMapper.createMapObjectFromEntity(e);
+                    }
+                    public boolean hasNext() {
+                        return eit.hasNext();
+                    }
+                };
+            }
         } catch (Exception e) {
             // TODO Handle exception
             e.printStackTrace();
@@ -143,7 +161,8 @@ public class QueryStore extends AbstractStore {
      */
     public Object querySortedLike(Key ancestor, String kind,
             Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
-            Integer limit, Integer offset, boolean keysOnly, boolean asList){
+            Integer limit, Integer offset, com.textquo.twist.types.Cursor startCursor,
+            boolean keysOnly, boolean asList){
 
         Preconditions.checkNotNull(query, "Query object can't be null");
         Preconditions.checkNotNull(sorts, "Sort can't be null");
@@ -234,9 +253,23 @@ public class QueryStore extends AbstractStore {
         pq = _ds.prepare(q);
         Object res = null;
         if(asList){
-            res = pq.asList(fetchOptions);
+            if(startCursor != null && startCursor.getWebSafeString() != null){
+                fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor.getWebSafeString()));
+                res = pq.asQueryResultList(fetchOptions);
+            } else if(startCursor != null && startCursor.getWebSafeString() == null) {
+                res = pq.asQueryResultList(fetchOptions);
+            } else {
+                res = pq.asList(fetchOptions);
+            }
         } else {
-            res = pq.asIterator(fetchOptions);
+            if(startCursor != null && startCursor.getWebSafeString() != null){
+                fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor.getWebSafeString()));
+                res = pq.asQueryResultIterable(fetchOptions);
+            } else if(startCursor != null && startCursor.getWebSafeString() == null){
+                res = pq.asQueryResultIterable(fetchOptions);
+            } else {
+                res = pq.asIterator(fetchOptions);
+            }
         }
         return res;
     }
