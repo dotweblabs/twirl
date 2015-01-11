@@ -124,6 +124,24 @@ store.find(Friend.class).sortDescending("lastName").now();
 store.find(Friend.class).skip(20).now();
 store.find(Friend.class).limit(10).now();
 ```
+####Cursors
+
+```java
+String cursor = getRequestFromWebQuery();
+	
+// Should be empty String 
+// or valid cursor String only
+Cursor startCursor = new Cursor(cursor);
+        
+ListResult<Post> posts = store.find(Post.class)
+       	.limit(10)
+        .withCursor(startCursor) 
+        .sortAscending("date")
+        .asList();
+                
+Cursor nextCursor = posts.getCursor();
+return nextCursor.getWebSafeString();;       
+```
 
 ##Features
 ```java
