@@ -309,6 +309,18 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertNull(result);
     }
 
+    @Test(expected = ObjectNotFoundException.class)
+    public void testDeletebyId(){
+        ChildEntity testEntity = new ChildEntity();
+        store.put(testEntity);
+        Long id = testEntity.getId();
+        RootEntity result = store.get(RootEntity.class, id);
+        assertNotNull(result);
+        store.delete(RootEntity.class, id);
+        result = store.get(RootEntity.class, id);
+        assertNull(result);
+    }
+
     @Test
     public void testFind(){
         store.put(new RootEntity("101", 5));
