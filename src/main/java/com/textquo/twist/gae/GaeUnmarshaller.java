@@ -216,7 +216,11 @@ public class GaeUnmarshaller implements Unmarshaller {
                     Map.Entry<String,Object> entry = it.next();
                     String fieldName = entry.getKey();
                     Object fieldValue = entry.getValue();
-                    map.put(fieldName, fieldValue);
+                    for(Field field : list(destination.getClass().getFields())){
+                            if(!field.getName().equals(fieldName)){
+                                map.put(fieldName, fieldValue);
+                            }
+                    }
                 }
                 Field field = flatField.getField();
                 setFieldValue(field, destination, map);
