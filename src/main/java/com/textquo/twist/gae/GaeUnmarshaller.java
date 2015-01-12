@@ -216,6 +216,8 @@ public class GaeUnmarshaller implements Unmarshaller {
                     Map.Entry<String,Object> entry = it.next();
                     String fieldName = entry.getKey();
                     Object fieldValue = entry.getValue();
+                    // TODO: How about when by change a Map key would be the same with the POJO field name
+                    // TODO: Fix this or do not allow that to happen!
                     for(Field field : list(destination.getClass().getFields())){
                             if(!field.getName().equals(fieldName)){
                                 map.put(fieldName, fieldValue);
