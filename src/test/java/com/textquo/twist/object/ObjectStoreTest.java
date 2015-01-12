@@ -298,15 +298,15 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("TestEmbedded", result.getEmbeddedEntity().getType());
     }
 
-    @Test
+    @Test(expected = ObjectNotFoundException.class)
     public void testDelete(){
-//        Object testEntity = createTestRootEnity();
-//        Key key = store.put(testEntity);
-//        RootEntity result = store.get(RootEntity.class, key);
-//        assertNotNull(result);
-//        store.delete(RootEntity.class, result.getKey());
-//        result = store.get(RootEntity.class, key);
-//        assertNull(result);
+        Object testEntity = createTestRootEnity();
+        Key key = store.put(testEntity);
+        RootEntity result = store.get(RootEntity.class, key);
+        assertNotNull(result);
+        store.delete(RootEntity.class, result.getKey());
+        result = store.get(RootEntity.class, key);
+        assertNull(result);
     }
 
     @Test
