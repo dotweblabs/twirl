@@ -35,8 +35,7 @@ import org.junit.rules.ExpectedException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class JSONObjectStoreTest extends LocalDatastoreTestBase {
 
@@ -70,6 +69,7 @@ public class JSONObjectStoreTest extends LocalDatastoreTestBase {
         JSONEntity entity = new JSONEntity();
         entity.setKind("TestKind");
         entity.setId("TestId");
+        entity.setContent("Sample Content");
         entity.getFields().put("TestField1", "Test Value 1");
         entity.getFields().put("TestField2", "Test Value 2");
         entity.getFields().put("TestField3", "Test Value 3");
@@ -83,6 +83,11 @@ public class JSONObjectStoreTest extends LocalDatastoreTestBase {
 
         JSONEntity saved = store.get(JSONEntity.class, key);
         assertNotNull(saved);
+        assertTrue(!saved.getFields().isEmpty());
+        // Check for leaks
+        assertFalse(saved.getFields().containsKey("id"));
+        assertFalse(saved.getFields().containsKey("kind"));
+        assertFalse(saved.getFields().containsKey("content"));
     }
 
     @Test

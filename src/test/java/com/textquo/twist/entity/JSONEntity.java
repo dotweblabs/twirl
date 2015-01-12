@@ -36,6 +36,9 @@ public class JSONEntity {
 
     @Id
     private String id;
+
+    private String content;
+
     @Flat
     private Map<String,Object> fields;
 
@@ -67,5 +70,13 @@ public class JSONEntity {
 
     public void setKind(String kind) {
         this.kind = kind;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }
