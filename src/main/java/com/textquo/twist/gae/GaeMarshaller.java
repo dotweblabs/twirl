@@ -180,7 +180,9 @@ public class GaeMarshaller implements Marshaller {
                                             = (Map.Entry<Object, Object>) entry;
                                     Object entryKey = mapEntry.getKey();
                                     Object entryVal = mapEntry.getValue();
-                                    if (entryVal instanceof Map){
+                                    if(entryVal == null){
+                                        setProperty(e, (String) entryKey, null);
+                                    } else if (entryVal instanceof Map){
                                         setProperty(e, (String) entryKey, createEmbeddedEntityFromMap((Map) entryVal));
                                     } else if (entryVal instanceof List){
                                         throw new RuntimeException("List values are not yet supported");
@@ -191,7 +193,7 @@ public class GaeMarshaller implements Marshaller {
                                             || entryVal instanceof User) {
                                         setProperty(e, (String) entryKey, entryVal);
                                     } else {
-                                        throw new RuntimeException("Unsupported GAE property type");
+                                        throw new RuntimeException("Unsupported GAE property type: " + entryVal.getClass().getName());
                                     }
                                     Preconditions.checkNotNull(e, "entity is null");
                                 } catch (ClassCastException ex) {
