@@ -140,6 +140,11 @@ public class Find<V> {
         return this;
     }
 
+    public Find withCursor(String webSafeCursor){
+        this.cursor = new Cursor(webSafeCursor);
+        return this;
+    }
+
     public Find withCursor(){
         this.cursor = new Cursor();
         return this;

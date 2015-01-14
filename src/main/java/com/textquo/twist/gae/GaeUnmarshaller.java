@@ -32,6 +32,7 @@ import com.textquo.twist.annotations.Flat;
 import com.textquo.twist.annotations.Ancestor;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.AnnotationUtil.AnnotatedField;
+import com.textquo.twist.util.PrimitiveDefaults;
 import com.textquo.twist.validation.Validator;
 import com.textquo.twist.wrappers.PrimitiveWrapper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -91,9 +92,16 @@ public class GaeUnmarshaller implements Unmarshaller {
                 // do nothing for a final field
                 // usually static UID fields
             } else {
-                field.setAccessible(true);
-                field.set(instance, value);
-                field.setAccessible(accessible);
+                if(field.getType().isPrimitive() && value == null){
+                    Object defaultValue = PrimitiveDefaults.getDefaultValue(field.getType().getClass());
+                    field.setAccessible(true);
+                    field.set(instance, defaultValue);
+                    field.setAccessible(accessible);
+                } else {
+                    field.setAccessible(true);
+                    field.set(instance, value);
+                    field.setAccessible(accessible);
+                }
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
