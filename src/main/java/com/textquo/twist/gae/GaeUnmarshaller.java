@@ -22,11 +22,9 @@
  */
 package com.textquo.twist.gae;
 
-import com.google.common.collect.Lists;
 import com.textquo.twist.GaeObjectStore;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.users.User;
-import com.google.common.base.Preconditions;
 import com.textquo.twist.Unmarshaller;
 import com.textquo.twist.annotations.Flat;
 import com.textquo.twist.annotations.Ancestor;
@@ -132,9 +130,8 @@ public class GaeUnmarshaller implements Unmarshaller {
     }
 
     private void doUnmarshall(Object destination, Transaction transaction, Entity entity){
-        Preconditions.checkNotNull(destination, "Destination object cannot be null");
-        Preconditions.checkNotNull(entity, "Source entity cannot be null");
-
+//        Preconditions.checkNotNull(destination, "Destination object cannot be null");
+//        Preconditions.checkNotNull(entity, "Source entity cannot be null");
         assert validator.validate(destination) == true;
 
         Map<String,Object> props = entity.getProperties();
@@ -223,7 +220,7 @@ public class GaeUnmarshaller implements Unmarshaller {
 
         Iterator<Map.Entry<String,Object>> it = props.entrySet().iterator();
         Class<?> clazz = destination.getClass();
-        List<Field> fields = Lists.newArrayList(clazz.getDeclaredFields());
+        List<Field> fields = list(clazz.getDeclaredFields());
 
         while(it.hasNext()){
             Map.Entry<String,Object> entry = it.next();
