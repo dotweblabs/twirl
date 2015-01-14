@@ -305,6 +305,9 @@ public class GaeUnmarshaller implements Unmarshaller {
                                 setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
                             }
                         }
+                    } else if(fieldValue instanceof Text) {
+                        Text textField = (Text) fieldValue;
+                        setFieldValue(field, destination, textField.getValue());
                     } else if (fieldValue instanceof Date){
                         setFieldValue(field, destination, fieldValue);
                     } else if (fieldValue instanceof User) {
