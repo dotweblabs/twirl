@@ -27,8 +27,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.textquo.twist.annotations.*;
 import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.gae.GaeMarshaller;
@@ -107,7 +105,7 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public void delete(Key... keys) {
-        delete(Lists.newArrayList(keys));
+        delete(list(keys));
     }
 
     @Override
@@ -134,7 +132,7 @@ public class GaeObjectStore implements ObjectStore {
     public void deleteInTransaction(Key... keys) {
         Transaction tx = _ds.beginTransaction();
         try {
-            _ds.delete(com.google.common.collect.Lists.newArrayList(keys));
+            _ds.delete(list(keys));
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
@@ -366,9 +364,9 @@ public class GaeObjectStore implements ObjectStore {
         Iterable<Entity> entities = marshall(object);
         List<Key> keys = _ds.put(entities);
         assert list(entities).size() == keys.size();
-        key = Iterables.getLast(keys);
+        key = getLast(keys);
         if(isCached(object)){
-            _cache.put(key, Iterables.getLast(entities));
+            _cache.put(key, getLast(list(entities)));
         }
         updateObjectKey(key, object);
         return key;
@@ -393,7 +391,7 @@ public class GaeObjectStore implements ObjectStore {
             Iterable<Entity> entities = marshall(object);
             List<Key> keys = _ds.put(entities);
             assert list(entities).size() == keys.size();
-            result = Iterables.getLast(keys);
+            result = getLast(keys);
         } catch (Exception e) {
             e.printStackTrace();
             tx.rollback();
@@ -465,7 +463,7 @@ public class GaeObjectStore implements ObjectStore {
      * @param clazz type to register
      */
     public void register(Class<?> clazz){
-        List<Annotation> annotations = Lists.newArrayList(clazz.getAnnotations());
+        List<Annotation> annotations = list(clazz.getAnnotations());
         if(annotations.isEmpty()){
             String kind = StringHelper.getClassNameFrom(clazz.getName());
             cls.put(clazz, kind);
@@ -579,6 +577,16 @@ public class GaeObjectStore implements ObjectStore {
     public boolean isCached(Object object){
         boolean isCached = AnnotationUtil.isClassAnnotated(Cached.class, object);
         return isCached;
+    }
+
+    private <T> T getLast(T...objs){
+        T last = list(objs).get(list(objs).size() - 1);
+        return last;
+    }
+
+    private <T> T getLast(List<T> objs){
+        T last = list(objs).get(list(objs).size() - 1);
+        return last;
     }
 
 }

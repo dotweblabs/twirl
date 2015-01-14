@@ -26,14 +26,10 @@ import static org.boon.Lists.list;
 import static org.junit.Assert.*;
 
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.common.collect.Lists;
 import com.textquo.twist.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.ObjectStore;
 import com.textquo.twist.LocalDatastoreTestBase;
-import com.textquo.twist.TestData;
-import com.textquo.twist.annotations.Entity;
-import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.entity.*;
 import com.textquo.twist.types.Cursor;
 import com.textquo.twist.types.ListResult;
@@ -329,17 +325,17 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         store.put(new RootEntity("104", 2));
         store.put(new RootEntity("105", 1));
 
-        List<RootEntity> one = Lists.newArrayList(store.find(RootEntity.class).equal("__key__", "101").now());
-        List<RootEntity> four = Lists.newArrayList(store.find(RootEntity.class).greaterThan("__key__", "101").now());
-        List<RootEntity> all = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101").now());
+        List<RootEntity> one = list(store.find(RootEntity.class).equal("__key__", "101").now());
+        List<RootEntity> four = list(store.find(RootEntity.class).greaterThan("__key__", "101").now());
+        List<RootEntity> all = list(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101").now());
 
-        List<RootEntity> all_reversed = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101")
+        List<RootEntity> all_reversed = list(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101")
                 .sortAscending("count").now());
-        List<RootEntity> all_limited = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101")
+        List<RootEntity> all_limited = list(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101")
                 .sortAscending("count").limit(1).now());
 
-        List<RootEntity> all_count = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("count", 1).now());
-        List<RootEntity> two = Lists.newArrayList(store.find(RootEntity.class).greaterThanOrEqual("count", 1).greaterThanOrEqual("__key__", "104").now());
+        List<RootEntity> all_count = list(store.find(RootEntity.class).greaterThanOrEqual("count", 1).now());
+        List<RootEntity> two = list(store.find(RootEntity.class).greaterThanOrEqual("count", 1).greaterThanOrEqual("__key__", "104").now());
 
         assertEquals(1, one.size());
         assertEquals(4, four.size());
@@ -406,11 +402,14 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         store.put(new RootEntity("104", 2));
         store.put(new RootEntity("105", 1));
 
+        String startWebSafeCursor = "";
+
         String oldCursorString = "";
 
         ListResult<RootEntity> entities = store.find(RootEntity.class)
                 .greaterThanOrEqual("count", 1)
                 .limit(2)
+                .withCursor(startWebSafeCursor)
                 .withCursor(new Cursor(oldCursorString))
                 .sortAscending("count")
                 .asList();
@@ -490,7 +489,7 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         RootEntity update105 = new RootEntity("105", 101);
 
         List<RootEntity> update_all
-                = Lists.newArrayList(store.update(RootEntity.class)
+                = list(store.update(RootEntity.class)
                     .greaterThanOrEqual("__key__", "101")
                     .with(update101)
                     .now());

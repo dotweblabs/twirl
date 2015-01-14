@@ -28,7 +28,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.common.TwistException;
 import com.google.appengine.api.users.User;
-import com.google.common.base.Preconditions;
 import com.textquo.twist.GaeObjectStore;
 import com.textquo.twist.Marshaller;
 import com.textquo.twist.annotations.*;
@@ -76,7 +75,9 @@ public class GaeMarshaller implements Marshaller {
      */
     @Override
     public IdentityHashMap marshall(Key parent, Object instance){
-        Preconditions.checkNotNull(instance, "Object should not be null");
+        if(instance == null){
+            throw new RuntimeException("Object cannot be null");
+        }
         Entity e = null;
         // Its possible that a Entity to be saved without id and just a parent key
         if(parent != null && hasNoIdField(instance)){
@@ -195,7 +196,9 @@ public class GaeMarshaller implements Marshaller {
                                     } else {
                                         throw new RuntimeException("Unsupported GAE property type: " + entryVal.getClass().getName());
                                     }
-                                    Preconditions.checkNotNull(e, "entity is null");
+                                    if(e == null){
+                                        throw new RuntimeException("Entity is null");
+                                    }
                                 } catch (ClassCastException ex) {
                                     // Something is wrong here
                                     ex.printStackTrace();
@@ -329,7 +332,9 @@ public class GaeMarshaller implements Marshaller {
      * @return marshalled
      */
     public static Entity createEntityFromBasicTypes(Entity target, Object obj){
-        Preconditions.checkNotNull(obj, "Object should not be null");
+        if(obj == null){
+            throw new RuntimeException("Object should not be null");
+        }
         Map<String,Object> props = null;
         try {
             if (obj.getClass().isPrimitive()){
@@ -472,9 +477,11 @@ public class GaeMarshaller implements Marshaller {
      */
     //TODO: This method is quite the most problematic part, since there is no list implementation in the com.textquo.twist.datastore, unlike with a <code>Map</code>.
     public EmbeddedEntity createEmbeddedEntityFromList(List entity){
+        if(entity == null){
+            throw new RuntimeException("List entity cannot be nulll");
+        }
         EmbeddedEntity ee = null;
         try {
-            Preconditions.checkNotNull(entity, "List entity cannot be null");
             int index = 0;
             ee = new EmbeddedEntity();
 //            if (parent != null)
@@ -514,7 +521,9 @@ public class GaeMarshaller implements Marshaller {
      */
     public EmbeddedEntity createEmbeddedEntityFromMap(Map<String,Object> map){
 
-        Preconditions.checkNotNull(map, "Map entity cannot be null");
+        if(map == null){
+            throw new RuntimeException("Map entity cannot be null");
+        }
 
         // I think this is not necessary:
         // Deal with empty map
@@ -766,8 +775,12 @@ public class GaeMarshaller implements Marshaller {
     private static void setProperty(Entity entity, String key, Object value){
         LOG.debug("Setting property key: " + key);
 
-        Preconditions.checkNotNull(entity, "entity can't be null");
-        Preconditions.checkNotNull(key, "entity property key can't be null");
+        if(entity == null){
+            throw new RuntimeException("entity can't be null");
+        }
+        if(key == null){
+            throw new RuntimeException("entity property key can't be null");
+        }
 
         if (key.isEmpty()){
             throw new IllegalArgumentException("entity property key can't be empty");
