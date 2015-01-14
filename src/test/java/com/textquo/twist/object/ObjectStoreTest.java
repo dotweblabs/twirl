@@ -30,6 +30,7 @@ import com.textquo.twist.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.ObjectStore;
 import com.textquo.twist.LocalDatastoreTestBase;
+import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.entity.*;
 import com.textquo.twist.types.Cursor;
 import com.textquo.twist.types.ListResult;
@@ -236,6 +237,19 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testPut_long_String(){
+        String longString = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+        Post post = new Post();
+        post.setUserId("testUserId");
+        post.setMessage(longString);
+        Key key = store.put(post);
+        Post saved = store.get(Post.class, key);
+        assertNotNull(saved);
+        assertEquals("testUserId", saved.getUserId());
+        assertEquals(longString, saved.getMessage());
+    }
+
+    @Test
     public void testGetByKey(){
 
         Object testEntity = createTestRootEnity();
@@ -410,7 +424,6 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
                 .greaterThanOrEqual("count", 1)
                 .limit(2)
                 .withCursor(startWebSafeCursor)
-                .withCursor(new Cursor(oldCursorString))
                 .sortAscending("count")
                 .asList();
 
@@ -490,9 +503,9 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
 
         List<RootEntity> update_all
                 = list(store.update(RootEntity.class)
-                    .greaterThanOrEqual("__key__", "101")
-                    .with(update101)
-                    .now());
+                .greaterThanOrEqual("__key__", "101")
+                .with(update101)
+                .now());
 
         assertEquals(5, update_all.size());
         assertEquals(105, update_all.get(0).getCount());
