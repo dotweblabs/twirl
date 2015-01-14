@@ -23,7 +23,6 @@
 package com.textquo.twist.object;
 
 import com.google.appengine.api.datastore.*;
-import com.google.common.base.Preconditions;
 import com.textquo.twist.serializer.ObjectSerializer;
 import com.textquo.twist.util.BoundedIterator;
 import com.textquo.twist.util.Pair;
@@ -46,7 +45,9 @@ public class QueryStore extends AbstractStore {
      * @return
      */
     protected boolean containsEntityWithFieldLike(String kind, Entity props){
-        Preconditions.checkNotNull(props, "entity cannot be null");
+        if(props == null){
+            throw new RuntimeException("entity cannot be null");
+        }
         boolean contains = false;
         Map<String,Object> m = props.getProperties();
         Transaction tx = _ds.beginTransaction();
@@ -164,8 +165,12 @@ public class QueryStore extends AbstractStore {
             Integer limit, Integer offset, com.textquo.twist.types.Cursor startCursor,
             boolean keysOnly, boolean asList){
 
-        Preconditions.checkNotNull(query, "Query object can't be null");
-        Preconditions.checkNotNull(sorts, "Sort can't be null");
+        if(query == null){
+            throw new RuntimeException("Query object cannot be null");
+        }
+        if(sorts == null){
+            throw new RuntimeException("Sort object cannot be null");
+        }
 
         LOG.debug("Query map="+query.toString());
 
@@ -290,11 +295,10 @@ public class QueryStore extends AbstractStore {
      * @return
      */
     protected boolean containsEntityLike(String kind, Map<String, Pair<Query.FilterOperator, Object>> query){
-        Preconditions.checkNotNull(query, "QueryStore object cannot be null");
+        if(query == null){
+            throw new RuntimeException("Query object cannot be null");
+        }
         boolean contains = false;
-
-        Preconditions.checkNotNull(query, "Null query object");
-
         Transaction tx = _ds.beginTransaction();
         try {
             Query q = new Query(kind);
@@ -341,8 +345,13 @@ public class QueryStore extends AbstractStore {
             String kind,
             Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts){
 
-        Preconditions.checkNotNull(query, "QueryStore object can't be null");
-        Preconditions.checkNotNull(sorts, "Sort can't be null");
+        if(query == null){
+            throw new RuntimeException("Query object cannot be null");
+        }
+        if(sorts == null){
+            throw new RuntimeException("Sort object cannot be null");
+        }
+
         LOG.debug("QueryStore map="+query.toString());
 
         PreparedQuery pq = null;
@@ -436,7 +445,9 @@ public class QueryStore extends AbstractStore {
      */
     protected Iterator<Entity> queryEntitiesLike(String kind, Map<String,
             Pair<Query.FilterOperator, Object>> queryParam){
-        Preconditions.checkNotNull(queryParam, "Null query object");
+        if(queryParam == null){
+            throw new RuntimeException("Null query cannot be null");
+        }
         Map<String,Pair<Query.FilterOperator, Object>> query = validateQuery(queryParam);
         Query q = new Query(kind);
         for (String propName : query.keySet()){
