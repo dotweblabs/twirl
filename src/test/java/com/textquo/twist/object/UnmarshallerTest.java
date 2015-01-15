@@ -80,5 +80,10 @@ public class UnmarshallerTest extends LocalDatastoreTestBase {
         assertEquals("TestValue", destination.get("TestProperty"));
         assertEquals("TestValue2", destination.get("TestProperty2"));
     }
+
+    @Test
+    public void testUnmarshallDate(){
+            
+    }
 }
 
