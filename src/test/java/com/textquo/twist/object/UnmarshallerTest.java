@@ -26,9 +26,11 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.textquo.twist.GaeObjectStore;
 import com.textquo.twist.LocalDatastoreTestBase;
+import com.textquo.twist.entity.Post;
 import com.textquo.twist.gae.GaeUnmarshaller;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.junit.Assert.*;
@@ -79,6 +81,19 @@ public class UnmarshallerTest extends LocalDatastoreTestBase {
 
         assertEquals("TestValue", destination.get("TestProperty"));
         assertEquals("TestValue2", destination.get("TestProperty2"));
+    }
+
+    @Test
+    public void testUnmarshallDate(){
+        Entity source = new Entity("Post");
+        source.setProperty("created", "2014-12-11T14:31:43 -08:00");
+
+        Post destination = new Post();
+
+        unmarshaller.unmarshall(destination, source);
+
+        assertNotNull(destination.getCreated());
+        assertTrue(destination.getCreated() instanceof Date);
     }
 }
 

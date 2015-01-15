@@ -169,7 +169,4 @@ public class MarshallerTest extends LocalDatastoreTestBase {
         assertEquals("MyDocument", e.getKind());
     }
 
-
-
-
 }
