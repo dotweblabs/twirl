@@ -24,13 +24,13 @@ package com.textquo.twist.object;
 
 import com.google.appengine.api.datastore.*;
 import com.textquo.twist.serializer.ObjectSerializer;
-import com.textquo.twist.util.BoundedIterator;
 import com.textquo.twist.util.Pair;
 
 import java.util.*;
 
 /**
  * Created by kerby on 4/27/14.
+ * TODO: Cleanup unused codes here
  */
 public class QueryStore extends AbstractStore {
 
@@ -38,113 +38,6 @@ public class QueryStore extends AbstractStore {
         super(ds, serializer);
     }
 
-    /**
-     * Check whether entity with the given properties exist
-     *
-     * @param props entity to extract properties from
-     * @return
-     */
-    protected boolean containsEntityWithFieldLike(String kind, Entity props){
-        if(props == null){
-            throw new RuntimeException("entity cannot be null");
-        }
-        boolean contains = false;
-        Map<String,Object> m = props.getProperties();
-        Transaction tx = _ds.beginTransaction();
-        try {
-            Iterator<String> it = m.keySet().iterator();
-            Query q = new Query(kind);
-            while (it.hasNext()){ // build the query
-                String propName = it.next();
-                Query.Filter filter = new Query.FilterPredicate(propName,
-                        Query.FilterOperator.EQUAL, m.get(propName));
-                Query.Filter prevFilter = q.getFilter();
-                // Note that the QueryStore object is immutable
-                q = new Query(kind).setFilter(prevFilter).setFilter(filter);
-                q = q.setKeysOnly();
-            }
-            PreparedQuery pq = _ds.prepare(q);
-            int c = pq.countEntities(FetchOptions.Builder.withDefaults());
-            if (c != 0)
-                contains = true;
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-        }
-        return contains;
-    }
-
-
-    public Iterator<Map<String,Object>> query(Key ancestor, String kind,
-            Map<String, Pair<Query.FilterOperator, Object>> filters,
-            Map<String, Query.SortDirection> sorts, Integer offset, Integer limit,
-            com.textquo.twist.types.Cursor startCursor){
-        if (filters == null){
-            filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
-        }
-        /**
-         * Map of fields and its matching filter operator and compare valueType
-         */
-        Iterator<Map<String,Object>> it = null;
-        try {
-            if (sorts == null){
-                sorts = new HashMap<String, Query.SortDirection>();
-            }
-            if(startCursor != null){
-                final Iterator<Entity> eit = (Iterator<Entity>) querySortedLike(ancestor, kind, filters, sorts, limit, offset, startCursor, false, false);
-                it = new Iterator<Map<String,Object>>() {
-                    public void remove() {
-                        eit.remove();
-                    }
-                    public Map<String,Object> next() {
-                        Entity e = eit.next();
-                        return null; //TODO!
-                        //return EntityMapper.createMapObjectFromEntity(e);
-                    }
-                    public boolean hasNext() {
-                        return eit.hasNext();
-                    }
-                };
-            } else {
-                final Iterator<Entity> eit = (Iterator<Entity>) querySortedLike(ancestor, kind, filters, sorts, limit, offset, null, false, false);
-                it = new Iterator<Map<String,Object>>() {
-                    public void remove() {
-                        eit.remove();
-                    }
-                    public Map<String,Object> next() {
-                        Entity e = eit.next();
-                        return null; //TODO!
-                        //return EntityMapper.createMapObjectFromEntity(e);
-                    }
-                    public boolean hasNext() {
-                        return eit.hasNext();
-                    }
-                };
-            }
-        } catch (Exception e) {
-            // TODO Handle exception
-            e.printStackTrace();
-            it = null;
-        } finally {
-
-        }
-        if (it == null){
-            LOG.debug("Returning null iterator");
-        }
-        if (limit != null){
-            if (offset != null){
-                return new BoundedIterator<Map<String,Object>>(offset, limit, it);
-            } else {
-                return new BoundedIterator<Map<String,Object>>(0, limit, it);
-            }
-        }
-        //List asList = Lists.newArrayList(it);
-        return it;
-    }
 
     /**
      * Builds a query filter from the given <code>entity</code> property names and values and add sorting from
@@ -286,7 +179,45 @@ public class QueryStore extends AbstractStore {
         return null;
     }
 
-
+    /**
+     * Check whether entity with the given properties exist
+     *
+     * @param props entity to extract properties from
+     * @return
+     */
+    protected boolean containsEntityWithFieldLike(String kind, Entity props){
+        if(props == null){
+            throw new RuntimeException("entity cannot be null");
+        }
+        boolean contains = false;
+        Map<String,Object> m = props.getProperties();
+        Transaction tx = _ds.beginTransaction();
+        try {
+            Iterator<String> it = m.keySet().iterator();
+            Query q = new Query(kind);
+            while (it.hasNext()){ // build the query
+                String propName = it.next();
+                Query.Filter filter = new Query.FilterPredicate(propName,
+                        Query.FilterOperator.EQUAL, m.get(propName));
+                Query.Filter prevFilter = q.getFilter();
+                // Note that the QueryStore object is immutable
+                q = new Query(kind).setFilter(prevFilter).setFilter(filter);
+                q = q.setKeysOnly();
+            }
+            PreparedQuery pq = _ds.prepare(q);
+            int c = pq.countEntities(FetchOptions.Builder.withDefaults());
+            if (c != 0)
+                contains = true;
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+        }
+        return contains;
+    }
 
     /**
      * Check whether entity with the given properties exist having
@@ -398,7 +329,6 @@ public class QueryStore extends AbstractStore {
         }
         pq = _ds.prepare(q);
         Iterator<Entity> res = pq.asIterator();
-        //List asList = Lists.newArrayList(res);
         return res;
     }
 
