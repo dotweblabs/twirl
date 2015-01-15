@@ -30,6 +30,7 @@ import com.textquo.twist.annotations.Flat;
 import com.textquo.twist.annotations.Ancestor;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.AnnotationUtil.AnnotatedField;
+import com.textquo.twist.util.DateUtil;
 import com.textquo.twist.util.PrimitiveDefaults;
 import com.textquo.twist.validation.Validator;
 import com.textquo.twist.wrappers.PrimitiveWrapper;
@@ -303,6 +304,16 @@ public class GaeUnmarshaller implements Unmarshaller {
                                     }
                                 } else if (field.getType().equals(boolean.class)){
                                     setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
+                                } else if (field.getType().equals(Date.class)){
+                                    if(fieldValue.getClass().equals(String.class)){
+                                        Date date = DateUtil.parseDate((String) fieldValue);
+                                        setFieldValue(field, destination, date);
+                                    } else if(fieldValue.getClass().equals(Date.class)){
+                                        setFieldValue(field, destination, fieldValue);
+                                    } else {
+                                        throw new RuntimeException("Unable to unmarshall "
+                                                + fieldValue.getClass().getName() + " to " + field.getType().getName());
+                                    }
                                 }
                             }
                         } else if(fieldValue instanceof Text) {
