@@ -162,7 +162,19 @@ public class GaeMarshaller implements Marshaller {
                         if (field.isAnnotationPresent(Embedded.class)){
                             setProperty(e, fieldName, createEmbeddedEntityFromList((List) fieldValue));
                         } else {
-                            throw new TwistException("List type should be annotated with @Embedded or @Flat");
+                            boolean supported = true;
+                            List list = (List) fieldValue;
+                            for (Object item : list){
+                                if(!GAE_SUPPORTED_TYPES.contains(item.getClass())){
+                                    supported = false;
+                                }
+                            }
+                            if(supported){
+                                setProperty(e, fieldName, fieldValue);
+                            } else{
+                                throw new RuntimeException("List should only include GAE supported types " + GAE_SUPPORTED_TYPES
+                                + " otherwise annotate the List with @Embedded");
+                            }
                         }
                     } else if(fieldValue instanceof Map){
                         LOG.debug( "Processing Map valueType");
@@ -793,7 +805,8 @@ public class GaeMarshaller implements Marshaller {
         }
 
         if (!GAE_SUPPORTED_TYPES.contains(value.getClass())
-                && !(value instanceof Blob) && !(value instanceof EmbeddedEntity)) {
+                && !(value instanceof Blob) && !(value instanceof EmbeddedEntity)
+                && !(value instanceof List)) {
             throw new RuntimeException("Unsupported type[class=" + value.
                     getClass().getName() + "] in GAE repository");
         }
@@ -819,6 +832,8 @@ public class GaeMarshaller implements Marshaller {
             entity.setProperty(key,
                     new com.google.appengine.api.datastore.Blob(
                             blob.getBytes()));
+        } else if(value instanceof List){
+            entity.setProperty(key, value);
         }
     }
 

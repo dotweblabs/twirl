@@ -26,6 +26,8 @@ import com.textquo.twist.annotations.Child;
 import com.textquo.twist.annotations.Embedded;
 import com.textquo.twist.annotations.Id;
 
+import java.util.List;
+
 public class RootEntity {
 
     @Id
@@ -35,6 +37,8 @@ public class RootEntity {
     private ChildEntity newChildEntity;
     @Embedded
     private ChildEntity embeddedEntity;
+
+    private List<ChildEntity> children;
 
     public RootEntity() {}
 
@@ -98,5 +102,13 @@ public class RootEntity {
 
     public void setEmbeddedEntity(ChildEntity childEntity){
         this.embeddedEntity = childEntity;
+    }
+
+    public List<ChildEntity> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<ChildEntity> children) {
+        this.children = children;
     }
 }
