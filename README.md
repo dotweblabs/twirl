@@ -16,7 +16,7 @@ Yet Another Google App Engine Datastore ORM with a twist! (We need your support,
                                                            
 twists aims to provide a lightweight Object mapping framework. Without adding complexity into the api.
 
-Persisting POJO's, Maps and (soon Primitive types) directly into the com.textquo.twist.datastore.
+Persisting POJO's, Maps and (soon Primitive types) directly into the Datastore.
 
 [![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/twist)
 
@@ -43,6 +43,13 @@ Iterator<Friend> all = store.find(Friend.class).greaterThanOrEqual("name", "Joe"
 Friend one = store.findOne(Friend.class).greaterThanOrEqual("name", "Joe").now();
 ```
 
+Note that you can also use static import for store:
+
+```java
+import static com.textquo.bin.client.local.storage.LocalStorage.store;
+
+store().put(friend);
+```
 
 ##Updating
 
