@@ -268,6 +268,38 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testFindOrderByStringDate(){
+        // December
+        for(int i=1; i <= 31; i++){
+            Map map = new LinkedHashMap();
+            map.put("__key__", "december"+i);
+            map.put("__kind__", "EntityWithDate");
+            String zero = i < 10 ? "0" : "";
+            map.put("created", "2014-12-" + zero + i + "T14:31:43 -08:00");
+            Key key = store.put(map);
+            assertEquals("december"+i, key.getName());
+        }
+        List<EntityWithDate> entities = store.find(EntityWithDate.class).sortDescending("created").asList().getList();
+        assertNotNull(entities);
+        assertEquals(31, entities.size());
+        // November
+        for(int i=1; i <= 30; i++){
+            Map map = new LinkedHashMap();
+            map.put("__key__", "november"+i);
+            map.put("__kind__", "EntityWithDate");
+            String zero = i < 10 ? "0" : "";
+            map.put("created", "2014-11-" + zero + i + "T14:31:43 -08:00");
+            Key key = store.put(map);
+            assertEquals("november"+i, key.getName());
+        }
+        List<EntityWithDate> all = store.find(EntityWithDate.class).sortDescending("created").asList().getList();
+        assertNotNull(all);
+        assertEquals(61, all.size());
+        assertEquals("december31", all.get(0).getId());
+        assertEquals("november1", all.get(60).getId());
+    }
+
+    @Test
     public void tesdFindByPropertyKeysOnly(){
 
         Object testEntity = createTestRootEnity();
