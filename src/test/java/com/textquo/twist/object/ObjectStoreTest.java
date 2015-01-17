@@ -224,6 +224,18 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testPut_map_getAsPOJO(){
+        Map<String,Object> map = new LinkedHashMap<>();
+        map.put("__key__", "test");
+        map.put("__kind__", "Post");
+        map.put("created", "2014-12-11T14:31:43 -08:00");
+        store.put(map);
+        Post saved = store.get(Post.class, "test");
+        assertNotNull(saved);
+        assertNotNull(saved.getCreated());
+    }
+
+    @Test
     public void testPut_cached(){
         Post post = new Post();
         post.setUserId("testUserId");
@@ -265,6 +277,22 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("TestRoot", result.getKey());
         assertEquals("TestChild", result.getNewChildEntity().getType());
         assertEquals("TestEmbedded", result.getEmbeddedEntity().getType());
+    }
+
+    @Test
+    public void testFind_orderByDateString(){
+        for(int i=1; i < 31 ; i++){
+            Map<String,Object> map = new LinkedHashMap<>();
+            map.put("__key__", "test" + i);
+            map.put("__kind__", "Post");
+            map.put("created", "2014-12-" + i + "T14:31:43 -08:00");
+            Key key = store.put(map);
+            assertNotNull(key);
+        }
+        List<Post> posts = store.find(Post.class)
+                .sortDescending("create").asList().getList();
+        //assertNotNull(posts);
+        //assertEquals(31, posts.size());
     }
 
     @Test
