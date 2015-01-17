@@ -24,23 +24,22 @@ package com.textquo.twist.object;
 
 import static org.junit.Assert.*;
 
-import com.google.appengine.api.datastore.EmbeddedEntity;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.*;
 import com.textquo.twist.Marshaller;
-import com.textquo.twist.TestData;
 import com.textquo.twist.common.AutoGenerateStringIdException;
-import com.textquo.twist.entity.ChildChildEntity;
-import com.textquo.twist.entity.ChildEntity;
-import com.textquo.twist.entity.JSONEntity;
-import com.textquo.twist.entity.RootEntity;
+import com.textquo.twist.entity.*;
 import com.textquo.twist.gae.GaeMarshaller;
 import com.textquo.twist.LocalDatastoreTestBase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
+
+import static org.boon.Lists.list;
+
 
 /**
  * Created by kerby on 4/23/14.
@@ -168,5 +167,59 @@ public class MarshallerTest extends LocalDatastoreTestBase {
 
         assertEquals("MyDocument", e.getKind());
     }
+
+    @Test
+    public void test(){
+        Entity parent = new Entity("Parent");
+// set parent properties...
+        List<EmbeddedEntity> children = new ArrayList<EmbeddedEntity>();
+        for (int i = 0; i < 5; i++) {
+            EmbeddedEntity child = new EmbeddedEntity();
+            // set child properties...
+            children.add(child);
+        }
+        parent.setUnindexedProperty("children", children);
+        parent.setUnindexedProperty("children2", list("tag1", "tag2", "tag3"));
+
+        DatastoreServiceFactory.getDatastoreService().put(parent);
+
+        try {
+            Entity e = DatastoreServiceFactory.getDatastoreService().get(parent.getKey());
+            e.getKey();
+            Object children2 = e.getProperty("children2");
+            assertTrue(children2 instanceof List);
+        } catch (EntityNotFoundException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void test_Marshall_List(){
+        Post post = new Post();
+        post.setTags(list("tag1", "tag2", "tag3"));
+
+        IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, post);
+        Entity e = stack.get(post);
+        Object tags = e.getProperty("tags");
+
+        assertNotNull(e);
+        assertTrue(tags instanceof List);
+        assertEquals("tag1", ((List) tags).get(0));
+        assertEquals("tag2", ((List) tags).get(1));
+        assertEquals("tag3", ((List) tags).get(2));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void test_Marshall_List_with_POJO(){
+        RootEntity entity = new RootEntity();
+        entity.setId("test_id");
+
+        entity.setChildren(list(new ChildEntity(), new ChildEntity(), new ChildEntity()));
+
+        IdentityHashMap<Object,Entity> stack = testMarshaller.marshall(null, entity);
+        Entity e = stack.get(entity);
+    }
+
 
 }

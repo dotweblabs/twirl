@@ -224,6 +224,18 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testPut_map_getAsPOJO(){
+        Map<String,Object> map = new LinkedHashMap<>();
+        map.put("__key__", "test");
+        map.put("__kind__", "Post");
+        map.put("created", "2014-12-11T14:31:43 -08:00");
+        store.put(map);
+        Post saved = store.get(Post.class, "test");
+        assertNotNull(saved);
+        assertNotNull(saved.getCreated());
+    }
+
+    @Test
     public void testPut_cached(){
         Post post = new Post();
         post.setUserId("testUserId");

@@ -27,6 +27,7 @@ import com.textquo.twist.annotations.Entity;
 import com.textquo.twist.annotations.Id;
 
 import java.util.Date;
+import java.util.List;
 
 @Cached
 @Entity
@@ -36,6 +37,7 @@ public class Post {
     private String userId;
     private String message;
     private Date created;
+    private List<String> tags;
 
     public Long getId() {
         return id;
@@ -63,5 +65,13 @@ public class Post {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }
