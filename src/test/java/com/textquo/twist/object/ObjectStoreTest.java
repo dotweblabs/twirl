@@ -286,6 +286,7 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
             Map map = new LinkedHashMap();
             map.put("__key__", "december"+i);
             map.put("__kind__", "EntityWithDate");
+            map.put("current", false);
             String zero = i < 10 ? "0" : "";
             map.put("created", "2014-12-" + zero + i + "T14:31:43 -08:00");
             Key key = store.put(map);
@@ -299,6 +300,7 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
             Map map = new LinkedHashMap();
             map.put("__key__", "november"+i);
             map.put("__kind__", "EntityWithDate");
+            map.put("current", true);
             String zero = i < 10 ? "0" : "";
             map.put("created", "2014-11-" + zero + i + "T14:31:43 -08:00");
             Key key = store.put(map);
@@ -309,6 +311,18 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals(61, all.size());
         assertEquals("december31", all.get(0).getId());
         assertEquals("november1", all.get(60).getId());
+
+        List<EntityWithDate> allQueryWithEqual
+                = store.find(EntityWithDate.class)
+                .equal("current", true)
+                .sortDescending("created")
+                .asList()
+                .getList();
+
+        assertNotNull(allQueryWithEqual);
+        assertEquals(30, allQueryWithEqual.size());
+        assertEquals("november1", allQueryWithEqual.get(29).getId());
+
     }
 
     @Test
