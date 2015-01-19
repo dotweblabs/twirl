@@ -46,6 +46,22 @@ public class KeyStructure {
         return KeyFactory.createKey(clazz.getSimpleName(), key);
     }
 
+    public static Key createKey(Key parent, Class<?> clazz, Long id){
+        return KeyFactory.createKey(parent, clazz.getSimpleName(), id);
+    }
+
+    public static Key createKey(Class<?> clazz, Long id){
+        return KeyFactory.createKey(clazz.getSimpleName(), id);
+    }
+
+    public static Key createKey(Key parent, Class<?> clazz, long id){
+        return KeyFactory.createKey(parent, clazz.getSimpleName(), id);
+    }
+
+    public static Key createKey(Class<?> clazz, long id){
+        return KeyFactory.createKey(clazz.getSimpleName(), id);
+    }
+
 	public static Key createKey(String kind, String key) {
 		return KeyFactory.createKey(kind, key);
 	}
