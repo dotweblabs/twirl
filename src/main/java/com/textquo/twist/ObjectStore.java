@@ -23,6 +23,7 @@
 package com.textquo.twist;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Transaction;
 import com.textquo.twist.types.Find;
 import com.textquo.twist.types.FindOne;
 import com.textquo.twist.types.Update;
@@ -68,5 +69,5 @@ public interface ObjectStore {
     public abstract Marshaller marshaller();
     public abstract Unmarshaller unmarshaller();
 
-
+    public Transaction getTransaction();
 }

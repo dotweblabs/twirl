@@ -69,6 +69,10 @@ public class GaeObjectStore implements ObjectStore {
         return Child.class;
     }
 
+    public static Class<Unindexed> unIndexed(){
+        return Unindexed.class;
+    }
+
     private IdentityHashMap<Class<?>,String> cls = new IdentityHashMap<Class<?>,String>();
 
     protected static Logger LOG = LogManager.getLogger(GaeObjectStore.class.getName());
@@ -417,6 +421,11 @@ public class GaeObjectStore implements ObjectStore {
     @Override
     public Unmarshaller unmarshaller() {
         return new GaeUnmarshaller(this);
+    }
+
+    @Override
+    public Transaction getTransaction() {
+        return _ds.getCurrentTransaction();
     }
 
     private Iterable<Entity> marshall(Object instance){
