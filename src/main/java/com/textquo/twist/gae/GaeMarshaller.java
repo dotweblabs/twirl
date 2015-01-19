@@ -54,7 +54,7 @@ public class GaeMarshaller implements Marshaller {
     private IdentityHashMap<Object,Entity> stack = new IdentityHashMap<Object, Entity>();
 
     /**
-     * GAE com.textquo.twist.datastore supported types.
+     * GAE Datastore supported types.
      */
     protected static final Set<Class<?>> GAE_SUPPORTED_TYPES =
             DataTypeUtils.getSupportedTypes();
@@ -66,7 +66,7 @@ public class GaeMarshaller implements Marshaller {
 
     /**
      *
-     * Create entity objects that can be persisted into the GAE com.textquo.twist.datastore,
+     * Create entity objects that can be persisted into the GAE Datastore,
      * including its Parent-Child relationships (if necessary).
      *
      * @param parent parent of the generated entity or Entities
@@ -247,49 +247,63 @@ public class GaeMarshaller implements Marshaller {
                         } else if (fieldType.equals(double.class)){
                             double i = (Double) fieldValue;
                             setProperty(e, fieldName, i, indexed);
-                        } else { // POJO
+                        } else if(fieldType.equals(byte.class)){
+                            byte b = (byte) fieldValue;
+                            Blob blob = new Blob(new byte[b]);
+                            setProperty(e, fieldName, blob, indexed);
+                        } else if(fieldType.equals(byte[].class)){
+                            byte[] bytes = (byte[]) fieldValue;
+                            Blob blob = new Blob(bytes);
+                            setProperty(e, fieldName, blob, indexed);
+                        }else { // POJO
                             if (field.isAnnotationPresent(Embedded.class)){
                                 Map<String,Object> map = createMapFrom(fieldValue);
                                 EmbeddedEntity ee = createEmbeddedEntityFromMap(map);
                                 setProperty(e, fieldName, ee, indexed);
-                            } else if (field.isAnnotationPresent(Parent.class)){
+                            } else if (field.isAnnotationPresent(GaeObjectStore.parent())){
                                 // @Parent first before @Child, don't switch. @Child needs parent Key.
-                                if (parent != null){
-                                    // Case where a Parent entity is marshalled then during the
-                                    // iteration process, a @Child entity is found
-                                    Entity _target = new Entity(createKeyFrom(parent, instance));
-                                    _target.setPropertiesFrom(e);
-                                    e = _target;
+                                if (field.getType().equals(Key.class)){
+                                    // skip it
+                                    continue;
                                 } else {
-                                    // Case where a Child entity is first marshalled
-                                    // at this point this child is not yet in the stack
-                                    // and the Parent entity is not yet also in the stack
-                                    // so we will create a Key from the "not yet marshalled" parent instance
-                                    // or is it not? Let's check.
-                                    Object parentField = field.get(instance);
-                                    Entity parentEntity = stack.get(parentField);
-                                    if(parentEntity!=null){
-                                        Entity _target = new Entity(createKeyFrom(parentEntity.getKey(), instance));
+                                    if (parent != null){
+                                        // Case where a Parent entity is marshalled then during the
+                                        // iteration process, a @Child entity is found
+                                        Entity _target = new Entity(createKeyFrom(parent, instance));
                                         _target.setPropertiesFrom(e);
                                         e = _target;
-                                    } else{
-                                        Key generatedParentKey = createKeyFrom(null, parentField);
-                                        Entity _target = new Entity(createKeyFrom(generatedParentKey, instance));
-                                        _target.setPropertiesFrom(e);
-                                        e = _target;
-                                        marshall(null, parentField);
+                                    } else {
+                                        // Case where a Child entity is first marshalled
+                                        // at this point this child is not yet in the stack
+                                        // and the Parent entity is not yet also in the stack
+                                        // so we will create a Key from the "not yet marshalled" parent instance
+                                        // or is it not? Let's check.
+                                        Object parentField = field.get(instance);
+                                        Entity parentEntity = stack.get(parentField);
+                                        if(parentEntity!=null){
+                                            Entity _target = new Entity(createKeyFrom(parentEntity.getKey(), instance));
+                                            _target.setPropertiesFrom(e);
+                                            e = _target;
+                                        } else{
+                                            Key generatedParentKey = createKeyFrom(null, parentField);
+                                            Entity _target = new Entity(createKeyFrom(generatedParentKey, instance));
+                                            _target.setPropertiesFrom(e);
+                                            e = _target;
+                                            marshall(null, parentField);
+                                        }
                                     }
                                 }
-                            } else if (field.isAnnotationPresent(Child.class)){
+                            } else if (field.isAnnotationPresent(GaeObjectStore.child())){
                                 Object childField = field.get(instance);
                                 marshall(e.getKey(), childField);
                                 Entity childEntity = stack.get(childField);
                                 Key childEntityKey = childEntity.getKey();
                                 setProperty(e, fieldName, childEntityKey, indexed);
-                            } else if (field.isAnnotationPresent(Ancestor.class)){
+                            } else if (field.isAnnotationPresent(GaeObjectStore.ancestor())){
                                 // already processed above, skip it
                             } else {
-                                throw new RuntimeException("POJO's must be annotated with @Embedded, @Parent or @Child annotations.");
+                                throw new RuntimeException("POJO's must be annotated with @Embedded, @Parent or @Child annotations for field "
+                                        + fieldName);
                             }
                         }
                     }
@@ -380,7 +394,7 @@ public class GaeMarshaller implements Marshaller {
      * @return
      */
     private Key inspectObjectAndCreateKey(Object instance){
-        AnnotationUtil.AnnotatedField parentField = AnnotationUtil.getFieldWithAnnotation(Parent.class, instance);
+        AnnotationUtil.AnnotatedField parentField = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.parent(), instance);
         String fieldName = parentField.getFieldName();
         Object fieldValue = parentField.getFieldValue();
 
@@ -427,7 +441,7 @@ public class GaeMarshaller implements Marshaller {
      * @param instance String, Long/long key object
      * @return GAE {@code Key}
      */
-    private static Key createKeyFrom(Key parent, Object instance){
+    public static Key createKeyFrom(Key parent, Object instance){
         Key key = null;
         Object id = null;
         String kind = getKindOf(instance);
@@ -447,8 +461,34 @@ public class GaeMarshaller implements Marshaller {
             }
             return key;
         }
-        AnnotationUtil.AnnotatedField idField = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.key(), instance);
+
+        AnnotationUtil.AnnotatedField ancestorField
+                = AnnotationUtil
+                    .getFieldWithAnnotation(GaeObjectStore.ancestor(), instance);
+
+        AnnotationUtil.AnnotatedField parentField
+                = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.parent(), instance);
+
+        AnnotationUtil.AnnotatedField idField
+                = AnnotationUtil
+                    .getFieldWithAnnotation(GaeObjectStore.key(), instance);
+
+        if(ancestorField != null){
+            Class<?> clazz = ancestorField.getFieldType();
+            if(clazz.equals(Key.class)){
+                Key ancestor = (Key) ancestorField.getFieldValue();
+                // TODO: No use use it seems
+            } else {
+                throw new RuntimeException("Only " + Key.class + " is supported to be annoated with @Ancestor");
+            }
+        }
+
         if (idField != null){
+            if(parentField != null && parentField.getFieldValue() != null){
+                if(parentField.getFieldValue().getClass().equals(Key.class)){
+                    parent = (Key) parentField.getFieldValue();
+                }
+            }
             Class<?> clazz = idField.getFieldType();
             id = idField.getFieldValue();
             if (clazz.equals(String.class)){
@@ -490,7 +530,7 @@ public class GaeMarshaller implements Marshaller {
      * @param entity to marshall into {@code EmbeddedEntity}
      * @return marshalled
      */
-    //TODO: This method is quite the most problematic part, since there is no list implementation in the com.textquo.twist.datastore, unlike with a <code>Map</code>.
+    //TODO: This method is quite the most problematic part, since there is no list implementation in the Datastore, unlike with a <code>Map</code>.
     public EmbeddedEntity createEmbeddedEntityFromList(List entity){
         if(entity == null){
             throw new RuntimeException("List entity cannot be nulll");
@@ -748,7 +788,7 @@ public class GaeMarshaller implements Marshaller {
     }
 
     /**
-     * Helper method to convert a retrieved Date object from the GAE com.textquo.twist.datastore
+     * Helper method to convert a retrieved Date object from the GAE Datastore
      * to a string format that Google Gson library can map to a Date field on a POJO
      *
      * @param map

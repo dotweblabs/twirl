@@ -42,7 +42,7 @@ public abstract class AbstractStore {
     protected static TransactionOptions _options;
 
     /**
-     * GAE com.textquo.twist.datastore supported types.
+     * GAE Datastore supported types.
      */
     protected static final Set<Class<?>> GAE_SUPPORTED_TYPES =
             DataTypeUtils.getSupportedTypes();

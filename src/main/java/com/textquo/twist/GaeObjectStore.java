@@ -44,7 +44,11 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import static org.boon.Lists.list;
 
@@ -64,6 +68,10 @@ public class GaeObjectStore implements ObjectStore {
 
     public static Class<Parent> parent(){
         return Parent.class;
+    }
+
+    public static Class<Ancestor> ancestor(){
+        return Ancestor.class;
     }
 
     public static Class<Child> child(){
@@ -87,7 +95,7 @@ public class GaeObjectStore implements ObjectStore {
     protected ObjectSerializer _serializer;
 
     /**
-     * GAE com.textquo.twist.datastore supported types.
+     * GAE Datastore supported types.
      */
     protected static final Set<Class<?>> GAE_SUPPORTED_TYPES =
             DataTypeUtils.getSupportedTypes();
@@ -114,8 +122,16 @@ public class GaeObjectStore implements ObjectStore {
     }
 
     @Override
-    public void delete(Iterable<Key> keys) {
-        _ds.delete(keys);
+    public <T> void delete(Iterable<T> keysOrObjects) {
+        for(Object o : keysOrObjects){
+            if(o instanceof Key){
+                _ds.delete((Key)o);
+            } else {
+                Key key = getParent(o);
+                _ds.delete(key);
+            }
+        }
+        //_ds.delete(keys);
     }
 
     @Override
@@ -255,7 +271,6 @@ public class GaeObjectStore implements ObjectStore {
                 unmarshaller().unmarshall(instance, e);
             }
         } catch (EntityNotFoundException e1) {
-            throw new ObjectNotFoundException("Object with key=" + key + " not found");
         }
         return instance;
     }
@@ -275,29 +290,27 @@ public class GaeObjectStore implements ObjectStore {
                 unmarshaller().unmarshall(result, e);
             }
         } catch (EntityNotFoundException e1) {
-            throw new ObjectNotFoundException("Object with key=" + key + " not found");
         }
         return result;
     }
 
     @Override
     public <T> T get(Class<T> clazz, Long id) {
-        T result = null;
+        T instance = null;
         try {
+            instance = createInstance(clazz);
             String kind = getKind(clazz);
             Entity e = _ds.get(KeyStructure.createKey(kind, id));
-            result = createInstance(clazz);
             if(isPrimitive(clazz)){
-                PrimitiveWrapper<T> wrapper = new PrimitiveWrapper<T>(result);
+                PrimitiveWrapper<T> wrapper = new PrimitiveWrapper<T>(instance);
                 unmarshaller().unmarshall(wrapper, e);
-                result = wrapper.getValue();
+                instance = wrapper.getValue();
             } else {
-                unmarshaller().unmarshall(result, e);
+                unmarshaller().unmarshall(instance, e);
             }
         } catch (EntityNotFoundException e1) {
-            throw new ObjectNotFoundException("Object with id=" + id + " not found");
         }
-        return result;
+        return instance;
     }
 
     @Override
@@ -312,7 +325,6 @@ public class GaeObjectStore implements ObjectStore {
             }
             unmarshaller().unmarshall(result, e);
         } catch (EntityNotFoundException e1) {
-            throw new ObjectNotFoundException("Object with key=" + key + " not found");
         }
         return result;
     }
@@ -329,7 +341,6 @@ public class GaeObjectStore implements ObjectStore {
             }
             unmarshaller().unmarshall(result, e);
         } catch (EntityNotFoundException e1) {
-            throw new ObjectNotFoundException("Object with id=" + id + " not found");
         }
         return result;
     }
@@ -340,7 +351,6 @@ public class GaeObjectStore implements ObjectStore {
         try {
             Map<Key,Entity> entities = _ds.get(keys);
         } catch (Exception e) {
-            throw new ObjectNotFoundException("Object with keys=" + keys + " not found");
         }
         return result;
     }
@@ -391,6 +401,11 @@ public class GaeObjectStore implements ObjectStore {
         }
         updateObjectKey(key, object);
         return key;
+    }
+
+    @Override
+    public Iterable<Key> put(Object... objects){
+        return put(list(objects));
     }
 
     @Override
@@ -538,6 +553,31 @@ public class GaeObjectStore implements ObjectStore {
         }
     }
 
+    // TODO: Warning this is not tested!
+    public Key getParent(Object instance){
+        Deque<Object> ancestors = new LinkedBlockingDeque<>();
+        Key parentKey = null;
+        Object parentObject = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.parent(), instance);
+        if(parentObject != null){
+            ancestors.add(parentObject);
+        }
+        while(!ancestors.isEmpty()){
+            Object last = ancestors.getLast();
+            AnnotationUtil.AnnotatedField idField
+                    = AnnotationUtil
+                    .getFieldWithAnnotation(GaeObjectStore.key(), last);
+            if(idField != null){
+                Object parentId = idField.getFieldValue();
+                if(parentId.getClass().equals(String.class)){
+                    parentKey = KeyStructure.createKey(parentKey, parentObject.getClass(), (String)parentId);
+                } else if(parentId.getClass().equals(Long.class) || parentId.getClass().equals(long.class)){
+                    parentKey = KeyStructure.createKey(parentKey, parentObject.getClass(), (Long)parentId);
+                }
+            }
+        }
+        return parentKey;
+    }
+
     public <T> T createInstance(Class<T> clazz) {
         try {
             // TODO: This could be very dangerous
@@ -558,7 +598,18 @@ public class GaeObjectStore implements ObjectStore {
             } else if(clazz.equals(List.class)){
                 return (T) new LinkedList<>();
             }
-            return clazz.newInstance();
+            try {
+                Constructor<?> constructor  = clazz.getDeclaredConstructor(new Class[0]);
+                boolean isAccessible = constructor.isAccessible();
+                constructor.setAccessible(true);
+                T instance = (T) constructor.newInstance();
+                constructor.setAccessible(isAccessible);
+                return instance;
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         } catch (IllegalAccessException e){
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -575,7 +626,8 @@ public class GaeObjectStore implements ObjectStore {
      */
     private static Key getParentKey(Object instance){
         Key parent = null;
-        AnnotationUtil.AnnotatedField parentKeyField = AnnotationUtil.getFieldWithAnnotation(Ancestor.class, instance);
+        AnnotationUtil.AnnotatedField parentKeyField
+                = AnnotationUtil.getFieldWithAnnotation(ancestor(), instance);
         if(parentKeyField != null){
             parent = (Key) parentKeyField.getFieldValue();
         }

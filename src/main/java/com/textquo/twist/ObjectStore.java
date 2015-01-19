@@ -29,6 +29,8 @@ import com.textquo.twist.types.FindOne;
 import com.textquo.twist.types.Function;
 import com.textquo.twist.types.Update;
 
+import java.util.List;
+
 /**
  * Simple wrapper around the low-level Datastore service to allow
  * storage of any {@code Object} types
@@ -39,7 +41,7 @@ public interface ObjectStore {
     public void delete(Key... keys);
     public void deleteInTransaction(Key key);
     public void deleteInTransaction(Key... keys);
-    public void delete(Iterable<Key> keys);
+    public <T> void delete(Iterable<T> keysOrObjects);
     public void deleteInTransaction(Iterable<Key> keys);
     public <T> void delete(Class<T> clazz, String key);
     public <T> void delete(Class<T> clazz, Long id);
@@ -56,6 +58,7 @@ public interface ObjectStore {
     public Object getInTransaction(Key key);
     public Iterable<Object> getInTransaction(Iterable<Key> keys);
     public Key put(Object object);
+    public Iterable<Key> put(Object... objects);
     public Iterable<Key> put(Iterable<Object> objects);
     public Key putInTransaction(Object object);
     public Iterable<Key> putInTransaction(Iterable<Object> objects);

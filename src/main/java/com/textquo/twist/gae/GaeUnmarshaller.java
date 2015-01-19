@@ -152,7 +152,7 @@ public class GaeUnmarshaller implements Unmarshaller {
                 if(entity.getProperties().size() > 1){
                     LOG.warn("Unmarshalling entity with multiple properties into primitive type will be serialized");
                     // TODO: Implement XStream serializer
-                    throw new RuntimeException("Serializing multiple properties into primitve not yet implemented");
+                    throw new RuntimeException("Serializing multiple properties into primitives not yet implemented");
                 } else if (entity.getProperties().size() == 1){
                     String entityKey = entity.getProperties().keySet().iterator().next();
                     wrapper.setValue(entity.getProperty(entityKey));
@@ -179,12 +179,12 @@ public class GaeUnmarshaller implements Unmarshaller {
         }
 
         AnnotatedField parentKeyField
-                = AnnotationUtil.getFieldWithAnnotation(Ancestor.class, destination);
+                = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.ancestor(), destination);
         if(parentKeyField !=null){
             if(parentKeyField.getFieldType().equals(Key.class)){
                 parentKeyField.setFieldValue(entity.getParent());
             } else {
-                throw new RuntimeException("Only GAE Key can be used as @ParentKey");
+                throw new RuntimeException("Only GAE Key can be used as @Ancestor");
             }
         }
 
@@ -270,7 +270,8 @@ public class GaeUnmarshaller implements Unmarshaller {
                             }
                         } else if(fieldValue instanceof String
                                 || fieldValue instanceof Boolean
-                                || fieldValue instanceof Number) {
+                                || fieldValue instanceof Number
+                                || fieldValue instanceof Blob) {
                             if(field.getName().equals(fieldName)){
                                 Class<?> fieldType = field.getType();
                                 if (field.getType().equals(String.class)){
@@ -304,6 +305,17 @@ public class GaeUnmarshaller implements Unmarshaller {
                                     }
                                 } else if (field.getType().equals(boolean.class)){
                                     setFieldValue(field, destination, ((Boolean)fieldValue).booleanValue());
+                                } else if(field.getType().equals(byte.class)){
+                                    if(fieldValue.getClass().equals(Blob.class)){
+                                        // TODO: Need to have a second look with this code
+                                        Blob blob = (Blob) fieldValue;
+                                        setFieldValue(field, destination, blob.getBytes()[0]);
+                                    }
+                                } else if(field.getType().equals(byte[].class)){
+                                    if(fieldValue.getClass().equals(Blob.class)){
+                                        Blob blob = (Blob) fieldValue;
+                                        setFieldValue(field, destination, blob.getBytes());
+                                    }
                                 } else if (field.getType().equals(Date.class)){
                                     if(fieldValue.getClass().equals(String.class)){
                                         Date date = DateUtil.parseDate((String) fieldValue);
