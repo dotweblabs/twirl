@@ -292,7 +292,10 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
             Key key = store.put(map);
             assertEquals("december"+i, key.getName());
         }
-        List<EntityWithDate> entities = store.find(EntityWithDate.class).sortDescending("created").asList().getList();
+        List<EntityWithDate> entities = store.find(EntityWithDate.class)
+                .sortDescending("created")
+                .asList()
+                .getList();
         assertNotNull(entities);
         assertEquals(31, entities.size());
         // November
@@ -306,7 +309,10 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
             Key key = store.put(map);
             assertEquals("november"+i, key.getName());
         }
-        List<EntityWithDate> all = store.find(EntityWithDate.class).sortDescending("created").asList().getList();
+        List<EntityWithDate> all = store.find(EntityWithDate.class)
+                .sortDescending("created")
+                .asList()
+                .getList();
         assertNotNull(all);
         assertEquals(61, all.size());
         assertEquals("december31", all.get(0).getId());
@@ -397,21 +403,48 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         store.put(new RootEntity("104", 2));
         store.put(new RootEntity("105", 1));
 
-        List<RootEntity> one = list(store.find(RootEntity.class).equal("__key__", "101").now());
-        List<RootEntity> four = list(store.find(RootEntity.class).greaterThan("__key__", "101").now());
-        List<RootEntity> all = list(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101").now());
+        List<RootEntity> one = list(store.find(RootEntity.class)
+                .equal("__key__", "101")
+                .now());
 
-        List<RootEntity> all_reversed = list(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101")
+        List<RootEntity> four = list(store.find(RootEntity.class)
+                .greaterThan("__key__", "101")
+                .now());
+
+        List<RootEntity> all = list(store.find(RootEntity.class)
+                .greaterThanOrEqual("__key__", "101")
+                .sortAscending("__key__")
+                .sortDescending("count")
+                .now());
+
+        List<RootEntity> all_order = list(store.find(RootEntity.class)
+                .greaterThanOrEqual("__key__", "101")
+                .now());
+
+        List<RootEntity> all_reversed = list(store.find(RootEntity.class)
+                .greaterThanOrEqual("__key__", "101")
+                .sortAscending("__key__")
                 .sortAscending("count").now());
-        List<RootEntity> all_limited = list(store.find(RootEntity.class).greaterThanOrEqual("__key__", "101")
+
+        List<RootEntity> all_limited = list(store.find(RootEntity.class)
+                .greaterThanOrEqual("__key__", "101")
+                .sortAscending("__key__")
                 .sortAscending("count").limit(1).now());
 
-        List<RootEntity> all_count = list(store.find(RootEntity.class).greaterThanOrEqual("count", 1).now());
-        List<RootEntity> two = list(store.find(RootEntity.class).greaterThanOrEqual("count", 1).greaterThanOrEqual("__key__", "104").now());
+        List<RootEntity> all_count = list(store.find(RootEntity.class)
+                .greaterThanOrEqual("count", 1)
+                .now());
+
+        List<RootEntity> two = list(store.find(RootEntity.class)
+                .greaterThanOrEqual("count", 1)
+                .greaterThanOrEqual("__key__", "104")
+                .now());
 
         assertEquals(1, one.size());
         assertEquals(4, four.size());
         assertEquals(5, all.size());
+        assertEquals("101", all_order.get(0).getKey());
+        assertEquals("105", all_order.get(4).getKey());
         assertEquals(5, all_reversed.size());
         assertEquals(1, all_limited.size());
         assertEquals("105", all_reversed.get(4).getKey());
@@ -422,6 +455,24 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("101", one.get(0).getKey());
         assertEquals(5, one.get(0).getCount());
 
+    }
+
+    @Test
+    public void testFind_withSort(){
+        store.put(new RootEntity("101", 5));
+        store.put(new RootEntity("102", 4));
+        store.put(new RootEntity("103", 3));
+        store.put(new RootEntity("104", 2));
+        store.put(new RootEntity("105", 1));
+
+        List<RootEntity> all = list(store.find(RootEntity.class)
+                //.greaterThanOrEqual("__key__", "101")
+                .sortAscending("__key__")
+                .sortAscending("count").now());
+
+        assertNotNull(all);
+        assertEquals(5, all.size());
+        assertEquals("105", all.get(0).getKey());
     }
 
     @Test

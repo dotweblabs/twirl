@@ -83,7 +83,7 @@ public class QueryStore extends AbstractStore {
         }
 
         // Sort
-        Iterator<Map.Entry<String, Query.SortDirection>> sortIterator = sorts.entrySet().iterator();
+        //Iterator<Map.Entry<String, Query.SortDirection>> sortIterator = sorts.entrySet().iterator();
         Query q = null;
         if(ancestor != null){
             q = new Query(kind, ancestor);
@@ -120,25 +120,22 @@ public class QueryStore extends AbstractStore {
                         sorts.remove(propName); // remove it
                     }
                 } else {
-                    while(sortIterator.hasNext()){
-                        // TODO: Bug! ancestor query gets lost here!
-                        Map.Entry<String, Query.SortDirection> sort = sortIterator.next();
-                        if(ancestor != null){
-                            q = new Query(kind, ancestor)
-                                    .setFilter(prevFilter)
-                                    .setFilter(_filter)
-                                    .addSort(sort.getKey(), sort.getValue());
-                        } else {
-                            q = new Query(kind)
-                                    .setFilter(prevFilter)
-                                    .setFilter(_filter)
-                                    .addSort(sort.getKey(), sort.getValue());
-                        }
+                    if(ancestor != null){
+                        q = new Query(kind, ancestor)
+                                .setFilter(prevFilter)
+                                .setFilter(_filter);
+                    } else {
+                        q = new Query(kind)
+                                .setFilter(prevFilter)
+                                .setFilter(_filter);
                     }
                 }
                 subFilters.add(_filter);
             }
         } else if (query == null || query.isEmpty()){
+            // Sort
+            Iterator<Map.Entry<String, Query.SortDirection>> sortIterator
+                    = sorts.entrySet().iterator();
             while(sortIterator.hasNext()){
                 // TODO: Bug! ancestor query gets lost here!
                 Map.Entry<String, Query.SortDirection> sort = sortIterator.next();
@@ -150,6 +147,55 @@ public class QueryStore extends AbstractStore {
                             .addSort(sort.getKey(), sort.getValue());
                 }
             }
+        }
+
+        Map<String, Query.SortDirection> finalSort = new LinkedHashMap<>();
+
+        List<Query.SortPredicate> sortPredicates = q.getSortPredicates();
+        for(Query.SortPredicate predicate : sortPredicates){
+            Query.SortDirection direction = predicate.getDirection();
+            String propertyName = predicate.getPropertyName();
+            finalSort.put(propertyName, direction);
+        }
+
+        finalSort.putAll(sorts);
+        // Apply sorts
+        Iterator<Map.Entry<String, Query.SortDirection>> finalSortIterator
+                = finalSort.entrySet().iterator();
+
+        String prevPropertyName = null;
+        Query.SortDirection prevDirection = null;
+
+        while(finalSortIterator.hasNext()){
+            Query.Filter prevFilter = q.getFilter();
+            // TODO: Bug! ancestor query gets lost here!
+            Map.Entry<String, Query.SortDirection> sort = finalSortIterator.next();
+            if(prevPropertyName != null && prevDirection != null){
+                if(ancestor != null){
+                    q = new Query(kind, ancestor)
+                            .setFilter(prevFilter)
+                            .addSort(prevPropertyName, prevDirection)
+                            .addSort(sort.getKey(), sort.getValue());
+                } else {
+                    q = new Query(kind)
+                            .setFilter(prevFilter)
+                            .addSort(prevPropertyName, prevDirection)
+                            .addSort(sort.getKey(), sort.getValue());
+                }
+            } else {
+                if(ancestor != null){
+                    q = new Query(kind, ancestor)
+                            .setFilter(prevFilter)
+                            .addSort(sort.getKey(), sort.getValue());
+                } else {
+                    q = new Query(kind)
+                            .setFilter(prevFilter)
+                            .addSort(sort.getKey(), sort.getValue());
+                }
+            }
+            prevPropertyName = sort.getKey();
+            prevDirection = sort.getValue();
+
         }
         if(keysOnly){
             q.setKeysOnly();
