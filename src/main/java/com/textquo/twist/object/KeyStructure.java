@@ -38,6 +38,10 @@ import java.util.List;
  */
 public class KeyStructure {
 
+    public static Key createKey(Class<?> clazz, String key){
+        return KeyFactory.createKey(clazz.getSimpleName(), key);
+    }
+
 	public static Key createKey(String kind, String key) {
 		return KeyFactory.createKey(kind, key);
 	}
