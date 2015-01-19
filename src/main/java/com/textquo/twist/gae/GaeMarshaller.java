@@ -87,6 +87,9 @@ public class GaeMarshaller implements Marshaller {
             Key key = createKeyFrom(parent, instance); // inspect kind and create key
             e = new Entity(key);
         }
+
+        boolean indexed = !AnnotationUtil.isClassAnnotated(GaeObjectStore.unIndexed(), instance);
+
         Map<String,Object> props = new LinkedHashMap<String, Object>();
         List<Entity> target = null;
         // Marshall java.util.Map
@@ -102,11 +105,11 @@ public class GaeMarshaller implements Marshaller {
                             && !entryKey.equals(GaeObjectStore.KIND_RESERVED_PROPERTY)
                             && !entryKey.equals(GaeObjectStore.NAMESPACE_RESERVED_PROPERTY)){
                         if(entryVal instanceof Map){
-                            setProperty(e, entryKey, createEmbeddedEntityFromMap((Map) entryVal));
+                            setProperty(e, entryKey, createEmbeddedEntityFromMap((Map) entryVal), indexed);
                         } else if(entryVal instanceof List){
-                            setProperty(e, entryKey, createEmbeddedEntityFromList((List)entryVal));
+                            setProperty(e, entryKey, createEmbeddedEntityFromList((List) entryVal), indexed);
                         } else {
-                            setProperty(e, entryKey, entryVal);
+                            setProperty(e, entryKey, entryVal, indexed);
                         }
                     }
                 }
@@ -128,13 +131,13 @@ public class GaeMarshaller implements Marshaller {
                     continue;
                 }
                 String fieldName = field.getName();
-                if(field.isAnnotationPresent(Id.class)){
+                if(field.isAnnotationPresent(GaeObjectStore.key())){
                     // skip
+                    continue;
+                } else if(field.isAnnotationPresent(GaeObjectStore.kind())){
                     continue;
                 } else if(field.isAnnotationPresent(Volatile.class)){
                     // skip
-                    continue;
-                } else if(field.isAnnotationPresent(Kind.class)){
                     continue;
                 }
                 try {
@@ -145,22 +148,22 @@ public class GaeMarshaller implements Marshaller {
                     if (fieldValue == null){
                         e.setProperty(fieldName, null);
                     } else if (fieldValue instanceof String) {
-                        setProperty(e, fieldName, fieldValue);
+                        setProperty(e, fieldName, fieldValue, indexed);
                     } else if(fieldValue instanceof Number
                             || fieldValue instanceof Long
                             || fieldValue instanceof Integer
                             || fieldValue instanceof Short) {
-                        setProperty(e, fieldName, fieldValue);
+                        setProperty(e, fieldName, fieldValue, indexed);
                     } else if(fieldValue instanceof Boolean) {
-                        setProperty(e, fieldName, fieldValue);
+                        setProperty(e, fieldName, fieldValue, indexed);
                     } else if(fieldValue instanceof Date) {
-                        setProperty(e, fieldName, fieldValue);
+                        setProperty(e, fieldName, fieldValue, indexed);
                     } else if(fieldValue instanceof User) { // GAE support this type
-                        setProperty(e, fieldName, fieldValue);
+                        setProperty(e, fieldName, fieldValue, indexed);
                     } else if(fieldValue instanceof List) {
                         LOG.debug( "Processing List valueType");
                         if (field.isAnnotationPresent(Embedded.class)){
-                            setProperty(e, fieldName, createEmbeddedEntityFromList((List) fieldValue));
+                            setProperty(e, fieldName, createEmbeddedEntityFromList((List) fieldValue), indexed);
                         } else {
                             boolean supported = true;
                             List list = (List) fieldValue;
@@ -170,7 +173,7 @@ public class GaeMarshaller implements Marshaller {
                                 }
                             }
                             if(supported){
-                                setProperty(e, fieldName, fieldValue);
+                                setProperty(e, fieldName, fieldValue, indexed);
                             } else{
                                 throw new RuntimeException("List should only include GAE supported types " + GAE_SUPPORTED_TYPES
                                 + " otherwise annotate the List with @Embedded");
@@ -179,7 +182,7 @@ public class GaeMarshaller implements Marshaller {
                     } else if(fieldValue instanceof Map){
                         LOG.debug( "Processing Map valueType");
                         if (field.isAnnotationPresent(Embedded.class)){
-                            setProperty(e, fieldName, createEmbeddedEntityFromMap((Map) fieldValue));
+                            setProperty(e, fieldName, createEmbeddedEntityFromMap((Map) fieldValue), indexed);
                         } else if (field.isAnnotationPresent(Flat.class)){
                             Map<String,Object> flat = (Map)fieldValue;
                             Iterator<Map.Entry<String, Object>> it = flat.entrySet().iterator();
@@ -194,9 +197,9 @@ public class GaeMarshaller implements Marshaller {
                                     Object entryKey = mapEntry.getKey();
                                     Object entryVal = mapEntry.getValue();
                                     if(entryVal == null){
-                                        setProperty(e, (String) entryKey, null);
+                                        setProperty(e, (String) entryKey, null, indexed);
                                     } else if (entryVal instanceof Map){
-                                        setProperty(e, (String) entryKey, createEmbeddedEntityFromMap((Map) entryVal));
+                                        setProperty(e, (String) entryKey, createEmbeddedEntityFromMap((Map) entryVal), indexed);
                                     } else if (entryVal instanceof List){
                                         throw new RuntimeException("List values are not yet supported");
                                     } else if (entryVal instanceof String
@@ -204,7 +207,7 @@ public class GaeMarshaller implements Marshaller {
                                             || entryVal instanceof Boolean
                                             || entryVal instanceof Date
                                             || entryVal instanceof User) {
-                                        setProperty(e, (String) entryKey, entryVal);
+                                        setProperty(e, (String) entryKey, entryVal, indexed);
                                     } else {
                                         throw new RuntimeException("Unsupported GAE property type: " + entryVal.getClass().getName());
                                     }
@@ -225,30 +228,30 @@ public class GaeMarshaller implements Marshaller {
                         // For primitives
                         if (fieldType.equals(int.class)){
                             int i = (Integer) fieldValue;
-                            setProperty(e, fieldName, i);
+                            setProperty(e, fieldName, i, indexed);
                         } else if (fieldType.equals(boolean.class)){
                             boolean i = (Boolean) fieldValue;
-                            setProperty(e, fieldName, i);
+                            setProperty(e, fieldName, i, indexed);
                         } else if (fieldType.equals(byte.class)){
                             byte i = (Byte) fieldValue;
-                            setProperty(e, fieldName, i);
+                            setProperty(e, fieldName, i, indexed);
                         } else if (fieldType.equals(short.class)){
                             short i = (Short) fieldValue;
-                            setProperty(e, fieldName, i);
+                            setProperty(e, fieldName, i, indexed);
                         } else if (fieldType.equals(long.class)){
                             long i = (Long) fieldValue;
-                            setProperty(e, fieldName, i);
+                            setProperty(e, fieldName, i, indexed);
                         } else if (fieldType.equals(float.class)){
                             float i = (Float) fieldValue;
-                            setProperty(e, fieldName, i);
+                            setProperty(e, fieldName, i, indexed);
                         } else if (fieldType.equals(double.class)){
                             double i = (Double) fieldValue;
-                            setProperty(e, fieldName, i);
+                            setProperty(e, fieldName, i, indexed);
                         } else { // POJO
                             if (field.isAnnotationPresent(Embedded.class)){
                                 Map<String,Object> map = createMapFrom(fieldValue);
                                 EmbeddedEntity ee = createEmbeddedEntityFromMap(map);
-                                setProperty(e, fieldName, ee);
+                                setProperty(e, fieldName, ee, indexed);
                             } else if (field.isAnnotationPresent(Parent.class)){
                                 // @Parent first before @Child, don't switch. @Child needs parent Key.
                                 if (parent != null){
@@ -282,7 +285,7 @@ public class GaeMarshaller implements Marshaller {
                                 marshall(e.getKey(), childField);
                                 Entity childEntity = stack.get(childField);
                                 Key childEntityKey = childEntity.getKey();
-                                setProperty(e, fieldName, childEntityKey);
+                                setProperty(e, fieldName, childEntityKey, indexed);
                             } else if (field.isAnnotationPresent(Ancestor.class)){
                                 // already processed above, skip it
                             } else {
@@ -412,7 +415,7 @@ public class GaeMarshaller implements Marshaller {
     }
 
     private static boolean hasNoIdField(Object instance){
-        AnnotationUtil.AnnotatedField idField = AnnotationUtil.getFieldWithAnnotation(Id.class, instance);
+        AnnotationUtil.AnnotatedField idField = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.key(), instance);
         return idField == null ? true : false;
     }
 
@@ -444,7 +447,7 @@ public class GaeMarshaller implements Marshaller {
             }
             return key;
         }
-        AnnotationUtil.AnnotatedField idField = AnnotationUtil.getFieldWithAnnotation(Id.class, instance);
+        AnnotationUtil.AnnotatedField idField = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.key(), instance);
         if (idField != null){
             Class<?> clazz = idField.getFieldType();
             id = idField.getFieldValue();
@@ -784,7 +787,68 @@ public class GaeMarshaller implements Marshaller {
         return newObj;
     }
 
-    private static void setProperty(Entity entity, String key, Object value){
+    private static void setProperty(Entity entity, String key, Object value, boolean isIndexed){
+        if(isIndexed){
+            setIndexedProperty(entity, key, value);
+        }else{
+            setUnindexProperty(entity, key, value);
+        }
+    }
+
+    private static void setUnindexProperty(Entity entity, String key, Object value){
+        LOG.debug("Setting unindexed property key: " + key);
+
+        if(entity == null){
+            throw new RuntimeException("entity can't be null");
+        }
+        if(key == null){
+            throw new RuntimeException("entity property key can't be null");
+        }
+
+        if (key.isEmpty()){
+            throw new IllegalArgumentException("entity property key can't be empty");
+        }
+
+
+        if (value == null){
+            entity.setUnindexedProperty(key, null);
+            return;
+        }
+
+        if (!GAE_SUPPORTED_TYPES.contains(value.getClass())
+                && !(value instanceof Blob) && !(value instanceof EmbeddedEntity)
+                && !(value instanceof List)) {
+            throw new RuntimeException("Unsupported type[class=" + value.
+                    getClass().getName() + "] in GAE repository");
+        }
+        if (value instanceof String) {
+            final String valueString = (String) value;
+            if (valueString.length()
+                    > DataTypeUtils.MAX_STRING_PROPERTY_LENGTH) {
+                final Text text = new Text(valueString);
+
+                entity.setUnindexedProperty(key, text);
+            } else {
+                entity.setUnindexedProperty(key, value);
+            }
+        } else if (value instanceof Number
+                || value instanceof Date
+                || value instanceof Boolean
+                || GAE_SUPPORTED_TYPES.contains(value.getClass())) {
+            entity.setUnindexedProperty(key, value);
+        } else if (value instanceof EmbeddedEntity) {
+            entity.setUnindexedProperty(key, value);
+        } else if (value instanceof Blob) {
+            final Blob blob = (Blob) value;
+            entity.setUnindexedProperty(key,
+                    new com.google.appengine.api.datastore.Blob(
+                            blob.getBytes()));
+        } else if(value instanceof List){
+            entity.setUnindexedProperty(key, value);
+        }
+    }
+
+    private static void setIndexedProperty(Entity entity, String key, Object value){
         LOG.debug("Setting property key: " + key);
 
         if(entity == null){
