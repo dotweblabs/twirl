@@ -35,6 +35,7 @@ import com.textquo.twist.object.KeyStructure;
 import com.textquo.twist.serializer.ObjectSerializer;
 import com.textquo.twist.types.Find;
 import com.textquo.twist.types.FindOne;
+import com.textquo.twist.types.Function;
 import com.textquo.twist.types.Update;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.StringHelper;
@@ -215,6 +216,22 @@ public class GaeObjectStore implements ObjectStore {
     @Override
     public <T> Update update(Class<T> clazz){
         return new Update(this, clazz, getKind(clazz));
+    }
+
+    @Override
+    public <T> T transact(Function<T> function) {
+        T result = null;
+        Transaction tx = _ds.beginTransaction();
+        try {
+            result = function.execute();
+        } catch (Exception e) {
+            tx.rollback();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+        }
+        return result;
     }
 
     @Override

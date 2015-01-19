@@ -26,6 +26,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Transaction;
 import com.textquo.twist.types.Find;
 import com.textquo.twist.types.FindOne;
+import com.textquo.twist.types.Function;
 import com.textquo.twist.types.Update;
 
 /**
@@ -65,6 +66,8 @@ public interface ObjectStore {
     public <T> Find find(Class<T> clazz);
     public <T> FindOne findOne(Class<T> clazz);
     public <T> Update update(Class<T> clazz);
+
+    public <T> T transact(Function<T> function);
 
     public abstract Marshaller marshaller();
     public abstract Unmarshaller unmarshaller();

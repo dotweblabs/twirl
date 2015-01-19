@@ -23,15 +23,13 @@
 package com.textquo.twist.types;
 
 /**
- * Command object similar to other command objects. 
- * Accepts Y args and return T type object.
- * 
+ * Command object similar to other command objects.
+ * *
  * @author Kerby Martino
  *
  * @param <T> argument type
- * @param <Y> return type
  */
-public interface Function<T,Y> {
-	public T execute(Y params);
+public interface Function<T> {
+	public T execute();
 }
 
