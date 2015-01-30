@@ -22,6 +22,7 @@
  */
 package com.textquo.twist.util;
 
+@Deprecated
 public class PrimitiveDefaults {
     // These gets initialized to their default values
     private static boolean DEFAULT_BOOLEAN;

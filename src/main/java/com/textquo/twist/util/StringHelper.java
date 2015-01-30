@@ -25,6 +25,7 @@ package com.textquo.twist.util;
 /**
  * Created by kerby on 4/23/14.
  */
+@Deprecated
 public class StringHelper {
     public static String getClassNameOf(Object o){
            return getClassNameFrom(o.getClass().getName());

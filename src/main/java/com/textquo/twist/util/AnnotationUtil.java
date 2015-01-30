@@ -28,6 +28,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 
+@Deprecated
 public class AnnotationUtil {
 
     public static class AnnotatedField  {

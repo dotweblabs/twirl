@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * Created by kerby on 1/16/15.
  */
+@Deprecated
 public class DateUtil {
     private static final List<SimpleDateFormat> knownPatterns
             = new ArrayList<SimpleDateFormat>();

@@ -25,6 +25,7 @@ package com.textquo.twist.util;
 import java.util.Iterator;
 import java.util.Map;
 
+@Deprecated
 public class MapHelper {
     public static String getKeyType(Map map){
         String keyKind = Object.class.getName();

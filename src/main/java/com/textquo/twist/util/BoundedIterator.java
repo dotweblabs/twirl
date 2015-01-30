@@ -31,6 +31,7 @@ import java.util.NoSuchElementException;
  *
  * @param <T>  element type
  */
+@Deprecated
 public class BoundedIterator<T> implements Iterator<T> {
     private final Iterator<T> iterator;
     private final long offset;

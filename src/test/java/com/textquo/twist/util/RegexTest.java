@@ -31,6 +31,7 @@ import static org.junit.Assert.*;
 /**
  * Created by kerby on 4/23/14.
  */
+@Deprecated
 public class RegexTest extends LocalDatastoreTestBase {
     @Test
     public void testGetClassNameFromString(){

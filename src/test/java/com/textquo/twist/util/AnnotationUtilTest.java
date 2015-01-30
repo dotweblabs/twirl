@@ -31,6 +31,7 @@ import org.junit.Test;
 import java.lang.annotation.Annotation;
 import static org.junit.Assert.*;
 
+@Deprecated
 public class AnnotationUtilTest extends LocalDatastoreTestBase {
     @Test
     public void test(){
