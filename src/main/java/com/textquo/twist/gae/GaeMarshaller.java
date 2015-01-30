@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.boon.Maps;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -124,10 +125,12 @@ public class GaeMarshaller implements Marshaller {
                 if (target == null){
                     target = new LinkedList<Entity>();
                 }
-                if((field.getModifiers() & java.lang.reflect.Modifier.FINAL)
-                        == java.lang.reflect.Modifier.FINAL){
+                if((field.getModifiers() & Modifier.FINAL) == Modifier.FINAL){
                     // do nothing for a final field
                     // usually static UID fields
+                    continue;
+                } else if((field.getModifiers() & Modifier.TRANSIENT) == Modifier.TRANSIENT){
+                    // do nothing for transient fields
                     continue;
                 }
                 String fieldName = field.getName();
