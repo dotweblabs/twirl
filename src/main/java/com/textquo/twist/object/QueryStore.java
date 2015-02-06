@@ -65,8 +65,6 @@ public class QueryStore extends AbstractStore {
             throw new RuntimeException("Sort object cannot be null");
         }
 
-        LOG.debug("Query map="+query.toString());
-
         PreparedQuery pq = null;
 
         // Limit & offset
@@ -95,7 +93,6 @@ public class QueryStore extends AbstractStore {
         if (!query.isEmpty()){
             // Apply filters and sorting for fields given in the filter query
             for (String propName : query.keySet()){
-                LOG.debug("Filter Property name = " + propName + " and get keysOnly = " + keysOnly);
                 Pair<Query.FilterOperator, Object> filterAndValue = query.get(propName);
                 Query.FilterOperator operator = filterAndValue.getFirst();
                 Object value = filterAndValue.getSecond();
@@ -334,8 +331,6 @@ public class QueryStore extends AbstractStore {
         if(sorts == null){
             throw new RuntimeException("Sort object cannot be null");
         }
-
-        LOG.debug("QueryStore map="+query.toString());
 
         PreparedQuery pq = null;
 

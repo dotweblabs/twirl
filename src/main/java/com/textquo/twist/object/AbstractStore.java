@@ -51,7 +51,6 @@ public abstract class AbstractStore {
         if (ds == null) {
             _ds = DatastoreServiceFactory.getDatastoreService();
             _options = TransactionOptions.Builder.withXG(true);
-            LOG.info("Create a new DatastoreService instance");
         } else {
             _ds = ds;
         }
