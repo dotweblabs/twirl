@@ -889,7 +889,6 @@ public class GaeMarshaller implements Marshaller {
     }
 
     private static void setIndexedProperty(Entity entity, String key, Object value){
-        LOG.debug("Setting property key: " + key);
 
         if(entity == null){
             throw new RuntimeException("entity can't be null");
