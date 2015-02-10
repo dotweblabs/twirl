@@ -371,7 +371,6 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
 
     @Test
     public void testGetById(){
-
         Object testEntity = createTestRootEnity();
         Key key = store.put(testEntity);
         RootEntity result = store.get(RootEntity.class, "TestRoot");
@@ -385,6 +384,19 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("TestRoot", result.getKey());
         assertEquals("TestChild", result.getNewChildEntity().getType());
         assertEquals("TestEmbedded", result.getEmbeddedEntity().getType());
+    }
+
+    @Test
+    public void testGetByLongId(){
+        EntityLongId entity = new EntityLongId();
+        entity.setContent("Test Content");
+        store.put(entity);
+        assertEquals(1L, entity.getId().longValue());
+
+        EntityLongId stored = store.get(EntityLongId.class, 1L);
+        assertNotNull(stored);
+        assertEquals(1L, stored.getId().longValue());
+        assertEquals("Test Content", stored.getContent());
     }
 
     @Test
