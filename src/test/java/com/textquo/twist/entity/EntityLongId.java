@@ -5,7 +5,8 @@ import com.textquo.twist.annotations.Ancestor;
 import com.textquo.twist.annotations.Entity;
 import com.textquo.twist.annotations.Id;
 
-@Entity
+@DummyAnnotation
+@Entity(name = "Entity")
 public class EntityLongId {
 
     @Id

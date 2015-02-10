@@ -498,15 +498,15 @@ public class GaeObjectStore implements ObjectStore {
                             cls.put(clazz, entityName);
                         }
                     }
+                }
+            }
+            // Fallback
+            if (cls.get(clazz) == null){
+                String kind = StringHelper.getClassNameFrom(clazz.getName());
+                if (kind == null || kind.isEmpty()){
+                    cls.put(clazz, StringHelper.getClassNameFrom(clazz.getName()));
                 } else {
-                    if (cls.get(clazz) == null){
-                        String kind = StringHelper.getClassNameFrom(clazz.getName());
-                        if (kind == null || kind.isEmpty()){
-                            cls.put(clazz, StringHelper.getClassNameFrom(clazz.getName()));
-                        } else {
-                            cls.put(clazz, kind);
-                        }
-                    }
+                    cls.put(clazz, kind);
                 }
             }
         }
