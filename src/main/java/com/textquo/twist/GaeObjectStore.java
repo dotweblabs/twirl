@@ -277,40 +277,14 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public <T> T get(Class<T> clazz, String key) {
-        T result = null;
-        try {
-            String kind = getKind(clazz);
-            Entity e = _ds.get(KeyStructure.createKey(kind, key));
-            result = createInstance(clazz);
-            if(isPrimitive(clazz)){
-                PrimitiveWrapper<T> wrapper = new PrimitiveWrapper<T>(result);
-                unmarshaller().unmarshall(wrapper, e);
-                result = wrapper.getValue();
-            } else {
-                unmarshaller().unmarshall(result, e);
-            }
-        } catch (EntityNotFoundException e1) {
-        }
-        return result;
+        String kind = getKind(clazz);
+        return get(clazz, KeyStructure.createKey(kind, key));
     }
 
     @Override
     public <T> T get(Class<T> clazz, Long id) {
-        T instance = null;
-        try {
-            instance = createInstance(clazz);
-            String kind = getKind(clazz);
-            Entity e = _ds.get(KeyStructure.createKey(kind, id));
-            if(isPrimitive(clazz)){
-                PrimitiveWrapper<T> wrapper = new PrimitiveWrapper<T>(instance);
-                unmarshaller().unmarshall(wrapper, e);
-                instance = wrapper.getValue();
-            } else {
-                unmarshaller().unmarshall(instance, e);
-            }
-        } catch (EntityNotFoundException e1) {
-        }
-        return instance;
+        String kind = getKind(clazz);
+        return get(clazz, KeyStructure.createKey(kind, id));
     }
 
     @Override
