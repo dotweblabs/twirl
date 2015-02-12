@@ -322,7 +322,7 @@ public class GaeUnmarshaller implements Unmarshaller {
                                         Date date = DateUtil.parseDate((String) fieldValue);
                                         setFieldValue(field, destination, date);
                                     } else if(fieldValue.getClass().equals(Long.class)){
-                                        Date date = DateUtil.parseDate(String.valueOf(fieldValue));
+                                        Date date = new Date((Long)fieldValue);
                                         setFieldValue(field, destination, date);
                                     } else if(fieldValue.getClass().equals(Date.class)){
                                         setFieldValue(field, destination, fieldValue);
