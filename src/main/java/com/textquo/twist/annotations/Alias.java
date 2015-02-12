@@ -22,16 +22,17 @@
  */
 package com.textquo.twist.annotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Note: Entity to be stored must have empty constructor
+ * Fields annotated with <code>@Alias</code> copies its value
+ * from the given field name
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Entity {
-    public String name() default "";
+public @interface Alias {
+    public String field() default "";
 }

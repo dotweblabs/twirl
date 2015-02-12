@@ -490,7 +490,6 @@ public class GaeObjectStore implements ObjectStore {
                 }
                 if(entityAnnotation != null){
                     String entityName = entityAnnotation.name();
-                    String entitySpacer = entityAnnotation.spacer();
                     if (cls.get(clazz) == null){
                         if (entityName == null || entityName.isEmpty()){
                             cls.put(clazz, StringHelper.getClassNameFrom(clazz.getName()));

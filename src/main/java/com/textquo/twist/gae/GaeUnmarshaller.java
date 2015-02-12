@@ -26,6 +26,7 @@ import com.textquo.twist.GaeObjectStore;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.users.User;
 import com.textquo.twist.Unmarshaller;
+import com.textquo.twist.annotations.Alias;
 import com.textquo.twist.annotations.Flat;
 import com.textquo.twist.annotations.Ancestor;
 import com.textquo.twist.util.AnnotationUtil;
@@ -92,7 +93,7 @@ public class GaeUnmarshaller implements Unmarshaller {
                 // usually static UID fields
             } else {
                 if(field.getType().isPrimitive() && value == null){
-                    Object defaultValue = PrimitiveDefaults.getDefaultValue(field.getType().getClass());
+                    Object defaultValue = PrimitiveDefaults.getDefaultValue(clazz);
                     field.setAccessible(true);
                     field.set(instance, defaultValue);
                     field.setAccessible(accessible);
@@ -361,6 +362,13 @@ public class GaeUnmarshaller implements Unmarshaller {
                 }
                 throw  e;
             }
+        }
+        AnnotatedField aliasField = AnnotationUtil.getFieldWithAnnotation(Alias.class, destination);
+        if(aliasField != null){
+            Alias alias = aliasField.getField().getAnnotation(Alias.class);
+            String fieldName = alias.field();
+            Object value = props.get(fieldName);
+            setFieldValue(aliasField.getField(), destination, value);
         }
     }
 

@@ -91,6 +91,26 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testPut_aliasedField(){
+        EntityAlias entity = new EntityAlias();
+        entity.setActive(false);
+        entity.setActiveFlag(true);
+        store.put(entity);
+        EntityAlias saved = store.get(EntityAlias.class, entity.getId());
+        assertEquals(true, saved.isActive());
+    }
+
+    @Test
+    public void testPut_aliasedField_NULL_reference(){
+        EntityAlias entity = new EntityAlias();
+        entity.setActive(true);
+        entity.setActiveFlag(null);
+        store.put(entity);
+        EntityAlias saved = store.get(EntityAlias.class, entity.getId());
+        assertEquals(false, saved.isActive());
+    }
+
+    @Test
     public void testPut_child(){
         RootEntity rootObject = new RootEntity(); // one entity
 
