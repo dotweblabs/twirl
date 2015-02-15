@@ -35,11 +35,11 @@ import com.textquo.twist.util.DateUtil;
 import com.textquo.twist.util.PrimitiveDefaults;
 import com.textquo.twist.validation.Validator;
 import com.textquo.twist.wrappers.PrimitiveWrapper;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.boon.Maps;
-
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -180,13 +180,22 @@ public class GaeUnmarshaller implements Unmarshaller {
         }
 
         AnnotatedField parentKeyField
-                = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.ancestor(), destination);
+                = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.parent(), destination);
         if(parentKeyField !=null){
             if(parentKeyField.getFieldType().equals(Key.class)){
                 parentKeyField.setFieldValue(entity.getParent());
             } else {
-                throw new RuntimeException("Only GAE Key can be used as @Ancestor");
+//                throw new RuntimeException("Only GAE Key can be used as @Ancestor");
             }
+        }
+        
+        AnnotatedField ancestorKeyField = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.ancestor(), destination);
+        if(ancestorKeyField !=null){
+        	if(ancestorKeyField.getFieldType().equals(Key.class)){
+        		ancestorKeyField.setFieldValue(getAncestor(entity));
+        	} else {
+                throw new RuntimeException("Only GAE Key can be used as @Ancestor");
+        	}
         }
 
         AnnotatedField idField
@@ -375,7 +384,15 @@ public class GaeUnmarshaller implements Unmarshaller {
         }
     }
 
-    /**
+    private Key getAncestor(Entity entity) {
+    	Key ancestor = entity.getKey();
+    	while (ancestor.getParent() != null) {
+    		ancestor = ancestor.getParent();
+    	}
+		return ancestor;
+	}
+
+	/**
      * Process <code>EmbeddedEntity</code> and inner <code>EmbeddedEntity</code>
      * of this entity.
      *
