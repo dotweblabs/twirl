@@ -40,6 +40,7 @@ import com.textquo.twist.types.Update;
 import com.textquo.twist.util.AnnotationUtil;
 import com.textquo.twist.util.StringHelper;
 import com.textquo.twist.wrappers.PrimitiveWrapper;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -252,6 +253,10 @@ public class GaeObjectStore implements ObjectStore {
 
     @Override
     public <T> T get(Class<T> clazz, Key key) {
+    	return get(clazz, key, false);
+    }
+    
+    private <T> T get(Class<T> clazz, Key key, boolean safe) {
         T instance = null;
         try {
             Entity e = _ds.get(key);
@@ -271,9 +276,63 @@ public class GaeObjectStore implements ObjectStore {
                 unmarshaller().unmarshall(instance, e);
             }
         } catch (EntityNotFoundException e1) {
+        	if (safe) {
+        		throw new ObjectNotFoundException(e1.getMessage(), e1);
+        	}
         }
         return instance;
     }
+    
+    @Override
+	public <T> T safeGet(Class<T> clazz, Key key) {
+		return get(clazz, key, true);
+	}
+
+	@Override
+	public <T> T safeGet(Class<T> clazz, String key) {
+		String kind = getKind(clazz);
+        return get(clazz, KeyStructure.createKey(kind, key), true);
+	}
+
+	@Override
+	public <T> T safeGet(Class<T> clazz, Long id) {
+		String kind = getKind(clazz);
+        return get(clazz, KeyStructure.createKey(kind, id), true);
+	}
+
+	@Override
+	public <T> T safeGet(Class<T> clazz, String kind, String key) {
+		T result = null;
+        try {
+            Entity e = _ds.get(KeyStructure.createKey(kind, key));
+            if(clazz.equals(Map.class)){
+                result = (T) new LinkedHashMap<>();
+            } else {
+                result = createInstance(clazz);
+            }
+            unmarshaller().unmarshall(result, e);
+            return result;
+        } catch (EntityNotFoundException e1) {
+        	throw new ObjectNotFoundException(e1.getMessage(), e1);
+        }
+	}
+
+	@Override
+	public <T> T safeGet(Class<T> clazz, String kind, Long id) {
+		T result = null;
+        try {
+            Entity e = _ds.get(KeyStructure.createKey(kind, id));
+            if(clazz.equals(Map.class)){
+                result = (T) new LinkedHashMap<>();
+            } else {
+                result = createInstance(clazz);
+            }
+            unmarshaller().unmarshall(result, e);
+            return result;
+        } catch (EntityNotFoundException e1) {
+        	throw new ObjectNotFoundException(e1.getMessage(), e1);
+        }
+	}
 
     @Override
     public <T> T get(Class<T> clazz, String key) {
