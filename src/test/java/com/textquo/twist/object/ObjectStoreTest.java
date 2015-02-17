@@ -314,6 +314,18 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testPut_List(){
+        Post post = new Post();
+        post.setCreated(new Date());
+        post.setMessage("Test Message");
+        post.setTags(list("tag1", "tag2", "tag3"));
+        store.put(post);
+        Post saved = store.get(Post.class, post.getId());
+        assertNotNull(saved);
+        assertTrue(!saved.getTags().isEmpty());
+    }
+
+    @Test
     public void testFind_List(){
         Post post = new Post();
         post.setCreated(new Date());
