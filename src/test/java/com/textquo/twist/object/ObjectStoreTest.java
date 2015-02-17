@@ -26,6 +26,7 @@ import static org.boon.Lists.list;
 import static org.junit.Assert.*;
 
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.GeoPt;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.textquo.twist.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
@@ -293,6 +294,16 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertNotNull(saved);
         assertEquals(bytes.length, saved.getBytes().length);
         assertEquals("Hello World", new String(saved.getBytes(), "UTF-8"));
+    }
+
+    @Test
+    public void testPut_entityWithGeoPoint(){
+        EntityGeoPoint entity = new EntityGeoPoint();
+        entity.setGeoPoint(new GeoPt(1.2F, 3.4F));
+        store.put(entity);
+        EntityGeoPoint saved = store.get(EntityGeoPoint.class, entity.getId());
+        assertEquals(1.2F, saved.getGeoPoint().getLatitude(), 0.1);
+        assertEquals(3.4F, saved.getGeoPoint().getLongitude(), 0.1);
     }
 
     @Test

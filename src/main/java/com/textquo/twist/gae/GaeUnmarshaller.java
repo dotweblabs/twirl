@@ -352,6 +352,8 @@ public class GaeUnmarshaller implements Unmarshaller {
                                 Object pojo = Maps.fromMap(getMap, field.getType());
                                 setFieldValue(field, destination, pojo);
                             }
+                        } else if(fieldValue instanceof GeoPt){
+                            setFieldValue(field, destination, fieldValue);
                         } else if (fieldValue instanceof List){
                             setFieldValue(field, destination, fieldValue);
                         } else if (fieldValue.getClass().isPrimitive()){

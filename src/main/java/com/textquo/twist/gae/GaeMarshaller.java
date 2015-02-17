@@ -120,6 +120,7 @@ public class GaeMarshaller implements Marshaller {
         } else {
             // Marshall all other object types
             Field[] fields = instance.getClass().getDeclaredFields();
+            GeoPt geoPt = null;
             for (Field field : fields) {
                 if (target == null){
                     target = new LinkedList<Entity>();
@@ -179,6 +180,8 @@ public class GaeMarshaller implements Marshaller {
                                 + " otherwise annotate the List with @Embedded");
                             }
                         }
+                    } else if(fieldValue instanceof GeoPt) {
+                        setProperty(e, fieldName, fieldValue, indexed);
                     } else if(fieldValue instanceof Map){
                         LOG.debug( "Processing Map valueType");
                         if (field.isAnnotationPresent(Embedded.class)){
