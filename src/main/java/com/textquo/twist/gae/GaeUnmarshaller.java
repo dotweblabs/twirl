@@ -371,7 +371,15 @@ public class GaeUnmarshaller implements Unmarshaller {
             Alias alias = aliasField.getField().getAnnotation(Alias.class);
             String fieldName = alias.field();
             Object value = props.get(fieldName);
-            setFieldValue(aliasField.getField(), destination, value);
+
+            String actualField = aliasField.getFieldName();
+            Object actualValue = props.get(actualField);
+
+            if(value != null){
+                setFieldValue(aliasField.getField(), destination, value);
+            } else {
+                setFieldValue(aliasField.getField(), destination, actualValue);
+            }
         }
     }
 

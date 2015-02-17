@@ -93,7 +93,6 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     @Test
     public void testPut_aliasedField(){
         EntityAlias entity = new EntityAlias();
-        entity.setActive(false);
         entity.setActiveFlag(true);
         store.put(entity);
         EntityAlias saved = store.get(EntityAlias.class, entity.getId());
@@ -107,7 +106,7 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         entity.setActiveFlag(null);
         store.put(entity);
         EntityAlias saved = store.get(EntityAlias.class, entity.getId());
-        assertEquals(false, saved.isActive());
+        assertEquals(true, saved.isActive());
     }
 
     @Test
