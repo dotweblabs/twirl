@@ -314,6 +314,22 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testFind_List(){
+        Post post = new Post();
+        post.setCreated(new Date());
+        post.setMessage("Test Message");
+        post.setTags(list("tag1", "tag2", "tag3"));
+        store.put(post);
+
+        Post saved = store.get(Post.class, post.getId());
+        assertNotNull(saved);
+
+        List<Post> postsWithTag = store.find(Post.class).equal("tags", "tag1").asList().getList();
+        assertNotNull(postsWithTag);
+        assertTrue(!postsWithTag.isEmpty());
+    }
+
+    @Test
     public void testFindOrderByStringDate(){
         // December
         for(int i=1; i <= 31; i++){
