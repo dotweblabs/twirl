@@ -26,6 +26,8 @@ import com.google.appengine.api.datastore.*;
 import com.textquo.twist.GaeObjectStore;
 import com.textquo.twist.object.QueryStore;
 import com.textquo.twist.util.Pair;
+import org.boon.collections.MultiMap;
+import org.boon.collections.MultiMapImpl;
 
 import java.util.*;
 
@@ -34,7 +36,7 @@ import java.util.*;
  */
 public class Find<V> {
 
-    protected Map<String, Pair<Query.FilterOperator, Object>> filters;
+    protected MultiMap<String, Pair<Query.FilterOperator, Object>> filters;
     protected Map<String, Query.SortDirection> sorts;
     protected List<String> projections;
     protected Integer skip;
@@ -54,7 +56,7 @@ public class Find<V> {
     }
 
     public Find(GaeObjectStore store, Class<V> clazz, String kind){
-        filters = new LinkedHashMap<String, Pair<Query.FilterOperator, Object>>();
+        filters = new MultiMapImpl<String, Pair<Query.FilterOperator, Object>>();
         sorts = new LinkedHashMap<String, Query.SortDirection>();
         projections = new LinkedList<String>();
         objectStore = store;
@@ -152,7 +154,7 @@ public class Find<V> {
 
     public Iterator<V> now() {
         if (filters == null){
-            filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
+            filters = new MultiMapImpl<String, Pair<Query.FilterOperator, Object>>();
         }
         /**
          * Map of fields and its matching filter operator and compare valueType
@@ -227,7 +229,7 @@ public class Find<V> {
     public ListResult<V> asList(){
         ListResult<V> result = new ListResult<V>();
         if (filters == null){
-            filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
+            filters = new MultiMapImpl<String, Pair<Query.FilterOperator, Object>>();
         }
         if(cursor != null){
             QueryResultList<Entity> entities

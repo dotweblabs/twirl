@@ -29,6 +29,8 @@ import com.google.gson.Gson;
 import com.textquo.twist.GaeObjectStore;
 import com.textquo.twist.object.QueryStore;
 import com.textquo.twist.util.Pair;
+import org.boon.collections.MultiMap;
+import org.boon.collections.MultiMapImpl;
 import org.boon.json.JsonParser;
 import org.boon.json.JsonParserFactory;
 
@@ -43,7 +45,7 @@ public class Update<V> {
 
     final JsonParser mapper = new JsonParserFactory().create();
 
-    protected Map<String, Pair<Query.FilterOperator, Object>> filters;
+    protected MultiMap<String, Pair<Query.FilterOperator, Object>> filters;
     protected Map<String, Query.SortDirection> sorts;
     protected Object ref;
 
@@ -60,7 +62,7 @@ public class Update<V> {
     }
 
     public Update(GaeObjectStore store, Class<V> clazz, String kind){
-        filters = new LinkedHashMap<String, Pair<Query.FilterOperator, Object>>();
+        filters = new MultiMapImpl<String, Pair<Query.FilterOperator, Object>>();
         sorts = new LinkedHashMap<String, Query.SortDirection>();
         objectStore = store;
         _store = new QueryStore(store.getDatastoreService(), null);
@@ -148,7 +150,7 @@ public class Update<V> {
 
     public Iterator<V> now() {
         if (filters == null){
-            filters = new HashMap<String, Pair<Query.FilterOperator, Object>>();
+            filters = new MultiMapImpl<String, Pair<Query.FilterOperator, Object>>();
         }
         final Set<Map.Entry<Object,Entity>> entities
                 = objectStore.marshaller().marshall(null, ref).entrySet();

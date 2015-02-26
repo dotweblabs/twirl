@@ -25,8 +25,11 @@ package com.textquo.twist.object;
 import com.google.appengine.api.datastore.*;
 import com.textquo.twist.serializer.ObjectSerializer;
 import com.textquo.twist.util.Pair;
+import org.boon.collections.MultiMap;
 
 import java.util.*;
+
+import static org.boon.Lists.list;
 
 /**
  * Created by kerby on 4/27/14.
@@ -54,7 +57,7 @@ public class QueryStore extends AbstractStore {
      * @return List or Iterator
      */
     public Object querySortedLike(Key ancestor, String kind,
-            Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
+            MultiMap<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
             Integer limit, Integer offset, com.textquo.twist.types.Cursor startCursor,
             boolean keysOnly, boolean asList){
 
@@ -93,41 +96,54 @@ public class QueryStore extends AbstractStore {
         if (!query.isEmpty()){
             // Apply filters and sorting for fields given in the filter query
             for (String propName : query.keySet()){
-                Pair<Query.FilterOperator, Object> filterAndValue = query.get(propName);
-                Query.FilterOperator operator = filterAndValue.getFirst();
-                Object value = filterAndValue.getSecond();
-                Query.Filter _filter = null;
-                if (propName.equals(KEY_RESERVED_PROPERTY)){
-                    _filter = new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, operator,
-                            KeyStructure.createKey(kind, String.valueOf(value)));
-                } else {
-                    _filter = new Query.FilterPredicate(propName, operator, value);
-                }
-                Query.Filter prevFilter = q.getFilter();
-                if (sorts.get(propName) != null){
-                    if(ancestor != null){
-                        q = new Query(kind, ancestor)
-                                .setFilter(prevFilter).setFilter(_filter)
-                                .addSort(propName, sorts.get(propName));
-                        sorts.remove(propName); // remove it
+                List<Pair<Query.FilterOperator, Object>> filterAndValues = list(query.getAll(propName));
+                for(Pair<Query.FilterOperator, Object> filterAndValue : filterAndValues){
+                    Query.FilterOperator operator = filterAndValue.getFirst();
+                    Object value = filterAndValue.getSecond();
+                    Query.Filter _filter = null;
+                    if (propName.equals(KEY_RESERVED_PROPERTY)){
+                        _filter = new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, operator,
+                                KeyStructure.createKey(kind, String.valueOf(value)));
                     } else {
-                        q = new Query(kind).setFilter(prevFilter)
-                                .setFilter(_filter)
-                                .addSort(propName, sorts.get(propName));
-                        sorts.remove(propName); // remove it
+                        _filter = new Query.FilterPredicate(propName, operator, value);
                     }
-                } else {
-                    if(ancestor != null){
-                        q = new Query(kind, ancestor)
-                                .setFilter(prevFilter)
-                                .setFilter(_filter);
+                    Query.Filter prevFilter = q.getFilter();
+                    if (sorts.get(propName) != null){
+                        if(ancestor != null){
+                            q = new Query(kind, ancestor)
+                                    .setFilter(prevFilter).setFilter(_filter)
+                                    .addSort(propName, sorts.get(propName));
+                            sorts.remove(propName); // remove it
+                        } else {
+                            q = new Query(kind).setFilter(prevFilter)
+                                    .setFilter(_filter)
+                                    .addSort(propName, sorts.get(propName));
+                            sorts.remove(propName); // remove it
+                        }
                     } else {
-                        q = new Query(kind)
-                                .setFilter(prevFilter)
-                                .setFilter(_filter);
+                        if(ancestor != null){
+                            if(prevFilter != null){
+                                Query.Filter filter = Query.CompositeFilterOperator.and(prevFilter, _filter);
+                                q = new Query(kind, ancestor)
+                                        .setFilter(filter);
+                            } else {
+                                q = new Query(kind, ancestor)
+                                        .setFilter(_filter);
+                            }
+
+                        } else {
+                            if(prevFilter != null){
+                                Query.Filter filter = Query.CompositeFilterOperator.and(prevFilter, _filter);
+                                q = new Query(kind)
+                                        .setFilter(filter);
+                            } else {
+                                q = new Query(kind)
+                                        .setFilter(_filter);
+                            }
+                        }
                     }
+                    subFilters.add(_filter);
                 }
-                subFilters.add(_filter);
             }
         } else if (query == null || query.isEmpty()){
             // Sort
@@ -223,7 +239,7 @@ public class QueryStore extends AbstractStore {
 
     // TODO: With cursor
     public Iterator<Entity> querySortedLikeAsList(Key ancestor, String kind,
-                                            Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
+                                            MultiMap<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts,
                                             Integer limit, Integer offset, boolean keysOnly){
         return null;
     }
@@ -323,7 +339,7 @@ public class QueryStore extends AbstractStore {
     @Deprecated
     protected Iterator<Entity> querySortedEntitiesLike(
             String kind,
-            Map<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts){
+            MultiMap<String, Pair<Query.FilterOperator, Object>> query, Map<String, Query.SortDirection> sorts){
 
         if(query == null){
             throw new RuntimeException("Query object cannot be null");
@@ -420,12 +436,12 @@ public class QueryStore extends AbstractStore {
      *
      * @return
      */
-    protected Iterator<Entity> queryEntitiesLike(String kind, Map<String,
+    protected Iterator<Entity> queryEntitiesLike(String kind, MultiMap<String,
             Pair<Query.FilterOperator, Object>> queryParam){
         if(queryParam == null){
             throw new RuntimeException("Null query cannot be null");
         }
-        Map<String,Pair<Query.FilterOperator, Object>> query = validateQuery(queryParam);
+        MultiMap<String,Pair<Query.FilterOperator, Object>> query = validateQuery(queryParam);
         Query q = new Query(kind);
         for (String propName : query.keySet()){
             Pair<Query.FilterOperator, Object> filterAndValue = query.get(propName);
@@ -445,9 +461,7 @@ public class QueryStore extends AbstractStore {
      * @param query pairs of {@code Query.FilterOperator} operators
      * @return the validated query object
      */
-    protected Map<String, Pair<Query.FilterOperator, Object>> validateQuery(
-            Map<String, Pair<Query.FilterOperator, Object>> query) {
-        //LOG.debug("QueryStore object type=" + query.getSecond().getClass().getName());
+    protected MultiMap<String, Pair<Query.FilterOperator, Object>> validateQuery(MultiMap<String, Pair<Query.FilterOperator, Object>> query) {
         Map<String,Object> toReplace = new HashMap<String,Object>();
         Set<Map.Entry<String, Pair<Query.FilterOperator, Object>>> entrySet = query.entrySet();
         for (Map.Entry<String, Pair<Query.FilterOperator, Object>> entry : entrySet){

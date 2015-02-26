@@ -523,11 +523,6 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
                 .greaterThanOrEqual("count", 1)
                 .now());
 
-        List<RootEntity> two = list(store.find(RootEntity.class)
-                .greaterThanOrEqual("count", 1)
-                .greaterThanOrEqual("__key__", "104")
-                .now());
-
         assertEquals(1, one.size());
         assertEquals(4, four.size());
         assertEquals(5, all.size());
@@ -538,11 +533,25 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals("105", all_reversed.get(4).getKey());
         assertEquals("101", all_reversed.get(0).getKey());
         assertEquals(5, all_count.size());
-        assertEquals(2, two.size());
 
         assertEquals("101", one.get(0).getKey());
         assertEquals(5, one.get(0).getCount());
+    }
 
+    @Test
+    public void testFindMultiFilter(){
+        store.put(new RootEntity("101", 5));
+        store.put(new RootEntity("102", 4));
+        store.put(new RootEntity("103", 3));
+        store.put(new RootEntity("104", 2));
+        store.put(new RootEntity("105", 1));
+
+        List<RootEntity> two = list(store.find(RootEntity.class)
+                .greaterThanOrEqual("count", 2)
+                .lessThanOrEqual("count", 3)
+                .now());
+
+        assertEquals(2, two.size());
     }
 
     @Test
