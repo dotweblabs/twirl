@@ -36,6 +36,7 @@ import java.util.*;
  */
 public class Find<V> {
 
+    protected Query _query;
     protected MultiMap<String, Pair<Query.FilterOperator, Object>> filters;
     protected Map<String, Query.SortDirection> sorts;
     protected List<String> projections;
@@ -63,6 +64,17 @@ public class Find<V> {
         _store = new QueryStore(store.getDatastoreService(), null);
         _clazz = clazz;
         _kind = kind;
+    }
+
+    public Find(GaeObjectStore store, Class<V> clazz, String kind, Query query){
+        filters = new MultiMapImpl<String, Pair<Query.FilterOperator, Object>>();
+        sorts = new LinkedHashMap<String, Query.SortDirection>();
+        projections = new LinkedList<String>();
+        objectStore = store;
+        _store = new QueryStore(store.getDatastoreService(), null);
+        _clazz = clazz;
+        _kind = kind;
+        _query = query;
     }
 
     public Find greaterThan(String key, Object value){
@@ -153,6 +165,55 @@ public class Find<V> {
     }
 
     public Iterator<V> now() {
+
+        Iterator<V> _it = null;
+        if (_query != null){
+            if(cursor != null){
+                final QueryResultIterator<Entity> it = (QueryResultIterator<Entity>) _store.query(_query, cursor, max, skip, false);
+                _it = new Iterator<V>() {
+                    @Override
+                    public boolean hasNext() {
+                        return it.hasNext();
+                    }
+
+                    @Override
+                    public V next() {
+                        Entity e = it.next();
+                        V instance = null;
+                        if(_clazz.equals(Map.class)){
+                            instance = (V) new LinkedHashMap<>();
+                        } else {
+                            instance = createInstance(_clazz);
+                        }
+                        objectStore.unmarshaller().unmarshall(instance, e);
+                        System.out.println(instance);
+                        return instance;                    }
+                };
+            } else {
+                final QueryResultIterator<Entity> it = (QueryResultIterator<Entity>) _store.query(_query, null, max, skip, false);
+                _it = new Iterator<V>() {
+                    @Override
+                    public boolean hasNext() {
+                        return it.hasNext();
+                    }
+
+                    @Override
+                    public V next() {
+                        Entity e = it.next();
+                        V instance = null;
+                        if(_clazz.equals(Map.class)){
+                            instance = (V) new LinkedHashMap<>();
+                        } else {
+                            instance = createInstance(_clazz);
+                        }
+                        objectStore.unmarshaller().unmarshall(instance, e);
+                        System.out.println(instance);
+                        return instance;                    }
+                };
+            }
+            return _it;
+        }
+
         if (filters == null){
             filters = new MultiMapImpl<String, Pair<Query.FilterOperator, Object>>();
         }

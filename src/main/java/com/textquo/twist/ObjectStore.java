@@ -23,6 +23,7 @@
 package com.textquo.twist;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.textquo.twist.types.Find;
 import com.textquo.twist.types.FindOne;
@@ -67,6 +68,7 @@ public interface ObjectStore {
     public <T> Find find(Class<T> clazz, Key ancestor);
     public <T> Find find(Class<T> clazz, String kind);
     public <T> Find find(Class<T> clazz);
+    public <T> Find find(Class<T> clazz, Query query);
     public <T> FindOne findOne(Class<T> clazz);
     public <T> Update update(Class<T> clazz);
 

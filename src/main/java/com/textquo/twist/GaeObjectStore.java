@@ -225,6 +225,11 @@ public class GaeObjectStore implements ObjectStore {
     }
 
     @Override
+    public <T> Find find(Class<T> clazz, Query query) {
+        return new Find(this, clazz, getKind(clazz), query);
+    }
+
+    @Override
     public <T> FindOne findOne(Class<T> clazz) {
         throw new RuntimeException("Not yet implemented");
     }

@@ -25,17 +25,15 @@ package com.textquo.twist.object;
 import static org.boon.Lists.list;
 import static org.junit.Assert.*;
 
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.GeoPt;
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.*;
 import com.textquo.twist.GaeObjectStore;
-import com.google.appengine.api.datastore.Key;
 import com.textquo.twist.ObjectStore;
 import com.textquo.twist.LocalDatastoreTestBase;
 import com.textquo.twist.common.ObjectNotFoundException;
 import com.textquo.twist.entity.*;
 import com.textquo.twist.types.Cursor;
 import com.textquo.twist.types.ListResult;
+import com.textquo.twist.types.QueryBuilder;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
@@ -548,16 +546,30 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         store.put(new RootEntity("105", 1, false));
         Date end = new Date();
 
-        List<RootEntity> two = list(store.find(RootEntity.class)
-                .greaterThanOrEqual("created", start)
-                .lessThanOrEqual("created", end)
-                .sortDescending("created")
-                .sortDescending("count")
-                .equal("status", true)
-                .now());
+        Query.Filter filter = Query.CompositeFilterOperator.and(new Query.FilterPredicate("created", Query.FilterOperator.GREATER_THAN_OR_EQUAL, start),
+                new Query.FilterPredicate("created", Query.FilterOperator.LESS_THAN_OR_EQUAL, end), new Query.FilterPredicate("status", Query.FilterOperator.EQUAL, true));
+
+        List<RootEntity> two = list(store.find(RootEntity.class,
+                new QueryBuilder().build(RootEntity.class)
+                        .setFilter(filter)
+                        .addSort("created", Query.SortDirection.DESCENDING)
+                        .addSort("count", Query.SortDirection.DESCENDING))
+                .limit(10).now());
 
         assertEquals(4, two.size());
-        assertEquals("104", two.get(0).getKey());
+        assertEquals(5, two.get(0).getCount());
+
+//        two = list(store.find(RootEntity.class)
+//                .greaterThanOrEqual("created", start)
+//                .lessThanOrEqual("created", end)
+//                .sortDescending("created")
+//                .sortAscending("count")
+//                //.equal("status", true)
+//                .limit(10)
+//                .now());
+//
+//        assertEquals(2, two.get(0).getCount());
+
     }
 
     @Test

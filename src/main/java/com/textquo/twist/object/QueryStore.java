@@ -41,7 +41,41 @@ public class QueryStore extends AbstractStore {
         super(ds, serializer);
     }
 
-
+    public Object query(Query query, com.textquo.twist.types.Cursor startCursor, Integer limit, Integer offset, Boolean asList){
+        FetchOptions fetchOptions = FetchOptions.Builder.withDefaults();
+        if(limit != null && offset != null){
+            fetchOptions = FetchOptions.Builder.withLimit(limit).offset(offset);
+        } else if(limit != null){
+            fetchOptions = FetchOptions.Builder.withLimit(limit);
+        } else if(offset != null){
+            if (fetchOptions == null) {
+                fetchOptions = FetchOptions.Builder.withDefaults();
+            }
+            fetchOptions.offset(offset);
+        }
+        PreparedQuery pq = _ds.prepare(query);
+        Object res = null;
+        if(asList){
+            if(startCursor != null && startCursor.getWebSafeString() != null){
+                fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor.getWebSafeString()));
+                res = pq.asQueryResultList(fetchOptions);
+            } else if(startCursor != null && startCursor.getWebSafeString() == null) {
+                res = pq.asQueryResultList(fetchOptions);
+            } else {
+                res = pq.asList(fetchOptions);
+            }
+        } else {
+            if(startCursor != null && startCursor.getWebSafeString() != null){
+                fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor.getWebSafeString()));
+                res = pq.asQueryResultIterable(fetchOptions);
+            } else if(startCursor != null && startCursor.getWebSafeString() == null){
+                res = pq.asQueryResultIterable(fetchOptions);
+            } else {
+                res = pq.asIterator(fetchOptions);
+            }
+        }
+        return res;
+    }
     /**
      * Builds a query filter from the given <code>entity</code> property names and values and add sorting from
      * <code>Map</code> sorts.
@@ -276,6 +310,7 @@ public class QueryStore extends AbstractStore {
         if(keysOnly){
             q.setKeysOnly();
         }
+        LOG.info("About to query: " + q.toString());
         pq = _ds.prepare(q);
         Object res = null;
         if(asList){
