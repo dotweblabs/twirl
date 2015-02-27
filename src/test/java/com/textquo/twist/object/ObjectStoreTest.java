@@ -540,20 +540,24 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
 
     @Test
     public void testFindMultiFilter(){
-        store.put(new RootEntity("101", 5));
-        store.put(new RootEntity("102", 4));
-        store.put(new RootEntity("103", 3));
-        store.put(new RootEntity("104", 2));
-        store.put(new RootEntity("105", 1));
+        Date start = new Date();
+        store.put(new RootEntity("101", 5, true));
+        store.put(new RootEntity("102", 4, true));
+        store.put(new RootEntity("103", 3, true));
+        store.put(new RootEntity("104", 2, true));
+        store.put(new RootEntity("105", 1, false));
+        Date end = new Date();
 
         List<RootEntity> two = list(store.find(RootEntity.class)
-                .greaterThanOrEqual("count", 2)
-                .lessThanOrEqual("count", 3)
-                .sortAscending("count")
-                .sortAscending("__key__")
+                .greaterThanOrEqual("created", start)
+                .lessThanOrEqual("created", end)
+                .sortDescending("created")
+                .sortDescending("count")
+                .equal("status", true)
                 .now());
 
-        assertEquals(2, two.size());
+        assertEquals(4, two.size());
+        assertEquals("104", two.get(0).getKey());
     }
 
     @Test

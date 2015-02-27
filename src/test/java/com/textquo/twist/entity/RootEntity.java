@@ -22,10 +22,12 @@
  */
 package com.textquo.twist.entity;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.textquo.twist.annotations.Child;
 import com.textquo.twist.annotations.Embedded;
 import com.textquo.twist.annotations.Id;
 
+import java.util.Date;
 import java.util.List;
 
 public class RootEntity {
@@ -33,6 +35,8 @@ public class RootEntity {
     @Id
     private String key;
     private Integer count;
+    private Date created;
+    private Boolean status;
     @Child
     private ChildEntity newChildEntity;
     @Embedded
@@ -49,6 +53,15 @@ public class RootEntity {
     public RootEntity(String key, Integer count){
         setId(key);
         setCount(count);
+        created = new Date();
+        status = false;
+    }
+
+    public RootEntity(String key, Integer count, Boolean status){
+        setId(key);
+        setCount(count);
+        created = new Date();
+        this.status = status;
     }
 
     public RootEntity(String key, Integer count, ChildEntity childEntity){
@@ -110,5 +123,21 @@ public class RootEntity {
 
     public void setChildren(List<ChildEntity> children) {
         this.children = children;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 }
