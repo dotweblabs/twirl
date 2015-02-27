@@ -549,6 +549,8 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         List<RootEntity> two = list(store.find(RootEntity.class)
                 .greaterThanOrEqual("count", 2)
                 .lessThanOrEqual("count", 3)
+                .sortAscending("count")
+                .sortAscending("__key__")
                 .now());
 
         assertEquals(2, two.size());
@@ -563,13 +565,12 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         store.put(new RootEntity("105", 1));
 
         List<RootEntity> all = list(store.find(RootEntity.class)
-                //.greaterThanOrEqual("__key__", "101")
                 .sortAscending("__key__")
                 .sortAscending("count").now());
 
         assertNotNull(all);
         assertEquals(5, all.size());
-        assertEquals("105", all.get(0).getKey());
+        assertEquals("101", all.get(0).getKey());
     }
 
     @Test
