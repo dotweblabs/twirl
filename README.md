@@ -1,7 +1,7 @@
 twist
 =====
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/textquo/twist?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pastekit/twist?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Yet Another Google App Engine Datastore ORM with a twist! (We need your support, fork it, and try it)
 
@@ -20,7 +20,7 @@ Persisting POJO's, Maps and (soon Primitive types) directly into the Datastore.
 
 [![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/twist)
 
-[![Build Status](https://travis-ci.org/textquo/twist.svg?branch=master)](https://travis-ci.org/textquo/twist)
+[![Build Status](https://travis-ci.org/pastekit/twist.svg?branch=master)](https://travis-ci.org/pastekit/twist)
 
 ##Sample
 
@@ -46,7 +46,7 @@ Friend one = store.findOne(Friend.class).greaterThanOrEqual("name", "Joe").now()
 Note that you can also use static import for store:
 
 ```java
-import static com.textquo.twist.ObjectStoreService.store;
+import static com.pastekit.twist.ObjectStoreService.store;
 
 store().put(friend);
 ```
@@ -197,7 +197,7 @@ messages.put("uid:123:msgid:456", "Ahoy! We are saving primitives.");
 String message = messages.get("uid:123:msgid:456");
 ```
 
-See: https://github.com/textquo/twist-keyvalue-extension
+See: https://github.com/pastekit/twist-keyvalue-extension
 
 
 
@@ -237,7 +237,7 @@ Dependency
 --------------
 
         <dependency>
-		  <groupId>com.textquo</groupId>
+		  <groupId>com.pastekit</groupId>
 		  <artifactId>twist</artifactId>
 		  <version>0.0.1-SNAPSHOT</version>
 		</dependency>
