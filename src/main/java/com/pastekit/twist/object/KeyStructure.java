@@ -26,7 +26,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.KeyRange;
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
+import com.google.appengine.repackaged.com.google.api.client.util.Lists;
 
 import java.util.List;
 
