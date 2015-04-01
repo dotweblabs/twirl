@@ -486,6 +486,28 @@ public class GaeObjectStore implements ObjectStore {
     }
 
     @Override
+    public Iterable<Key> putInTransaction(Object... objects) {
+        List<Key> keys = new LinkedList<>();
+        Transaction tx = _ds.beginTransaction(_options);
+        try {
+            for (Object o : objects){
+                Key key = put(o);
+                updateObjectKey(key, o);
+                keys.add(key);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            tx.rollback();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+        }
+
+        return keys;
+    }
+
+    @Override
     public Iterable<Key> putInTransaction(Iterable<Object> objects) {
         throw new RuntimeException("Not yet implemented");
     }
