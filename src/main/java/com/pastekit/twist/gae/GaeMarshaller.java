@@ -439,6 +439,8 @@ public class GaeMarshaller implements Marshaller {
         return kind;
     }
 
+
+
     private static boolean hasNoIdField(Object instance){
         AnnotationUtil.AnnotatedField idField = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.key(), instance);
         return idField == null ? true : false;

@@ -250,11 +250,12 @@ public class GaeObjectStore implements ObjectStore {
     @Override
     public <T> T transact(Function<T> function) {
         T result = null;
-        Transaction tx = _ds.beginTransaction();
+        Transaction tx = _ds.beginTransaction(_options);
         try {
             result = function.execute();
         } catch (Exception e) {
             tx.rollback();
+            e.printStackTrace();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -474,7 +475,7 @@ public class GaeObjectStore implements ObjectStore {
             assert list(entities).size() == keys.size();
             result = getLast(keys);
         } catch (Exception e) {
-            e.printStackTrace();
+            // TODO Wrap exception and add a getLastError() method
             tx.rollback();
         } finally {
             if (tx.isActive()) {

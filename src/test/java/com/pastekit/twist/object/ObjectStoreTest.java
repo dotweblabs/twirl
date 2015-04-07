@@ -135,6 +135,41 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testPut_parent(){
+        RootEntity rootObject = new RootEntity(); // one entity
+
+        // String not set
+        ChildEntity childObject = new ChildEntity("Test City");
+        childObject.setParent(rootObject);
+
+        rootObject.setId("TestUser");
+        rootObject.setCount(25);
+        rootObject.setNewChildEntity(childObject); // one entity, causes stackoverflow error
+
+        Key key = store.put(rootObject); // FIXME not consistent, RootEntity is not on last item!
+
+        rootObject = store.get(RootEntity.class, key);
+
+        ChildEntity update = rootObject.getNewChildEntity();
+        update.setType("Edited");
+
+        rootObject.setNewChildEntity(update);
+
+        assertEquals(2L, update.getId().longValue());
+
+        store.put(rootObject);
+        store.put(rootObject);
+
+        // Make sure ChildEntity is not duplicating on multiple parent puts
+        List<RootEntity> entities = store.find(RootEntity.class).asList().getList();
+        List<ChildEntity> childEntities = store.find(ChildEntity.class).asList().getList();
+
+        assertEquals(1, entities.size());
+        assertEquals(1, childEntities.size());
+
+    }
+
+    @Test
     public void testPut_noIdwithParentKey(){
         Key demoParentKey = KeyFactory.createKey("Guestbook", "demo");
         EntityNoId entity = new EntityNoId();
