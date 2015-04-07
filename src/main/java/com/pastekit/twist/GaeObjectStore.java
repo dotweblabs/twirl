@@ -470,19 +470,17 @@ public class GaeObjectStore implements ObjectStore {
         Transaction tx = _ds.beginTransaction(_options);
         Key result = null;
         try {
-            Iterable<Entity> entities = marshall(object);
-            List<Key> keys = _ds.put(entities);
-            assert list(entities).size() == keys.size();
-            result = getLast(keys);
+            result = put(object);
+            tx.commit();
         } catch (Exception e) {
             // TODO Wrap exception and add a getLastError() method
+            e.printStackTrace();
             tx.rollback();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
         }
-        updateObjectKey(result, object);
         return result;
     }
 
@@ -496,6 +494,7 @@ public class GaeObjectStore implements ObjectStore {
                 updateObjectKey(key, o);
                 keys.add(key);
             }
+            tx.commit();
         } catch (Exception e){
             e.printStackTrace();
             tx.rollback();
