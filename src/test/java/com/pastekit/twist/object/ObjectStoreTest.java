@@ -154,11 +154,21 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         update.setType("Edited");
 
         rootObject.setNewChildEntity(update);
+        rootObject.setNewChildEntity(update);
+        rootObject.setNewChildEntity(update);
 
         assertEquals(2L, update.getId().longValue());
 
         store.put(rootObject);
         store.put(rootObject);
+
+        rootObject.setNewChildEntity(update);
+        Key newKey = store.put(rootObject);
+
+        RootEntity saved = store.get(RootEntity.class, newKey);
+        ChildEntity childEntity = saved.getNewChildEntity();
+
+        assertEquals(2L, childEntity.getId().longValue());
 
         // Make sure ChildEntity is not duplicating on multiple parent puts
         List<RootEntity> entities = store.find(RootEntity.class).asList().getList();
