@@ -238,8 +238,8 @@ public class GaeObjectStore implements ObjectStore {
     }
 
     @Override
-    public <T> FindOne findOne(Class<T> clazz) {
-        throw new RuntimeException("Not yet implemented");
+    public <T> T findOne(Class<T> clazz) {
+        return (T) find(clazz).first();
     }
 
     @Override

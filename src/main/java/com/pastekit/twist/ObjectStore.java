@@ -54,7 +54,7 @@ public interface ObjectStore {
     public <T> T get(Class<T> clazz, Long id);
     public <T> T get(Class<T> clazz, String kind, String key);
     public <T> T get(Class<T> clazz, String kind, Long id);
-    
+
     public <T> T safeGet(Class<T> clazz, Key key);
     public <T> T safeGet(Class<T> clazz, String key);
     public <T> T safeGet(Class<T> clazz, Long id);
@@ -71,11 +71,11 @@ public interface ObjectStore {
     public Iterable<Key> putInTransaction(Object... object);
     public Iterable<Key> putInTransaction(Iterable<Object> objects);
 
-    public <T> Find find(Class<T> clazz, String kind, Key ancestor);
-    public <T> Find find(Class<T> clazz, Key ancestor);
-    public <T> Find find(Class<T> clazz, String kind);
-    public <T> Find find(Class<T> clazz);
-    public <T> FindOne findOne(Class<T> clazz);
+    public <T> Find<T> find(Class<T> clazz, String kind, Key ancestor);
+    public <T> Find<T> find(Class<T> clazz, Key ancestor);
+    public <T> Find<T> find(Class<T> clazz, String kind);
+    public <T> Find<T> find(Class<T> clazz);
+    public <T> T findOne(Class<T> clazz);
     public <T> Update update(Class<T> clazz);
 
     public <T> T transact(Function<T> function);

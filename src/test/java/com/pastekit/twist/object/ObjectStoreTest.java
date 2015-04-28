@@ -626,6 +626,14 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testFindFirst(){
+        store.put(new RootEntity("101", 5));
+        RootEntity first = store.find(RootEntity.class).first();
+        assertNotNull(first);
+        assertEquals("101", first.getKey());
+    }
+
+    @Test
     public void testFindMultiFilter(){
         Date start = new Date();
         store.put(new RootEntity("101", 5, true));
