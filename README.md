@@ -224,6 +224,21 @@ mvn clean install
 
 or add this to your POM:
 
+
+Repository
+--------------
+```
+        <repositories>
+            <repository>
+                <id>dropbox.repo</id>
+                <url>http://maven.weblabs.ph/mvn-repostory</url>
+            </repository>
+        </repositories>
+```
+
+From JFrog (not updated ATM):
+
+```
         <repositories>
             <!-- Snapshot repository -->
             <repository>
@@ -232,15 +247,18 @@ or add this to your POM:
                 <url>http://oss.jfrog.org/artifactory/oss-snapshot-local</url>
             </repository>
         </repositories>
+```
 
 Dependency
 --------------
 
+```
         <dependency>
-		  <groupId>com.pastekit</groupId>
-		  <artifactId>twist</artifactId>
-		  <version>0.0.1-SNAPSHOT</version>
+		    <groupId>com.pastekit</groupId>
+		    <artifactId>twist</artifactId>
+		    <version>0.0.1-SNAPSHOT</version>
 		</dependency>
+```
 
 Contribution
 --------------
