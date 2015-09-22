@@ -787,6 +787,30 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
 
     }
 
+
+    @Test
+    public void testFindSkipKeys(){
+        store.put(new SimpleEntity("101", 10));
+        store.put(new SimpleEntity("102", 9));
+        store.put(new SimpleEntity("103", 8));
+        store.put(new SimpleEntity("104", 7));
+        store.put(new SimpleEntity("105", 6));
+        store.put(new SimpleEntity("106", 5));
+        store.put(new SimpleEntity("107", 4));
+        store.put(new SimpleEntity("108", 3));
+        store.put(new SimpleEntity("109", 2));
+        store.put(new SimpleEntity("110", 1));
+
+        ListResult<SimpleEntity> entities = store.find(SimpleEntity.class)
+                .notEqual("__key__", Arrays.asList("102", 104)) // skip
+                .limit(5)
+                .sortAscending("__key__")
+                .sortAscending("count")
+                .withCursor("")
+                .asList();
+        assertEquals(5, entities.getList().size());
+    }
+
     @Test
     public void testUpdate(){
         store.put(new RootEntity("101", 5));

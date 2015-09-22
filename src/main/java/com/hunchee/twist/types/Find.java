@@ -96,8 +96,18 @@ public class Find<V> {
     }
 
     public Find notEqual(String key, Object value){
-        filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.NOT_EQUAL, value));
+        if(value instanceof List){
+            for(Object o : (List)value){
+                filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.NOT_EQUAL, o));
+            }
+        } else {
+            filters.put(key, new Pair<Query.FilterOperator, Object>(Query.FilterOperator.NOT_EQUAL, value));
+        }
         return this;
+    }
+
+    public Find notEqual(String key, Object... value){
+        return notEqual(key, value);
     }
 
     public Find sortAscending(String key){
