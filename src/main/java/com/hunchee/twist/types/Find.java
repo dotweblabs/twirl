@@ -25,6 +25,7 @@ package com.hunchee.twist.types;
 import com.google.appengine.api.datastore.*;
 import com.hunchee.twist.object.QueryStore;
 import com.hunchee.twist.GaeObjectStore;
+import com.hunchee.twist.util.CollectionUtil;
 import com.hunchee.twist.util.Pair;
 import org.boon.collections.MultiMap;
 import org.boon.collections.MultiMapImpl;
@@ -233,6 +234,11 @@ public class Find<V> {
 
         }
         return it;
+    }
+
+    public Iterable<V> asIterable() {
+        Iterator<V> it = now();
+        return CollectionUtil.iterable(it);
     }
 
     // TODO: Add test!

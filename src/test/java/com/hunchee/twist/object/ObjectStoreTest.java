@@ -709,6 +709,34 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testFind_asIterable(){
+        store.put(new RootEntity("101", 5));
+        store.put(new RootEntity("102", 4));
+        store.put(new RootEntity("103", 3));
+        store.put(new RootEntity("104", 2));
+        store.put(new RootEntity("105", 1));
+
+        Iterable<RootEntity> e = store.find(RootEntity.class).asIterable();
+        Iterable<RootEntity> l = store.find(RootEntity.class).limit(3).asIterable();
+
+        List<RootEntity> entities = new LinkedList<RootEntity>();
+        List<RootEntity> limited = new LinkedList<RootEntity>();
+
+        for (RootEntity entity : e) {
+            entities.add(entity);
+        }
+
+        for (RootEntity entity : l){
+            limited.add(entity);
+        }
+
+        assertTrue(!entities.isEmpty());
+        assertTrue(!limited.isEmpty());
+        assertEquals(5, entities.size());
+        assertEquals(3, limited.size());
+    }
+
+    @Test
     public void testFind_asList_withCursor(){
         store.put(new RootEntity("101", 5));
         store.put(new RootEntity("102", 4));
