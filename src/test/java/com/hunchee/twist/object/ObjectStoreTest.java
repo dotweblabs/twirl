@@ -91,6 +91,15 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testPut_withEnumField(){
+        EntityEnum entityEnum = new EntityEnum();
+        entityEnum.setTestEnum(EntityEnum.TestEnum.ONE);
+        store.put(entityEnum);
+        EntityEnum saved = store.get(EntityEnum.class, entityEnum.getId());
+        assertEquals(EntityEnum.TestEnum.ONE, saved.getTestEnum());
+    }
+
+    @Test
     public void testPut_aliasedField(){
         EntityAlias entity = new EntityAlias();
         entity.setActiveFlag(true);

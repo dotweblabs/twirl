@@ -282,7 +282,9 @@ public class GaeUnmarshaller implements Unmarshaller {
                                 || fieldValue instanceof Number
                                 || fieldValue instanceof Blob) {
                             if(field.getName().equals(fieldName)){
-                                Class<?> fieldType = field.getType();
+                                if(field.getType().isEnum()){
+                                    setFieldValue(field, destination, Enum.valueOf((Class<Enum>) field.getType(), (String)fieldValue));
+                                }
                                 if (field.getType().equals(String.class)){
                                     setFieldValue(field, destination, String.valueOf(fieldValue));
                                 } else if (field.getType().equals(Boolean.class)){

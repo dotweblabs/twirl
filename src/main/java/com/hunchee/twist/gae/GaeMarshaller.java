@@ -186,6 +186,10 @@ public class GaeMarshaller implements Marshaller {
                         }
                     } else if(fieldValue instanceof GeoPt) {
                         setProperty(e, fieldName, fieldValue, indexed);
+                    } else if (fieldValue instanceof Enum){
+                        String enumValue = fieldValue.toString();
+                        LOG.info("Enum marshalled as \"" + enumValue + "\"" );
+                        setProperty(e, fieldName, enumValue, indexed);
                     } else if(fieldValue instanceof Map){
                         LOG.debug( "Processing Map valueType");
                         if (field.isAnnotationPresent(Embedded.class)){
@@ -262,7 +266,9 @@ public class GaeMarshaller implements Marshaller {
                             byte[] bytes = (byte[]) fieldValue;
                             Blob blob = new Blob(bytes);
                             setProperty(e, fieldName, blob, indexed);
-                        }else { // POJO
+                        } else if(fieldType.equals(Enum.class)) {
+                            throw new RuntimeException("Enum primitive type not yet implemented");
+                        } else { // POJO
                             if (field.isAnnotationPresent(Embedded.class)){
                                 Map<String,Object> map = createMapFrom(fieldValue);
                                 EmbeddedEntity ee = createEmbeddedEntityFromMap(map);
