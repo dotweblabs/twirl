@@ -241,7 +241,9 @@ public class GaeObjectStore implements ObjectStore {
             result = function.execute();
             tx.commit();
         } catch (Exception e) {
-            tx.rollback();
+            if (tx.isActive()) {
+                tx.rollback();
+            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
