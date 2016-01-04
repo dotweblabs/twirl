@@ -340,8 +340,15 @@ public class GaeUnmarshaller implements Unmarshaller {
                                         throw new RuntimeException("Unable to unmarshall "
                                                 + fieldValue.getClass().getName() + " to " + field.getType().getName());
                                     }
+                                } else if (field.getType().equals(Blob.class)){
+                                    if(fieldValue.getClass().equals(Blob.class)){
+                                        Blob blob = (Blob) fieldValue;
+                                        setFieldValue(field, destination, blob);
+                                    }
                                 }
                             }
+                        } else if(fieldValue instanceof Blob) {
+                            setFieldValue(field, destination, fieldValue);
                         } else if(fieldValue instanceof Text) {
                             Text textField = (Text) fieldValue;
                             setFieldValue(field, destination, textField.getValue());

@@ -25,6 +25,7 @@ package com.hunchee.twist.object;
 import static org.boon.Lists.list;
 import static org.junit.Assert.*;
 
+import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.GeoPt;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.hunchee.twist.LocalDatastoreTestBase;
@@ -384,6 +385,21 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertNotNull(saved);
         assertEquals(bytes.length, saved.getBytes().length);
         assertEquals("Hello World", new String(saved.getBytes(), "UTF-8"));
+    }
+
+    @Test
+    public void testPut_entityWithBlob() throws Exception {
+        byte[] bytes = "Hello World".getBytes(Charset.forName("UTF-8"));
+        Blob blob = new Blob(bytes);
+        EntityWithBlob entity = new EntityWithBlob();
+        entity.setBlob(blob);
+        store.put(entity);
+        Long id = entity.getId();
+        EntityWithBlob saved = store.get(EntityWithBlob.class, id);
+        assertNotNull(saved);
+        assertEquals(bytes.length, saved.getBlob().getBytes().length);
+        assertEquals("Hello World", new String(saved.getBlob().getBytes(), "UTF-8"));
+
     }
 
     @Test
