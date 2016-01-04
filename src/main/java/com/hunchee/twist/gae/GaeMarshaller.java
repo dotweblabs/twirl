@@ -165,6 +165,8 @@ public class GaeMarshaller implements Marshaller {
                         setProperty(e, fieldName, fieldValue, indexed);
                     } else if(fieldValue instanceof User) { // GAE support this type
                         setProperty(e, fieldName, fieldValue, indexed);
+                    } else if(fieldValue instanceof Blob) {
+                      setProperty(e, fieldName, fieldValue, indexed);
                     } else if(fieldValue instanceof List) {
                         LOG.debug( "Processing List valueType");
                         if (field.isAnnotationPresent(Embedded.class)){
