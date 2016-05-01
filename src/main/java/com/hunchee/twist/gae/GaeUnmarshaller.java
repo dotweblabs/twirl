@@ -241,6 +241,10 @@ public class GaeUnmarshaller implements Unmarshaller {
                             }
                     }
                     if(ok){
+                        if(fieldValue instanceof EmbeddedEntity){
+                            Map m = getMapFromEmbeddedEntity((EmbeddedEntity) fieldValue);
+                            fieldValue = m;
+                        }
                         map.put(fieldName, fieldValue);
                     }
                 }

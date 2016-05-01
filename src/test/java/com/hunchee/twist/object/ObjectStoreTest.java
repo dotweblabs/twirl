@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.GeoPt;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.gson.Gson;
 import com.hunchee.twist.LocalDatastoreTestBase;
 import com.hunchee.twist.ObjectStore;
 import com.hunchee.twist.TestData;
@@ -892,5 +893,14 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
         assertEquals(105, update_all.get(4).getCount());
     }
 
+
+    @Test
+    public void testPut_GetJSONEntityWithMap(){
+        JSONEntityWithMap withMap = new JSONEntityWithMap();
+        withMap.setField("testKey", "testValue");
+        Key key = store.put(withMap);
+        JSONEntityWithMap result = store.get(JSONEntityWithMap.class, key);
+        LOG.info("Result: " + new Gson().toJson(result));
+    }
 
 }
