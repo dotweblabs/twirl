@@ -238,9 +238,10 @@ public class GaeObjectStore implements ObjectStore {
         T result = null;
         Transaction tx = _ds.beginTransaction(_options);
         try {
-            result = function.execute();
+            result = function.execute(tx);
             tx.commit();
         } catch (Exception e) {
+            e.printStackTrace();
             if (tx.isActive()) {
                 tx.rollback();
             }
@@ -428,6 +429,20 @@ public class GaeObjectStore implements ObjectStore {
         Key key = null;
         Iterable<Entity> entities = marshall(object);
         List<Key> keys = _ds.put(entities);
+        assert list(entities).size() == keys.size();
+        key = getLast(keys);
+        if(isCached(object)){
+            _cache.put(key, getLast(list(entities)));
+        }
+        updateObjectKey(key, object);
+        return key;
+    }
+
+    @Override
+    public Key put(Transaction tx, Object object) {
+        Key key = null;
+        Iterable<Entity> entities = marshall(object);
+        List<Key> keys = _ds.put(tx, entities);
         assert list(entities).size() == keys.size();
         key = getLast(keys);
         if(isCached(object)){

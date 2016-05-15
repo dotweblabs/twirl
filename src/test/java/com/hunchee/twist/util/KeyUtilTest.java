@@ -26,13 +26,16 @@ package com.hunchee.twist.util;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
 
 import com.hunchee.twist.LocalDatastoreTestBase;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 
@@ -81,7 +84,7 @@ public class KeyUtilTest extends LocalDatastoreTestBase {
     
     Entity e2 = new Entity("baz", "Bob", e1.getKey());
     Entity e3 = new Entity("foo");
-    ds.put(Lists.newArrayList(e2, e3));
+    ds.put(new ArrayList<Entity>(Arrays.asList(e2, e3)));
     
     assertTrue(KeyUtil.inSameEntityGroup(ancestor.getKey(), e1.getKey(), e2.getKey()));
     assertFalse(KeyUtil.inSameEntityGroup(ancestor.getKey(), e1.getKey(), e2.getKey(), e3.getKey()));

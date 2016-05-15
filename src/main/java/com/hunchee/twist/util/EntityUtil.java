@@ -23,12 +23,11 @@
 
 package com.hunchee.twist.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
-
 /**
  * Utility functions for dealing with entities.
  *
@@ -50,8 +49,8 @@ public class EntityUtil {
    * @return {@code true} if all the entities are in the same entity group.
    */
   public static boolean inSameEntityGroup(Entity... entities) {
-    List<Key> keys = Lists.newArrayList();
-    
+    List<Key> keys = new ArrayList<>();
+
     for (Entity entity : entities) {
       keys.add(entity.getKey());
     }

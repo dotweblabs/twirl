@@ -22,8 +22,6 @@
  */
 package com.hunchee.twist.util;
 
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -127,7 +125,7 @@ public class AnnotationUtil {
     }
 
     public static List<Annotation> getAnnotations(Object instance){
-        return Lists.newArrayList(instance.getClass().getAnnotations());
+        return new ArrayList<Annotation>(Arrays.asList(instance.getClass().getAnnotations()));
     }
 
     public static Annotation getClassAnnotation(Class<? extends Annotation> clazz, Object instance){

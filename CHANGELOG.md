@@ -1,3 +1,12 @@
+## 0-SNAPSHOT 05/15/16
+
+### Removed
+- Removed imports for GAE repackaged Lists
+
+### Updated
+- Updated test
+- Updated Function execute to throw exception
+
 ## 0-SNAPSHOT 05/01/16
 
 ### Fixed

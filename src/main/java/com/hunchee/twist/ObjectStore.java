@@ -61,6 +61,7 @@ public interface ObjectStore {
     public Object getInTransaction(Key key);
     public Iterable<Object> getInTransaction(Iterable<Key> keys);
     public Key put(Object object);
+    public Key put(Transaction tx, Object object);
     public Iterable<Key> put(Object... objects);
     public Iterable<Key> put(Iterable<Object> objects);
     public Key putInTransaction(Object object);

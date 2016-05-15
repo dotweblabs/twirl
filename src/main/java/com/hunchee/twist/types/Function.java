@@ -30,6 +30,6 @@ package com.hunchee.twist.types;
  * @param <T> argument type
  */
 public interface Function<T> {
-	public T execute();
+	public T execute(Object param) throws Exception;
 }
 

@@ -22,9 +22,9 @@
  */
 package com.hunchee.twist.util;
 
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
-
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -33,7 +33,7 @@ import java.util.Iterator;
 public class BeanUtil {
     public static Iterator<Field> getDeclaredFields(Object instance){
         Field[] fields = instance.getClass().getDeclaredFields();
-        Iterator<Field> iterator = Lists.newArrayList(fields).iterator();
+        Iterator<Field> iterator = new ArrayList<Field>(Arrays.asList(fields)).iterator();
         return iterator;
     }
 }
