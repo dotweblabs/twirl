@@ -219,7 +219,8 @@ public class GaeMarshaller implements Marshaller {
                                             || entryVal instanceof Number
                                             || entryVal instanceof Boolean
                                             || entryVal instanceof Date
-                                            || entryVal instanceof User) {
+                                            || entryVal instanceof User
+                                            || entryVal instanceof EmbeddedEntity) {
                                         setProperty(e, (String) entryKey, entryVal, indexed);
                                     } else {
                                         throw new RuntimeException("Unsupported GAE property type: " + entryVal.getClass().getName());
