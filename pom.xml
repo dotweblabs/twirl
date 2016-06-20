@@ -10,7 +10,7 @@
 	<properties>
 		<version.slf4j>1.7.5</version.slf4j>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<appengine.target.version>1.9.18</appengine.target.version>
+		<appengine.target.version>1.9.38</appengine.target.version>
 		<!-- github server corresponds to entry in ~/.m2/settings.xml -->
     	<github.global.server>github</github.global.server>		
 	</properties>

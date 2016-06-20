@@ -898,8 +898,10 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     public void testPut_GetJSONEntityWithMap(){
         JSONEntityWithMap withMap = new JSONEntityWithMap();
         withMap.setField("testKey", "testValue");
+        withMap.setField("testKey2", "testValue2");
         Key key = store.put(withMap);
         JSONEntityWithMap result = store.get(JSONEntityWithMap.class, key);
+        assertEquals("testValue2", result.getField("testKey2"));
         LOG.info("Result: " + new Gson().toJson(result));
     }
 
