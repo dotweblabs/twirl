@@ -46,7 +46,7 @@ Friend one = store.findOne(Friend.class).greaterThanOrEqual("name", "Joe").now()
 Note that you can also use static import for store:
 
 ```java
-import static com.hunchee.twist.ObjectStoreService.store;
+import static com.dotweblabs.twirl.ObjectStoreService.store;
 
 store().put(friend);
 ```

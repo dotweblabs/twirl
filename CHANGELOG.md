@@ -1,3 +1,9 @@
+## 0-SNAPSHOT 09/04/16
+
+## Updated
+- Updated License headers
+- Refactor to `com.dotweblabs.twirl`
+
 ## 0-SNAPSHOT 05/15/16
 
 ### Removed
