@@ -1,11 +1,12 @@
 ## 0-SNAPSHOT 09/04/16
 
-### Removed
-- Removed IDEA file
-
 ### Updated
+- Updated to use 'Twirl' as name
 - Updated License headers
 - Refactor to `com.dotweblabs.twirl`
+
+### Removed
+- Removed IDEA file
 
 ## 0-SNAPSHOT 05/15/16
 

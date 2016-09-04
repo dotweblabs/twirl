@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (c) 2014 Kerby Martino and others. All rights reserved.
+ * Copyright (c) 2016 Dotweblabs Web Technologies and others. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,10 +14,10 @@
  * limitations under the License.
  *
  *  __            __       __
- * |  |_.--.--.--|__.-----|  |_
- * |   _|  |  |  |  |__ --|   _|
- * |____|________|__|_____|____|
- * :: Twist :: Object Mapping ::
+ * |  |_.--.--.--|__.-----|  |
+ * |   _|  |  |  |  |   --|  |_
+ * |____|________|__|___| |____|
+ * :: twirl :: Object Mapping ::
  *
  */
 

@@ -22,8 +22,8 @@
  */
 package com.dotweblabs.twirl;
 
-import com.hunchee.twist.entity.ChildEntity;
-import com.hunchee.twist.entity.RootEntity;
+import com.dotweblabs.twirl.entity.ChildEntity;
+import com.dotweblabs.twirl.entity.RootEntity;
 
 public class TestData {
 public static RootEntity createTestRootEnity(){

@@ -26,7 +26,7 @@ import com.google.appengine.api.datastore.Key;
 import com.dotweblabs.twirl.LocalDatastoreTestBase;
 import com.dotweblabs.twirl.GaeObjectStore;
 import com.dotweblabs.twirl.ObjectStore;
-import com.hunchee.twist.entity.JSONEntity;
+import com.dotweblabs.twirl.entity.JSONEntity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

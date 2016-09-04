@@ -20,17 +20,17 @@
  * :: twirl :: Object Mapping ::
  *
  */
-package com.hunchee.twist;
+package com.dotweblabs.twirl;
 
 import com.dotweblabs.twirl.LocalDatastoreTestBase;
 import com.dotweblabs.twirl.annotations.Child;
-import com.hunchee.twist.entity.ChildEntity;
-import com.hunchee.twist.entity.RootEntity;
-import com.hunchee.twist.entity.RootEntityWithAnno;
+import com.dotweblabs.twirl.entity.ChildEntity;
+import com.dotweblabs.twirl.entity.RootEntity;
+import com.dotweblabs.twirl.entity.RootEntityWithAnno;
 import com.dotweblabs.twirl.util.AnnotationUtil;
 import com.dotweblabs.twirl.annotations.Cached;
 import com.dotweblabs.twirl.annotations.Entity;
-import com.hunchee.twist.entity.Post;
+import com.dotweblabs.twirl.entity.Post;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

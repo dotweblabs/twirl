@@ -23,25 +23,25 @@
 package com.dotweblabs.twirl.common;
 
 @SuppressWarnings("serial")
-public class TwistException extends RuntimeException {
+public class TwirlException extends RuntimeException {
 
-    public TwistException() {
+    public TwirlException() {
 		super();
 	}
 
-    public TwistException(String message){
+    public TwirlException(String message){
 		super(message);
 	}
 	
-	public TwistException(String message, Throwable cause){
+	public TwirlException(String message, Throwable cause){
 		super(message, cause);
 	}	
 
-	public TwistException(int code, String message){
+	public TwirlException(int code, String message){
 		super("Exception " + code + " " + message);
 	}
 
-    public TwistException(Throwable cause) {
+    public TwirlException(Throwable cause) {
         super(cause);
     }
 

@@ -31,7 +31,7 @@ import com.dotweblabs.twirl.annotations.Flat;
 import com.dotweblabs.twirl.annotations.Id;
 import com.dotweblabs.twirl.annotations.Volatile;
 import com.dotweblabs.twirl.common.AutoGenerateStringIdException;
-import com.dotweblabs.twirl.common.TwistException;
+import com.dotweblabs.twirl.common.TwirlException;
 import com.dotweblabs.twirl.util.MapHelper;
 import com.dotweblabs.twirl.util.StringHelper;
 import com.google.appengine.api.users.User;
@@ -236,7 +236,7 @@ public class GaeMarshaller implements Marshaller {
                                 }
                             }
                         } else {
-                            throw new TwistException("Map type should be annotated with @Embedded or @Flat");
+                            throw new TwirlException("Map type should be annotated with @Embedded or @Flat");
                         }
                     } else {
                         // For primitives

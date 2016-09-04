@@ -22,7 +22,7 @@
  */
 package com.dotweblabs.twirl.common;
 
-public class CacheInconsistencyException extends TwistException {
+public class CacheInconsistencyException extends TwirlException {
     public CacheInconsistencyException(String message){
         super(message);
     }

@@ -25,7 +25,7 @@ package com.dotweblabs.twirl.common;
 /**
  * Created by kerby on 4/27/14.
  */
-public class AutoGenerateStringIdException extends TwistException {
+public class AutoGenerateStringIdException extends TwirlException {
     public AutoGenerateStringIdException(){
         super("Cannot auto-generate String @Id");
     }

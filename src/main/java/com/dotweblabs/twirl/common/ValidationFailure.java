@@ -28,7 +28,7 @@ package com.dotweblabs.twirl.common;
  * @author patricktwohig
  *
  */
-public class ValidationFailure extends TwistException {
+public class ValidationFailure extends TwirlException {
 
     private static final long serialVersionUID = -326821188137374578L;
 

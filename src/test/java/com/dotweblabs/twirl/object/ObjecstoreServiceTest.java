@@ -24,7 +24,7 @@ package com.dotweblabs.twirl.object;
 
 import com.dotweblabs.twirl.LocalDatastoreTestBase;
 import com.dotweblabs.twirl.TestData;
-import com.hunchee.twist.entity.RootEntity;
+import com.dotweblabs.twirl.entity.RootEntity;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

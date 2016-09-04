@@ -26,7 +26,7 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.dotweblabs.twirl.LocalDatastoreTestBase;
 import com.dotweblabs.twirl.GaeObjectStore;
-import com.hunchee.twist.entity.Post;
+import com.dotweblabs.twirl.entity.Post;
 import com.dotweblabs.twirl.gae.GaeUnmarshaller;
 import org.junit.Test;
 

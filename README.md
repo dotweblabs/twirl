@@ -1,30 +1,30 @@
-twist
+twirl
 =====
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hunchee/twist?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dotweblabs/twirl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Yet Another Google App Engine Datastore ORM with a twist! (We need your support, fork it, and try it)
+Yet Another Google App Engine Datastore ORM with a twirl! (We need your support, fork it, and try it)
 
 ```
-  __            __       __   
- |  |_.--.--.--|__.-----|  |_ 
- |   _|  |  |  |  |__ --|   _|
- |____|________|__|_____|____|
- :: Twist :: Object Mapping ::
+   __            __       __
+  |  |_.--.--.--|__.-----|  |
+  |   _|  |  |  |  |   --|  |_
+  |____|________|__|___| |____|
+  :: twirl :: Object Mapping ::
                                 
 ```
                                                            
-twists aims to provide a lightweight Object mapping framework. Without adding complexity into the api.
+twirl aims to provide a lightweight Object mapping framework. Without adding complexity into the api.
 
 Persisting POJO's, Maps and (soon Primitive types) directly into the Datastore.
 
-[![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/twist)
+[![Show me a Demo at Codio](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/kerbymart/twirl)
 
-[![Build Status](https://travis-ci.org/hunchee/twist.svg?branch=master)](https://travis-ci.org/hunchee/twist)
+[![Build Status](https://travis-ci.org/dotweblabs/twirl.svg?branch=master)](https://travis-ci.org/dotweblabs/twirl)
 
 ##Sample
 
-Usage sample can be found here: https://github.com/kerbymart/twist-appengine-guestbook-java
+Usage sample can be found here: https://github.com/kerbymart/twirl-appengine-guestbook-java
 
 ##Setup
 
@@ -197,7 +197,7 @@ messages.put("uid:123:msgid:456", "Ahoy! We are saving primitives.");
 String message = messages.get("uid:123:msgid:456");
 ```
 
-See: https://github.com/hunchee/twist-keyvalue-extension
+See: https://github.com/dotweblabs/twirl-keyvalue-extension
 
 
 
@@ -210,7 +210,7 @@ Version
 Tech
 -----------
 
-twist uses a number of open source projects to work properly:
+twirl uses a number of open source projects to work properly:
 
 * [GAE SDK] - SDK for the AppEngine platform (GAE, AppScale or CapeDwarf)
 * boon
@@ -254,9 +254,9 @@ Dependency
 
 ```
         <dependency>
-		    <groupId>com.hunchee</groupId>
-		    <artifactId>twist</artifactId>
-		    <version>0.0.1-SNAPSHOT</version>
+		    <groupId>com.dotweblabs</groupId>
+		    <artifactId>twirl</artifactId>
+		    <version>0-SNAPSHOT</version>
 		</dependency>
 ```
 

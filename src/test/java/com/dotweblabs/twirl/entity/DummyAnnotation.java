@@ -20,7 +20,7 @@
  * :: twirl :: Object Mapping ::
  *
  */
-package com.hunchee.twist.entity;
+package com.dotweblabs.twirl.entity;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

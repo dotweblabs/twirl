@@ -32,7 +32,7 @@ import com.google.gson.Gson;
 import com.dotweblabs.twirl.LocalDatastoreTestBase;
 import com.dotweblabs.twirl.ObjectStore;
 import com.dotweblabs.twirl.TestData;
-import com.hunchee.twist.entity.*;
+import com.dotweblabs.twirl.entity.*;
 import com.dotweblabs.twirl.GaeObjectStore;
 import com.google.appengine.api.datastore.Key;
 import com.dotweblabs.twirl.types.Cursor;

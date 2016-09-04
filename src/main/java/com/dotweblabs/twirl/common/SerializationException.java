@@ -22,7 +22,7 @@
  */
 package com.dotweblabs.twirl.common;
 
-public class SerializationException extends TwistException {
+public class SerializationException extends TwirlException {
 	private static final long serialVersionUID = 6635858493741243873L;
 	public SerializationException() {
 		super();

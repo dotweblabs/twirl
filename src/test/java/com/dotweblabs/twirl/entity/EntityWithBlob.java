@@ -20,7 +20,7 @@
  * :: twirl :: Object Mapping ::
  *
  */
-package com.hunchee.twist.entity;
+package com.dotweblabs.twirl.entity;
 
 import com.google.appengine.api.datastore.Blob;
 import com.dotweblabs.twirl.annotations.Entity;
