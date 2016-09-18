@@ -274,6 +274,17 @@ public class ObjectStoreTest extends LocalDatastoreTestBase {
     }
 
     @Test
+    public void testPut_objectId(){
+        EntityObjectId entity = new EntityObjectId();
+        entity.setContent("Sample Content");
+        store.put(entity);
+        //System.out.println(entity.getId());
+        EntityObjectId saved = store.get(EntityObjectId.class, entity.getId());
+        assertNotNull(saved);
+        assertEquals("Sample Content", saved.getContent());
+    }
+
+    @Test
     public void testPut_map(){
         Map<String,Object> map = new HashMap<String,Object>();
         map.put("__key__", "testKey");

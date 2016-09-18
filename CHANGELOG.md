@@ -1,3 +1,8 @@
+## 0-SNAPSHOT 09/18/16
+
+### Added
+- Support for @ObjectId annotation
+
 ## 0-SNAPSHOT 09/04/16
 
 ### Updated

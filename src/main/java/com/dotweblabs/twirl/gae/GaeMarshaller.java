@@ -22,14 +22,11 @@
  */
 package com.dotweblabs.twirl.gae;
 
+import com.dotweblabs.twirl.annotations.*;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
-import com.dotweblabs.twirl.annotations.Embedded;
-import com.dotweblabs.twirl.annotations.Flat;
-import com.dotweblabs.twirl.annotations.Id;
-import com.dotweblabs.twirl.annotations.Volatile;
 import com.dotweblabs.twirl.common.AutoGenerateStringIdException;
 import com.dotweblabs.twirl.common.TwirlException;
 import com.dotweblabs.twirl.util.MapHelper;
@@ -39,7 +36,6 @@ import com.dotweblabs.twirl.GaeObjectStore;
 import com.dotweblabs.twirl.Marshaller;
 import com.dotweblabs.twirl.object.KeyStructure;
 import com.dotweblabs.twirl.util.AnnotationUtil;
-import com.dotweblabs.twirl.annotations.Kind;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -139,7 +135,11 @@ public class GaeMarshaller implements Marshaller {
                 if(field.isAnnotationPresent(GaeObjectStore.key())){
                     // skip
                     continue;
+                } else if(field.isAnnotationPresent(GaeObjectStore.objectId())){
+                    // skip
+                    continue;
                 } else if(field.isAnnotationPresent(GaeObjectStore.kind())){
+                    // skip
                     continue;
                 } else if(field.isAnnotationPresent(Volatile.class)){
                     // skip
@@ -491,6 +491,10 @@ public class GaeMarshaller implements Marshaller {
                 = AnnotationUtil
                     .getFieldWithAnnotation(GaeObjectStore.key(), instance);
 
+        AnnotationUtil.AnnotatedField objectIdField
+                = AnnotationUtil
+                .getFieldWithAnnotation(GaeObjectStore.objectId(), instance);
+
         if(ancestorField != null){
             Class<?> clazz = ancestorField.getFieldType();
             if(clazz.equals(Key.class)){
@@ -501,7 +505,27 @@ public class GaeMarshaller implements Marshaller {
             }
         }
 
-        if (idField != null){
+        if (objectIdField != null) {
+            if(parentField != null && parentField.getFieldValue() != null){
+                if(parentField.getFieldValue().getClass().equals(Key.class)){
+                    parent = (Key) parentField.getFieldValue();
+                }
+            }
+            Class<?> clazz = objectIdField.getFieldType();
+            id = objectIdField.getFieldValue();
+            if (clazz.equals(String.class)){
+                if(id !=null){
+                    key = KeyStructure.createKey(parent, kind, (String)id);
+                } else {
+                    ObjectId annotation = (ObjectId) objectIdField.annotation();
+                    Key auto = KeyStructure.createKey(parent, kind, KeyStructure.autoLongId(kind));
+                    Long autoId = auto.getId();
+                    key = KeyStructure.createKey(parent, kind, autoId);
+                }
+            } else {
+                throw new RuntimeException("Unsupported @ObjectId type " + id.getClass() + " Use String type only");
+            }
+        } else if (idField != null){
             if(parentField != null && parentField.getFieldValue() != null){
                 if(parentField.getFieldValue().getClass().equals(Key.class)){
                     parent = (Key) parentField.getFieldValue();

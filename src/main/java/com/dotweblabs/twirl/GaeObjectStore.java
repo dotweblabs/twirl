@@ -56,6 +56,10 @@ public class GaeObjectStore implements ObjectStore {
         return com.dotweblabs.twirl.annotations.Entity.class;
     }
 
+    public static Class<com.dotweblabs.twirl.annotations.ObjectId> objectId(){
+        return com.dotweblabs.twirl.annotations.ObjectId.class;
+    }
+
     public static Class<com.dotweblabs.twirl.annotations.Id> key(){
         return com.dotweblabs.twirl.annotations.Id.class;
     }
@@ -556,6 +560,7 @@ public class GaeObjectStore implements ObjectStore {
      */
     private void updateObjectKey(Key key, Object object){
         AnnotationUtil.AnnotatedField field = AnnotationUtil.getFieldWithAnnotation(key(), object);
+        AnnotationUtil.AnnotatedField objectIdField = AnnotationUtil.getFieldWithAnnotation(objectId(), object);
         if(field != null && key !=null){
             if(field.getFieldType().equals(String.class)){
                 field.setFieldValue(key.getName());
@@ -563,6 +568,13 @@ public class GaeObjectStore implements ObjectStore {
                 field.setFieldValue(key.getId());
             } else if(field.getFieldType().equals(Integer.class)){
                 throw new RuntimeException("Not yet supported");
+            }
+        } else if(objectIdField != null && key != null) {
+            if(objectIdField.getFieldType().equals(String.class)){
+                String objectId = KeyFactory.keyToString(key);
+                objectIdField.setFieldValue(objectId);
+            } else {
+                throw new RuntimeException("Only String type is supported as ObjectId");
             }
         }
     }

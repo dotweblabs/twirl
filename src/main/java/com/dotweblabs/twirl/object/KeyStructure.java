@@ -63,7 +63,12 @@ public class KeyStructure {
     }
 
 	public static Key createKey(String kind, String key) {
-		return KeyFactory.createKey(kind, key);
+        try {
+            Key decodedKey = KeyFactory.stringToKey(key);
+            return decodedKey;
+        } catch (Exception e){
+        }
+        return KeyFactory.createKey(kind, key);
 	}
 
 	public static Key createKey(Key parent, String kind, String key) {

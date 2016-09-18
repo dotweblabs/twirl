@@ -23,6 +23,7 @@
 package com.dotweblabs.twirl.gae;
 
 import com.dotweblabs.twirl.annotations.Alias;
+import com.dotweblabs.twirl.object.KeyStructure;
 import com.dotweblabs.twirl.util.PrimitiveDefaults;
 import com.dotweblabs.twirl.validation.Validator;
 import com.dotweblabs.twirl.GaeObjectStore;
@@ -208,6 +209,17 @@ public class GaeUnmarshaller implements Unmarshaller {
                 idField.setFieldValue(key.getId());
             } else {
                 throw new RuntimeException("Invalid key was retrieved with type " + idField.getFieldType());
+            }
+        }
+
+        AnnotatedField objectIdField
+                = AnnotationUtil.getFieldWithAnnotation(GaeObjectStore.objectId(), destination);
+        if(objectIdField != null) {
+            if(objectIdField.getFieldType().equals(String.class)){
+                String objectId = KeyFactory.keyToString(key);
+                objectIdField.setFieldValue(objectId);
+            } else {
+                throw new RuntimeException("Invalid ObjectId key was retrieved with type " + objectIdField.getFieldType());
             }
         }
 
