@@ -22,10 +22,11 @@
  */
 package com.dotweblabs.twirl.object;
 
-import com.google.appengine.api.datastore.*;
 import com.dotweblabs.twirl.LocalDatastoreTestBase;
+import com.google.appengine.api.datastore.*;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertNotNull;
 
 
 /**
